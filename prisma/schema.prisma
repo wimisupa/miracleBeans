@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  name      String
+  role      String   // PARENT, CHILD
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  assignedTasks Task[]   @relation("AssignedTasks")
+  createdTasks  Task[]   @relation("CreatedTasks")
+  transactions  Transaction[]
+  approvals     TaskApproval[]
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        String   // EARN, SPEND
+  points      Int
+  status      String   // PENDING, APPROVED, REJECTED, COMPLETED
+  
+  // Relations
+  creatorId   String
+  creator     Member   @relation("CreatedTasks", fields: [creatorId], references: [id])
+  assigneeId  String?
+  assignee    Member?  @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  approvals   TaskApproval[]
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  amount    Int
+  reason    String
+  
+  // Relations
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id])
+  
+  createdAt DateTime @default(now())
+}
+
+model TaskApproval {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, memberId])
+}
