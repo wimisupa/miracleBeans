@@ -21,17 +21,37 @@ const MemberContext = createContext<MemberContextType | undefined>(undefined)
 export function MemberProvider({ children }: { children: ReactNode }) {
     const [currentMember, setCurrentMember] = useState<Member | null>(null)
 
-    // Load from localStorage on mount
+    // Load from localStorage on mount and validate
     useEffect(() => {
         const saved = localStorage.getItem('miracle_po_member')
         if (saved) {
             try {
-                setCurrentMember(JSON.parse(saved))
+                const parsed = JSON.parse(saved)
+                setCurrentMember(parsed)
+                // Validate existence immediately
+                validateSession(parsed)
             } catch (e) {
                 localStorage.removeItem('miracle_po_member')
             }
         }
     }, [])
+
+    const validateSession = async (member: Member) => {
+        try {
+            const res = await fetch('/api/members')
+            const members = await res.json()
+            const exists = members.find((m: Member) => m.id === member.id)
+            if (exists) {
+                setCurrentMember(exists)
+                localStorage.setItem('miracle_po_member', JSON.stringify(exists))
+            } else {
+                console.warn('Member not found in DB, logging out')
+                logout()
+            }
+        } catch (e) {
+            console.error('Failed to validate session', e)
+        }
+    }
 
     const login = (member: Member) => {
         setCurrentMember(member)
@@ -41,21 +61,13 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     const logout = () => {
         setCurrentMember(null)
         localStorage.removeItem('miracle_po_member')
+        // Optional: Redirect to home or refresh
+        window.location.href = '/'
     }
 
     const refreshMember = async () => {
         if (!currentMember) return
-        try {
-            const res = await fetch('/api/members')
-            const members = await res.json()
-            const updated = members.find((m: Member) => m.id === currentMember.id)
-            if (updated) {
-                setCurrentMember(updated)
-                localStorage.setItem('miracle_po_member', JSON.stringify(updated))
-            }
-        } catch (e) {
-            console.error('Failed to refresh member', e)
-        }
+        await validateSession(currentMember)
     }
 
     return (
