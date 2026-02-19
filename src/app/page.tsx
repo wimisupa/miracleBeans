@@ -1,22 +1,36 @@
+'use client'
+
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { prisma } from '@/lib/prisma'
 import { Plus, Trophy, ClipboardList, Sparkles, Sprout } from 'lucide-react'
+import { useMember } from '@/context/MemberContext'
+import { useRouter } from 'next/navigation'
 
-// Revalidate frequently to show updated points/tasks
-export const revalidate = 0
-
-async function getData() {
-  const members = await prisma.member.findMany({
-    orderBy: { createdAt: 'asc' },
-  })
-  const pendingCount = await prisma.task.count({
-    where: { status: 'PENDING' }
-  })
-  return { members, pendingCount }
+type Member = {
+  id: string
+  name: string
+  role: string
+  points: number
+  pin: string
 }
 
-export default async function Home() {
-  const { members, pendingCount } = await getData()
+export default function Home() {
+  const router = useRouter()
+  const { currentMember } = useMember()
+  const [members, setMembers] = useState<Member[]>([])
+  const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/members').then(res => res.json()).then(data => setMembers(data))
+    fetch('/api/tasks').then(res => res.json()).then(tasks => {
+      setPendingCount(tasks.filter((t: any) => t.status === 'PENDING').length)
+    })
+  }, [])
+
+  const handleMemberClick = (member: Member) => {
+    // Navigate directly to history regardless of user
+    router.push(`/history/${member.id}`)
+  }
 
   return (
     <main>
@@ -101,11 +115,17 @@ export default async function Home() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
             {members.map((member) => (
-              <Link href={`/history/${member.id}`} key={member.id} className="card" style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
-                textDecoration: 'none', color: 'inherit', cursor: 'pointer',
-                padding: '1.5rem 1rem', marginBottom: 0
-              }}>
+              <div
+                key={member.id}
+                className="card"
+                onClick={() => handleMemberClick(member)}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
+                  textDecoration: 'none', color: 'inherit', cursor: 'pointer',
+                  padding: '1.5rem 1rem', marginBottom: 0,
+                  border: 'none',
+                  background: 'white'
+                }}>
                 <div
                   style={{
                     width: '64px',
@@ -122,7 +142,9 @@ export default async function Home() {
                 >
                   {member.role === 'PARENT' ? '👑' : '🌱'}
                 </div>
-                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: '#37474F' }}>{member.name}</h3>
+                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: '#37474F' }}>
+                  {member.name}
+                </h3>
                 <div style={{
                   fontSize: '1.25rem', fontWeight: '900',
                   color: 'var(--color-secondary)',
@@ -132,7 +154,9 @@ export default async function Home() {
                 }}>
                   {member.points.toLocaleString()} 콩
                 </div>
-              </Link>
+
+
+              </div>
             ))}
           </div>
         )}

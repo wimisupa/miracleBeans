@@ -405,32 +405,7 @@ export default function NewTaskPage() {
                     </form>
                 ) : (
                     <form onSubmit={handleSubmit}>
-                        {/* 1. Who? (Read-only) */}
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label className="label">누구인가요?</label>
-                            <div style={{
-                                padding: '1rem',
-                                background: 'rgba(255,255,255,0.5)',
-                                borderRadius: '16px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1rem',
-                                fontWeight: 'bold',
-                                border: '1px solid rgba(255,255,255,0.6)'
-                            }}>
-                                <div style={{
-                                    width: '44px', height: '44px',
-                                    background: currentMember.role === 'PARENT' ? '#FFECB3' : '#B2DFDB',
-                                    borderRadius: '50%',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: '#37474F',
-                                    fontSize: '1.2rem'
-                                }}>
-                                    <span>{currentMember.name[0]}</span>
-                                </div>
-                                <span style={{ color: '#37474F' }}>{currentMember.name}</span>
-                            </div>
-                        </div>
+
 
                         {/* 3. What? */}
                         <div style={{ marginBottom: '1rem' }}>

@@ -8,10 +8,15 @@ export default function Register() {
     const router = useRouter()
     const [name, setName] = useState('')
     const [role, setRole] = useState<'PARENT' | 'CHILD'>('CHILD') // Default to child
+    const [pin, setPin] = useState('')
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (pin.length !== 4) {
+            alert('비밀번호 4자리를 입력해주세요.')
+            return
+        }
         setLoading(true)
 
         try {
@@ -20,7 +25,7 @@ export default function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, role }),
+                body: JSON.stringify({ name, role, pin }),
             })
 
             if (res.ok) {
@@ -118,6 +123,25 @@ export default function Register() {
                                 <span>부모님</span>
                             </button>
                         </div>
+                    </div>
+
+                    <div style={{ marginBottom: '2.5rem' }}>
+                        <label className="label">비밀번호 설정</label>
+                        <p style={{ color: '#90A4AE', fontSize: '0.9rem', marginBottom: '0.5rem' }}>로그인할 때 사용할 4자리 숫자를 입력하세요.</p>
+                        <input
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={4}
+                            className="input"
+                            value={pin}
+                            onChange={(e) => {
+                                const val = e.target.value.replace(/[^0-9]/g, '')
+                                if (val.length <= 4) setPin(val)
+                            }}
+                            placeholder="0000"
+                            required
+                            style={{ letterSpacing: '4px', fontWeight: 'bold', textAlign: 'center' }}
+                        />
                     </div>
 
                     <button

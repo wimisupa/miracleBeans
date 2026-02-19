@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, role } = body
+        const { name, role, pin } = body
 
         if (!name || !role) {
             return NextResponse.json({ error: 'Name and role are required' }, { status: 400 })
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
             data: {
                 name,
                 role,
+                pin: pin || '0000',
                 points: 0, // Start with 0 points
             },
         })

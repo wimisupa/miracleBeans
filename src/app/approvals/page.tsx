@@ -98,18 +98,7 @@ export default function ApprovalsPage() {
                     <Clock size={28} />
                     <span>승인 대기열</span>
                 </div>
-                {currentMember && (
-                    <div style={{
-                        fontSize: '0.9rem',
-                        color: '#37474F',
-                        background: 'rgba(255,255,255,0.5)',
-                        padding: '4px 12px',
-                        borderRadius: '20px',
-                        backdropFilter: 'blur(4px)'
-                    }}>
-                        {currentMember.name}
-                    </div>
-                )}
+
             </header>
 
             {loading ? (

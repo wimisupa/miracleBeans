@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useMember } from '@/context/MemberContext'
 import { Sprout } from 'lucide-react'
 import Link from 'next/link'
+import LoginModal from './LoginModal'
 
 type Member = {
     id: string
@@ -16,6 +17,7 @@ export default function LoginScreen() {
     const { login } = useMember()
     const [members, setMembers] = useState<Member[]>([])
     const [loading, setLoading] = useState(true)
+    const [selectedMember, setSelectedMember] = useState<Member | null>(null)
 
     useEffect(() => {
         fetch('/api/members')
@@ -24,6 +26,10 @@ export default function LoginScreen() {
             .catch(err => console.error(err))
             .finally(() => setLoading(false))
     }, [])
+
+    const handleMemberClick = (member: Member) => {
+        setSelectedMember(member)
+    }
 
     if (loading) return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', gap: '1rem' }}>
@@ -63,7 +69,7 @@ export default function LoginScreen() {
                 {members.map(member => (
                     <button
                         key={member.id}
-                        onClick={() => login(member)}
+                        onClick={() => handleMemberClick(member)}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -117,6 +123,12 @@ export default function LoginScreen() {
                     </div>
                 )}
             </div>
+
+            <LoginModal
+                isOpen={!!selectedMember}
+                onClose={() => setSelectedMember(null)}
+                member={selectedMember}
+            />
         </div>
     )
 }
