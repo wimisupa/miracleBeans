@@ -38,7 +38,7 @@ body {
   background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 50%, #FFF9C4 100%);
   background-attachment: fixed;
   color: var(--color-text-main);
-  font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  font-family: var(--font-outfit), Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   line-height: 1.6;
   min-height: 100vh;
 }
@@ -159,15 +159,16 @@ button {
 }
 
 .logo {
-  font-size: 1.6rem;
-  font-weight: 900;
-  background: linear-gradient(45deg, #FFB300, #FF6F00);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-family: var(--font-fredoka), sans-serif;
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: #263238;
+  /* Soft Dark Blue-Grey */
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  filter: drop-shadow(0 2px 2px rgba(255, 160, 0, 0.2));
+  gap: 0.5rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 /* Animations */

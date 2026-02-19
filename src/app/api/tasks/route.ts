@@ -45,6 +45,7 @@ export async function POST(request: Request) {
                 points,
                 status: 'PENDING', // Always starts as pending
                 creatorId,
+                assigneeId: type === 'TATTLE' ? body.targetMemberId : undefined,
             },
         })
 

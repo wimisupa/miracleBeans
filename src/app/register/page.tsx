@@ -46,7 +46,7 @@ export default function Register() {
                 </button>
                 <div className="logo" style={{ flex: 1, justifyContent: 'center', paddingRight: '28px' }}>
                     <Sprout size={28} />
-                    <span>위미콩 가족 등록</span>
+                    <span>Wime Bean Family</span>
                 </div>
             </header>
 

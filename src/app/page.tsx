@@ -21,9 +21,9 @@ export default async function Home() {
   return (
     <main>
       <header className="header">
-        <div className="logo floating">
-          <Sprout size={32} />
-          <span>위미콩</span>
+        <div className="logo">
+          <Sprout size={28} />
+          <span>Wimi Bean</span>
         </div>
       </header>
 

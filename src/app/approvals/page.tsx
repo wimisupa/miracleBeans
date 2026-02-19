@@ -10,8 +10,9 @@ type Task = {
     id: string
     title: string
     points: number
-    type: 'EARN' | 'SPEND'
+    type: 'EARN' | 'SPEND' | 'TATTLE'
     creator: { id: string; name: string }
+    assigneeId?: string
     createdAt: string
     approvals: { member: { id: string; name: string } }[]
 }
@@ -125,7 +126,12 @@ export default function ApprovalsPage() {
                         const alreadyApproved = task.approvals.some(a => a.member.id === currentMember?.id)
 
                         // Who needs to approve? Everyone except creator.
-                        const requiredApprovers = allMembers.filter(m => m.id !== task.creator.id)
+                        // If TATTLE, also exclude assignee (target).
+                        const requiredApprovers = allMembers.filter(m => {
+                            if (m.id === task.creator.id) return false;
+                            if (task.type === 'TATTLE' && m.id === task.assigneeId) return false;
+                            return true;
+                        })
 
                         return (
                             <div key={task.id} className="card">
@@ -144,7 +150,7 @@ export default function ApprovalsPage() {
                                         </div>
                                     </div>
 
-                                    {!isCreator && !alreadyApproved && (
+                                    {!isCreator && !alreadyApproved && !(task.type === 'TATTLE' && currentMember?.id === task.assigneeId) && (
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
                                                 onClick={() => handleAction(task.id, 'APPROVE')}

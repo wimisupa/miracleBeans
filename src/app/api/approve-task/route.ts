@@ -48,15 +48,34 @@ export async function POST(request: Request) {
 
                 // Check consensus
                 const approvalCount = await tx.taskApproval.count({ where: { taskId: id } })
-                // Required: Everyone except the creator
-                const required = totalMembers > 1 ? totalMembers - 1 : 1
+
+                // Required: Everyone except the creator (and target if Tattle)
+                let required = totalMembers > 1 ? totalMembers - 1 : 1;
+
+                if (task.type === 'TATTLE') {
+                    // Exclude Creator (Accuser) AND Assignee (Target)
+                    // If totalMembers <= 2, then required is 1 (minimum 1 judge needed)
+                    required = totalMembers > 2 ? totalMembers - 2 : 1;
+                }
 
                 if (approvalCount >= required) {
-                    // Finalize
-                    const pointChange = task.type === 'EARN' ? task.points : -task.points
+                    // Finalize based on Task Type
+                    let pointChange = 0;
+                    let targetMemberId = task.creatorId;
+
+                    if (task.type === 'EARN') {
+                        pointChange = task.points;
+                    } else if (task.type === 'SPEND') {
+                        pointChange = -task.points;
+                    } else if (task.type === 'TATTLE') {
+                        pointChange = -task.points; // Penalty
+                        if (task.assigneeId) {
+                            targetMemberId = task.assigneeId; // Deduct from the accused
+                        }
+                    }
 
                     await tx.member.update({
-                        where: { id: task.creatorId },
+                        where: { id: targetMemberId },
                         data: { points: { increment: pointChange } }
                     })
 
@@ -64,7 +83,7 @@ export async function POST(request: Request) {
                         data: {
                             amount: pointChange,
                             reason: task.title,
-                            memberId: task.creatorId,
+                            memberId: targetMemberId,
                         }
                     })
 

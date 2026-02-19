@@ -44,9 +44,9 @@ export default function LoginScreen() {
             <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                 <div className="logo floating" style={{ justifyContent: 'center', marginBottom: '0.5rem', fontSize: '2.5rem' }}>
                     <Sprout size={48} />
-                    <span>위미콩</span>
+                    <span>Wimi Bean</span>
                 </div>
-                <p style={{ color: '#546E7A', fontSize: '1.1rem' }}>오늘도 행복한 하루 되세요! 🌱</p>
+                <p style={{ color: '#546E7A', fontSize: '1.1rem', fontFamily: 'var(--font-outfit)' }}>Happy Bean, Happy Family! 🌱</p>
             </div>
 
             <div className="glass-panel" style={{
