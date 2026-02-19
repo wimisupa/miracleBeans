@@ -34,11 +34,45 @@ export default function Home() {
 
   return (
     <main>
-      <header className="header">
+      <header className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="logo">
           <Sprout size={28} />
           <span>Wimi Bean</span>
         </div>
+        {currentMember && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '6px 12px',
+              background: 'rgba(255,255,255,0.6)',
+              borderRadius: '20px',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255,255,255,0.5)'
+            }}>
+              <span style={{ fontSize: '0.9rem', color: '#37474F' }}>
+                <span style={{ fontWeight: 'bold' }}>{currentMember.name}</span>님
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                if (confirm('로그아웃 하시겠습니까?')) {
+                  // Logout logic (clearing local storage & refresh)
+                  localStorage.removeItem('miracle_po_member');
+                  location.reload();
+                }
+              }}
+              style={{
+                background: 'rgba(255,255,255,0.6)',
+                borderRadius: '50%',
+                width: '36px', height: '36px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#FF5252'
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
+          </div>
+        )}
       </header>
 
       <section className="glass-panel" style={{ borderRadius: '24px', padding: '2rem', marginBottom: '2rem', textAlign: 'center' }}>
