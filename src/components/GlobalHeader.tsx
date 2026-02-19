@@ -26,6 +26,7 @@ export default function GlobalHeader() {
 
     return (
         <>
+            <GlobalHeaderStyle />
             <div style={{
                 position: 'fixed',
                 top: '1rem',
@@ -35,7 +36,7 @@ export default function GlobalHeader() {
                 gap: '0.5rem',
                 zIndex: 1000
             }}>
-                <div style={{
+                <div className="user-badge" style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
@@ -52,11 +53,12 @@ export default function GlobalHeader() {
                         borderRadius: '50%',
                         background: currentMember.role === 'PARENT' ? '#FFD54F' : '#4DB6AC',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'white', fontWeight: 'bold', fontSize: '0.8rem'
+                        color: 'white', fontWeight: 'bold', fontSize: '0.8rem',
+                        flexShrink: 0
                     }}>
                         {currentMember.name[0]}
                     </div>
-                    <span style={{ fontSize: '0.9rem', color: '#37474F', fontWeight: 'bold' }}>
+                    <span className="user-name" style={{ fontSize: '0.9rem', color: '#37474F', fontWeight: 'bold' }}>
                         {currentMember.name}
                     </span>
                 </div>
@@ -141,5 +143,20 @@ export default function GlobalHeader() {
 
 
         </>
+    )
+}
+
+function GlobalHeaderStyle() {
+    return (
+        <style jsx global>{`
+            @media (max-width: 480px) {
+                .user-name {
+                    display: none;
+                }
+                .user-badge {
+                    padding-right: 6px !important;
+                }
+            }
+        `}</style>
     )
 }
