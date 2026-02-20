@@ -1,0 +1,27 @@
+{
+    "name": "위미콩 (Wimi Bean)",
+    "short_name": "위미콩",
+    "description": "우리 가족 포인트 관리 앱 - 모두 함께 행복한 위미!",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#E0F2F1",
+    "theme_color": "#FFD54F",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
