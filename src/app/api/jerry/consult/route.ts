@@ -12,7 +12,10 @@ export async function POST(request: Request) {
 
         const verdict = await askJerry(description, type)
         return NextResponse.json(verdict)
-    } catch (error) {
+    } catch (error: any) {
+        if (error?.message === 'RATE_LIMIT_EXCEEDED') {
+            return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
+        }
         return NextResponse.json({ error: 'Jerry is sleeping' }, { status: 500 })
     }
 }

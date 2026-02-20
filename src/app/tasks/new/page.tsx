@@ -32,6 +32,14 @@ export default function NewTaskPage() {
     // Jerry Thinking State
     const [isJerryThinking, setIsJerryThinking] = useState(false)
     const [thinkingMessage, setThinkingMessage] = useState('')
+    const [cooldown, setCooldown] = useState(0)
+
+    useEffect(() => {
+        if (cooldown > 0) {
+            const timer = setTimeout(() => setCooldown(c => c - 1), 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [cooldown])
 
     const thinkingMessages = [
         "제리가 법전을 뒤적이는 중... 📚",
@@ -85,7 +93,7 @@ export default function NewTaskPage() {
     // --- Handlers ---
 
     const handleAskJerry = async () => {
-        if (!description) return
+        if (!description || cooldown > 0) return
 
         setIsJerryThinking(true)
         setJerryVerdict(null) // Clear previous verdict
@@ -95,6 +103,14 @@ export default function NewTaskPage() {
                 method: 'POST',
                 body: JSON.stringify({ description, type })
             })
+
+            if (res.status === 429) {
+                alert('앗, 제리가 지금 밀린 일들을 처리하느라 너무 바빠요! 🐹💦\\n잠시 유배를 다녀올게요. 30초 뒤에 다시 시도해주세요.')
+                setCooldown(30)
+                setIsJerryThinking(false)
+                return
+            }
+
             const data = await res.json()
             setJerryVerdict(data)
         } catch (e) {
@@ -345,13 +361,14 @@ export default function NewTaskPage() {
                                         minWidth: '80px',
                                         padding: '0 16px',
                                         borderRadius: '12px',
-                                        background: isJerryThinking ? '#B0BEC5' : 'linear-gradient(135deg, #FF5252 0%, #E53935 100%)',
+                                        background: (isJerryThinking || cooldown > 0) ? '#B0BEC5' : 'linear-gradient(135deg, #FF5252 0%, #E53935 100%)',
                                         color: 'white',
-                                        cursor: isJerryThinking ? 'not-allowed' : 'pointer'
+                                        cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
+                                        opacity: (isJerryThinking || cooldown > 0) ? 0.7 : 1
                                     }}
-                                    disabled={isJerryThinking}
+                                    disabled={isJerryThinking || cooldown > 0}
                                 >
-                                    {isJerryThinking ? '...' : '심판!'}
+                                    {isJerryThinking ? '...' : cooldown > 0 ? `${cooldown}초 대기` : '심판!'}
                                 </button>
                             </div>
                         </div>
@@ -429,12 +446,13 @@ export default function NewTaskPage() {
                                         minWidth: '80px',
                                         padding: '0 16px',
                                         borderRadius: '12px',
-                                        background: isJerryThinking ? '#B0BEC5' : 'var(--color-primary)',
-                                        cursor: isJerryThinking ? 'not-allowed' : 'pointer'
+                                        background: (isJerryThinking || cooldown > 0) ? '#B0BEC5' : 'var(--color-primary)',
+                                        cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
+                                        opacity: (isJerryThinking || cooldown > 0) ? 0.7 : 1
                                     }}
-                                    disabled={isJerryThinking}
+                                    disabled={isJerryThinking || cooldown > 0}
                                 >
-                                    {isJerryThinking ? '...' : '제리?'}
+                                    {isJerryThinking ? '...' : cooldown > 0 ? `${cooldown}초 대기` : '제리?'}
                                 </button>
                             </div>
                         </div>

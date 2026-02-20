@@ -9,10 +9,7 @@ interface JerryVerdict {
 }
 
 export async function askJerry(description: string, type: 'EARN' | 'SPEND' | 'TATTLE' | 'GIFT'): Promise<JerryVerdict> {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-        const prompt = `
+    const prompt = `
         You are 'Judge Jerry', a witty, fair, but slightly sarcastic hamster judge for a family point system.
         
         Current Request Type: ${type}
@@ -32,21 +29,45 @@ export async function askJerry(description: string, type: 'EARN' | 'SPEND' | 'TA
             "comment": "One sentence witty remark in Korean",
             "emoji": "Relevant emoji"
         }
-        `;
+    `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+    const maxRetries = 2;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            // Using 2.5-flash as the standard fast model
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
 
-        // Clean up markdown code blocks if present
-        const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const verdict = JSON.parse(jsonStr);
+            // Clean up markdown code blocks if present
+            const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            const verdict = JSON.parse(jsonStr);
 
-        return verdict;
+            return verdict;
 
-    } catch (error) {
-        console.error("Jerry Brain Error:", error);
-        // Fallback if API fails
-        return { points: 100, comment: '제리가 잠들었어요... (AI 연결 실패)', emoji: '😴' };
+        } catch (error: any) {
+            console.error(`Jerry Brain Error (Attempt ${attempt + 1}):`, error.message || error);
+
+            const isRateLimit = error?.status === 429 || error?.message?.includes("Quota exceeded") || error?.message?.includes("429");
+
+            if (isRateLimit) {
+                if (attempt < maxRetries) {
+                    const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500; // Exponential backoff + jitter
+                    console.warn(`[Jerry AI] Rate limited. Retrying in ${Math.round(delay)}ms...`);
+                    await new Promise(res => setTimeout(res, delay));
+                    continue;
+                } else {
+                    console.error("[Jerry AI] Max retries reached for Rate Limit.");
+                    throw new Error("RATE_LIMIT_EXCEEDED");
+                }
+            }
+
+            // For parsing errors or other non-rate-limit failures, fallback immediately
+            return { points: 100, comment: '음... 판례집을 잃어버렸어요. 기본 점수를 드릴게요.', emoji: '😵‍💫' };
+        }
     }
+
+    // Fallback if loop exits (shouldn't happen)
+    return { points: 100, comment: '제리가 잠들었어요... (연결 실패)', emoji: '😴' };
 }
