@@ -130,12 +130,12 @@ export default function Home() {
         <h1 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: '800', color: '#37474F' }}>우리 가족의 행복한 위미!</h1>
         <p style={{ color: '#607D8B', marginBottom: '1.5rem' }}>서로 돕고 사랑하며 콩을 모아보세요 🌱</p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
           <Link href="/tasks/new" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', color: 'inherit', border: 'none',
             background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0
+            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
           }}>
             <div style={{
               background: 'var(--color-primary)',
@@ -146,14 +146,14 @@ export default function Home() {
             }}>
               <ListTodo size={28} color="white" />
             </div>
-            <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>할 일</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>할 일</span>
           </Link>
 
           <Link href="/approvals" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', color: 'inherit', position: 'relative',
             background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0
+            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
           }}>
             {pendingCount > 0 && (
               <span style={{
@@ -176,14 +176,14 @@ export default function Home() {
             }}>
               <ClipboardList size={28} color="white" />
             </div>
-            <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>승인 대기열</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>승인 대기열</span>
           </Link>
 
           <Link href="/routines" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', color: 'inherit', border: 'none',
             background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0
+            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
           }}>
             <div style={{
               background: 'var(--color-primary)', // changed from secondary to primary or a new color
@@ -194,7 +194,7 @@ export default function Home() {
             }}>
               <Calendar size={28} color="white" />
             </div>
-            <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>루틴 관리</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>루틴 관리</span>
           </Link>
         </div>
 
