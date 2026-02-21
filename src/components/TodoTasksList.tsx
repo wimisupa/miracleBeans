@@ -49,11 +49,14 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
             }
 
             if (Array.isArray(routinesData)) {
-                unifiedList = [...unifiedList, ...routinesData.map(r => ({
+                unifiedList = [...unifiedList, ...routinesData.map((r: any) => ({
                     ...r,
                     isRoutine: true
                 }))]
             }
+
+            // Filter out completed routines as requested
+            unifiedList = unifiedList.filter(item => !item.isCompletedDaily)
 
             setItems(unifiedList)
         } catch (e) {
@@ -161,9 +164,17 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                                 {item.isCompletedDaily ? '완료 🎉' : (item.type === 'EARN' ? <><Check size={16} /> 완료</> : <><Timer size={16} /> 시작</>)}
                             </button>
                         ) : (
-                            <Link href={`/tasks/${item.id}/execute`} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px', border: 'none', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                            <button
+                                onClick={() => router.push(`/tasks/${item.id}/execute`)}
+                                className="btn btn-primary"
+                                style={{
+                                    padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px',
+                                    border: 'none', display: 'flex', gap: '4px', alignItems: 'center',
+                                    fontFamily: 'inherit'
+                                }}
+                            >
                                 <Timer size={16} /> 시작
-                            </Link>
+                            </button>
                         )
                     )}
                 </div>
