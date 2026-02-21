@@ -151,19 +151,18 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                             <button
                                 disabled={item.isCompletedDaily}
                                 onClick={() => handleRoutineClick(item)}
-                                className="btn btn-primary"
+                                className={item.isCompletedDaily ? "btn" : "btn btn-primary"}
                                 style={{
                                     padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px',
-                                    background: item.isCompletedDaily ? '#B0BEC5' : 'var(--color-primary)',
-                                    border: 'none', display: 'flex', gap: '4px', alignItems: 'center'
+                                    border: 'none', display: 'flex', gap: '4px', alignItems: 'center',
+                                    ...(item.isCompletedDaily ? { background: '#B0BEC5', color: 'white', boxShadow: 'none' } : {})
                                 }}
                             >
                                 {item.isCompletedDaily ? '완료 🎉' : (item.type === 'EARN' ? <><Check size={16} /> 완료</> : <><Timer size={16} /> 시작</>)}
                             </button>
                         ) : (
                             <Link href={`/tasks/${item.id}/execute`} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px', border: 'none', display: 'flex', gap: '4px', alignItems: 'center' }}>
-                                <Timer size={16} />
-                                시작
+                                <Timer size={16} /> 시작
                             </Link>
                         )
                     )}
