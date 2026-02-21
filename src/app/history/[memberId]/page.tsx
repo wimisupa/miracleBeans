@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, History, TrendingUp, TrendingDown, Sprout } from 'lucide-react'
+import TodoTasksList from '@/components/TodoTasksList'
 
 type Transaction = {
     id: string
@@ -63,6 +64,17 @@ export default function HistoryPage() {
             </header>
 
             <main className="container" style={{ padding: 0 }}>
+                {/* ⏳ Todo Tasks Section */}
+                <section style={{ padding: '1.5rem 1rem', background: 'rgba(255,255,255,0.7)', borderRadius: '24px', marginBottom: '1rem' }}>
+                    <h2 style={{ fontSize: '1.1rem', color: '#455A64', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '20px' }}>⏳</span> 해야 할 일
+                    </h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                        <TodoTasksList memberId={memberId} hideStartButton={true} />
+                    </div>
+                </section>
+
+                <h2 style={{ fontSize: '1.1rem', color: '#455A64', padding: '0 1rem', marginBottom: '1rem', marginTop: '1rem' }}>히스토리</h2>
                 {loading ? (
                     <div style={{ textAlign: 'center', padding: '2rem' }}>로딩 중...</div>
                 ) : transactions.length === 0 ? (
@@ -71,7 +83,7 @@ export default function HistoryPage() {
                         <p>아직 콩 기록이 없어요.<br />첫 수확을 기다려보세요! 🌱</p>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '0 1rem' }}>
                         {transactions.map(tx => (
                             <div key={tx.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

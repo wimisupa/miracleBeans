@@ -13,6 +13,7 @@ export async function GET(request: Request) {
             where: status ? { status: status } : undefined,
             include: {
                 creator: true,
+                assignee: true,
                 approvals: {
                     include: {
                         member: true
@@ -31,10 +32,17 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { title, description, type, points, creatorId } = body
+        const { title, description, type, points, creatorId, durationMinutes, routineId } = body
 
         if (!title || !points || !creatorId || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+        }
+
+        // Validate HOURGLASS required fields
+        if (type === 'HOURGLASS') {
+            if (durationMinutes === undefined) {
+                return NextResponse.json({ error: 'HOURGLASS tasks require durationMinutes' }, { status: 400 })
+            }
         }
 
         const task = await prisma.task.create({
@@ -43,9 +51,11 @@ export async function POST(request: Request) {
                 description,
                 type,
                 points,
-                status: 'PENDING', // Always starts as pending
+                status: type === 'HOURGLASS' ? 'TODO' : 'PENDING', // HOURGLASS starts as TODO, others PENDING
                 creatorId,
-                assigneeId: type === 'TATTLE' ? body.targetMemberId : undefined,
+                assigneeId: type === 'TATTLE' || type === 'HOURGLASS' ? body.targetMemberId || creatorId : undefined,
+                durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,
+                routineId: routineId || undefined,
             },
         })
 

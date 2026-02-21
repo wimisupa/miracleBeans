@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Sparkles, ArrowRight, Sprout, Gift, ChevronLeft, Coins, Siren } from 'lucide-react'
+import { ArrowRight, Sprout, Gift, ChevronLeft, Coins, Siren, ListTodo, Timer } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = {
@@ -17,14 +17,19 @@ export default function NewTaskPage() {
     const { currentMember, refreshMember } = useMember()
 
     // Joint state
-    const [type, setType] = useState<'EARN' | 'SPEND' | 'GIFT' | 'TATTLE'>('EARN')
+    const [activeTab, setActiveTab] = useState<'TASK' | 'SPEND' | 'GIFT' | 'TATTLE'>('TASK')
+    const [type, setType] = useState<'EARN' | 'HOURGLASS' | 'SPEND' | 'GIFT' | 'TATTLE'>('EARN')
     const [loading, setLoading] = useState(false)
     const [description, setDescription] = useState('')
+
+    // Hourglass specific state
+    const [durationMinutes, setDurationMinutes] = useState<number | ''>('')
 
     // Gift specific state
     const [receiverId, setReceiverId] = useState('')
     const [amount, setAmount] = useState(0)
     const [otherMembers, setOtherMembers] = useState<Member[]>([])
+    const [familyMembers, setFamilyMembers] = useState<Member[]>([])
 
     // Task specific state
     const [jerryVerdict, setJerryVerdict] = useState<{ points: number, comment: string, emoji: string } | null>(null)
@@ -79,14 +84,19 @@ export default function NewTaskPage() {
             refreshMember()
         }
 
-        if ((type === 'GIFT' || type === 'TATTLE') && currentMember) {
+        if ((type === 'GIFT' || type === 'TATTLE' || type === 'HOURGLASS') && currentMember) {
             fetch('/api/members')
                 .then(res => res.json())
                 .then((data: Member[]) => {
                     setOtherMembers(data.filter(m => m.id !== currentMember.id))
+                    setFamilyMembers(data)
+                    // If HOURGLASS and no receiverId is set, default to currentMember
+                    if (type === 'HOURGLASS' && !receiverId) {
+                        setReceiverId(currentMember.id)
+                    }
                 })
         }
-    }, [type, currentMember?.id])
+    }, [type, currentMember?.id, receiverId])
 
     if (!currentMember) return null
 
@@ -101,7 +111,8 @@ export default function NewTaskPage() {
         try {
             const res = await fetch('/api/jerry/consult', {
                 method: 'POST',
-                body: JSON.stringify({ description, type })
+                // Jerry evaluates HOURGLASS just like EARN
+                body: JSON.stringify({ description, type: type === 'HOURGLASS' ? 'EARN' : type })
             })
 
             if (res.status === 429) {
@@ -125,6 +136,11 @@ export default function NewTaskPage() {
         e.preventDefault()
         if (!jerryVerdict) return
 
+        if (type === 'HOURGLASS' && (!durationMinutes || !receiverId)) {
+            alert('담당자 및 진행 시간을 모두 입력해주세요.')
+            return
+        }
+
         setLoading(true)
         try {
             const res = await fetch('/api/tasks', {
@@ -136,7 +152,8 @@ export default function NewTaskPage() {
                     type,
                     points: jerryVerdict.points,
                     creatorId: currentMember.id,
-                    targetMemberId: type === 'TATTLE' ? receiverId : undefined
+                    targetMemberId: (type === 'TATTLE' || type === 'HOURGLASS') ? receiverId : undefined,
+                    durationMinutes: type === 'HOURGLASS' ? Number(durationMinutes) : undefined
                 }),
             })
 
@@ -194,15 +211,15 @@ export default function NewTaskPage() {
                 </Link>
                 <div className="logo" style={{ flex: 1 }}>
                     <Sprout size={28} />
-                    <span>{type === 'GIFT' ? '콩 선물하기' : type === 'TATTLE' ? '제리에게 이르기' : '새로운 활동'}</span>
+                    <span>{activeTab === 'GIFT' ? '콩 선물하기' : activeTab === 'TATTLE' ? '제리에게 이르기' : '할 일'}</span>
                 </div>
             </header>
 
             <div className="card">
-                {/* Mode Selection */}
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '6px', borderRadius: '20px' }}>
+                {/* Top Level Mode Selection */}
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', background: 'rgba(255,255,255,0.5)', padding: '6px', borderRadius: '20px', overflowX: 'auto' }}>
                     {([
-                        { id: 'EARN', icon: <Coins size={16} />, label: '모으기' },
+                        { id: 'TASK', icon: <ListTodo size={16} />, label: '할 일' },
                         { id: 'SPEND', icon: <ArrowRight size={16} />, label: '쓰기' },
                         { id: 'GIFT', icon: <Gift size={16} />, label: '선물' },
                         { id: 'TATTLE', icon: <Siren size={16} />, label: '이르기' }
@@ -210,22 +227,27 @@ export default function NewTaskPage() {
                         <button
                             key={mode.id}
                             onClick={() => {
-                                setType(mode.id as any);
+                                setActiveTab(mode.id as any);
+                                setType(mode.id === 'TASK' ? 'EARN' : mode.id as any);
                                 setJerryVerdict(null);
                                 setDescription('');
+                                setDurationMinutes('');
                             }}
                             style={{
                                 flex: 1,
-                                padding: '10px 0',
+                                minWidth: '70px',
+                                padding: '10px 4px',
                                 borderRadius: '16px',
                                 border: 'none',
-                                background: type === mode.id ? 'white' : 'transparent',
-                                color: type === mode.id ? 'var(--color-primary)' : '#607D8B',
+                                background: activeTab === mode.id ? 'white' : 'transparent',
+                                color: activeTab === mode.id ? 'var(--color-primary)' : '#607D8B',
                                 fontWeight: 'bold',
-                                boxShadow: type === mode.id ? '0 4px 10px rgba(0,0,0,0.05)' : 'none',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                                fontSize: '0.9rem',
+                                boxShadow: activeTab === mode.id ? '0 4px 10px rgba(0,0,0,0.05)' : 'none',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                                 transition: 'all 0.2s',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap'
                             }}
                         >
                             {mode.icon}
@@ -233,6 +255,40 @@ export default function NewTaskPage() {
                         </button>
                     ))}
                 </div>
+
+                {/* Sub-selector for TASK (EARN vs HOURGLASS) */}
+                {activeTab === 'TASK' && (
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', padding: '4px', background: 'rgba(0,0,0,0.03)', borderRadius: '16px' }}>
+                        <button
+                            type="button"
+                            onClick={() => { setType('EARN'); setJerryVerdict(null); }}
+                            style={{
+                                flex: 1, padding: '8px', borderRadius: '12px', border: 'none',
+                                background: type === 'EARN' ? 'var(--color-secondary)' : 'transparent',
+                                color: type === 'EARN' ? 'white' : '#607D8B',
+                                fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer',
+                                transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                            }}
+                        >
+                            <Coins size={16} />
+                            모으기 (즉시)
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setType('HOURGLASS'); setJerryVerdict(null); }}
+                            style={{
+                                flex: 1, padding: '8px', borderRadius: '12px', border: 'none',
+                                background: type === 'HOURGLASS' ? 'var(--color-primary)' : 'transparent',
+                                color: type === 'HOURGLASS' ? 'white' : '#607D8B',
+                                fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer',
+                                transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                            }}
+                        >
+                            <Timer size={16} />
+                            모래시계 (타이머)
+                        </button>
+                    </div>
+                )}
 
                 {type === 'GIFT' ? (
                     <form onSubmit={handleTransfer}>
@@ -424,10 +480,59 @@ export default function NewTaskPage() {
                     <form onSubmit={handleSubmit}>
 
 
+                        {/* 2. Who (HOURGLASS ONLY) */}
+                        {type === 'HOURGLASS' && (
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label className="label">누가 할 건가요?</label>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '0.5rem' }}>
+                                    {familyMembers.map(m => (
+                                        <div
+                                            key={m.id}
+                                            onClick={() => setReceiverId(m.id)}
+                                            style={{
+                                                padding: '0.8rem',
+                                                borderRadius: '16px',
+                                                border: receiverId === m.id ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.5)',
+                                                background: receiverId === m.id ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
+                                                color: receiverId === m.id ? 'white' : '#37474F',
+                                                textAlign: 'center',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
+                                            <div style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>
+                                                {m.role === 'PARENT' ? '👑' : '🌱'}
+                                            </div>
+                                            {m.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 3. When & How Long (HOURGLASS ONLY) */}
+                        {type === 'HOURGLASS' && (
+                            <div style={{ marginBottom: '1rem', background: 'rgba(255,255,255,0.6)', padding: '1rem', borderRadius: '16px' }}>
+                                <div>
+                                    <label className="label">얼마나 할 예정인가요? (분)</label>
+                                    <input
+                                        type="number"
+                                        className="input"
+                                        value={durationMinutes}
+                                        onChange={(e) => setDurationMinutes(Number(e.target.value))}
+                                        placeholder="예: 30"
+                                        min="1"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         {/* 3. What? */}
                         <div style={{ marginBottom: '1rem' }}>
                             <label className="label">
-                                {type === 'EARN' ? '어떤 착한 일을 했나요?' : '무엇을 하고 싶나요?'}
+                                {type === 'EARN' || type === 'HOURGLASS' ? '어떤 착한 일을 할건가요?' : '무엇을 하고 싶나요?'}
                             </label>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input
@@ -435,7 +540,7 @@ export default function NewTaskPage() {
                                     className="input"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    placeholder={type === 'EARN' ? '예: 설거지, 안마' : '예: 게임 1시간'}
+                                    placeholder={type === 'EARN' ? '예: 설거지, 안마' : type === 'HOURGLASS' ? '예: 책 읽기, 수학문제 풀기' : '예: 게임 1시간'}
                                     required
                                 />
                                 <button

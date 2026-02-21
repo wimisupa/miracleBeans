@@ -10,7 +10,7 @@ type Task = {
     id: string
     title: string
     points: number
-    type: 'EARN' | 'SPEND' | 'TATTLE'
+    type: 'EARN' | 'SPEND' | 'TATTLE' | 'HOURGLASS'
     creator: { id: string; name: string }
     assigneeId?: string
     createdAt: string
@@ -111,13 +111,14 @@ export default function ApprovalsPage() {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {tasks.map(task => {
-                        const isCreator = currentMember?.id === task.creator.id
+                        const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN') ? (task.assigneeId || task.creator.id) : task.creator.id;
+                        const isPersonWhoDidIt = currentMember?.id === personWhoDidIt;
                         const alreadyApproved = task.approvals.some(a => a.member.id === currentMember?.id)
 
-                        // Who needs to approve? Everyone except creator.
+                        // Who needs to approve? Everyone except the person who did it.
                         // If TATTLE, also exclude assignee (target).
                         const requiredApprovers = allMembers.filter(m => {
-                            if (m.id === task.creator.id) return false;
+                            if (m.id === personWhoDidIt) return false;
                             if (task.type === 'TATTLE' && m.id === task.assigneeId) return false;
                             return true;
                         })
@@ -128,18 +129,21 @@ export default function ApprovalsPage() {
                                     <div>
                                         <div style={{ fontSize: '0.85rem', color: '#90A4AE', marginBottom: '0.25rem' }}>
                                             {task.creator.name} • {new Date(task.createdAt).toLocaleDateString()}
+                                            {task.assigneeId && task.assigneeId !== task.creator.id && (
+                                                <span style={{ marginLeft: '4px', fontStyle: 'italic', color: '#B0BEC5' }}>(담당: {allMembers.find(m => m.id === task.assigneeId)?.name})</span>
+                                            )}
                                         </div>
                                         <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#37474F' }}>{task.title}</h3>
                                         <div style={{
                                             fontWeight: 'bold',
                                             fontSize: '1.1rem',
-                                            color: task.type === 'EARN' ? 'var(--color-secondary)' : 'var(--color-accent)'
+                                            color: (task.type === 'EARN' || task.type === 'HOURGLASS') ? 'var(--color-secondary)' : 'var(--color-accent)'
                                         }}>
-                                            {task.type === 'EARN' ? '+' : '-'}{task.points} 콩
+                                            {(task.type === 'EARN' || task.type === 'HOURGLASS') ? '+' : '-'}{task.points} 콩
                                         </div>
                                     </div>
 
-                                    {!isCreator && !alreadyApproved && !(task.type === 'TATTLE' && currentMember?.id === task.assigneeId) && (
+                                    {!isPersonWhoDidIt && !alreadyApproved && !(task.type === 'TATTLE' && currentMember?.id === task.assigneeId) && (
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
                                                 onClick={() => handleAction(task.id, 'APPROVE')}

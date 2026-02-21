@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Trophy, ClipboardList, Sparkles, Sprout } from 'lucide-react'
+import { Plus, Trophy, ClipboardList, ListTodo, Sprout, Calendar, Clock, Timer } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 import { useRouter } from 'next/navigation'
+import TodoTasksList from '@/components/TodoTasksList'
 
 type Member = {
   id: string
@@ -19,6 +20,19 @@ export default function Home() {
   const { currentMember } = useMember()
   const [members, setMembers] = useState<Member[]>([])
   const [pendingCount, setPendingCount] = useState(0)
+  const [todayRoutines, setTodayRoutines] = useState<any[]>([])
+
+  const fetchTodayRoutines = () => {
+    if (currentMember) {
+      fetch(`/api/routines/today?memberId=${currentMember.id}`)
+        .then(res => res.json())
+        .then(data => setTodayRoutines(data))
+    }
+  }
+
+  useEffect(() => {
+    fetchTodayRoutines()
+  }, [currentMember])
 
   useEffect(() => {
     fetch('/api/members').then(res => res.json()).then(data => setMembers(data))
@@ -30,6 +44,43 @@ export default function Home() {
   const handleMemberClick = (member: Member) => {
     // Navigate directly to history regardless of user
     router.push(`/history/${member.id}`)
+  }
+
+  const handleRoutineClick = async (routine: any) => {
+    if (routine.isCompletedDaily) return
+
+    if (routine.type === 'EARN') {
+      const res = await fetch('/api/tasks', {
+        method: 'POST', body: JSON.stringify({
+          title: routine.title,
+          description: '루틴 달성으로 인한 콩 적립! 🌱',
+          type: 'EARN',
+          points: routine.points,
+          creatorId: currentMember?.id,
+          routineId: routine.id
+        })
+      })
+      if (res.ok) {
+        fetchTodayRoutines() // reload to show completed
+      }
+    } else if (routine.type === 'HOURGLASS') {
+      const res = await fetch('/api/tasks', {
+        method: 'POST', body: JSON.stringify({
+          title: routine.title,
+          description: '루틴 타이머 수행 중...',
+          type: 'HOURGLASS',
+          points: routine.points,
+          creatorId: currentMember?.id,
+          targetMemberId: currentMember?.id,
+          durationMinutes: routine.durationMinutes,
+          routineId: routine.id
+        })
+      })
+      const task = await res.json()
+      if (task.id) {
+        router.push(`/tasks/${task.id}/execute`)
+      }
+    }
   }
 
   return (
@@ -79,7 +130,7 @@ export default function Home() {
         <h1 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: '800', color: '#37474F' }}>우리 가족의 행복한 위미!</h1>
         <p style={{ color: '#607D8B', marginBottom: '1.5rem' }}>서로 돕고 사랑하며 콩을 모아보세요 🌱</p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
           <Link href="/tasks/new" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', color: 'inherit', border: 'none',
@@ -91,11 +142,11 @@ export default function Home() {
               padding: '12px',
               borderRadius: '50%',
               marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(255, 193, 7, 0.3)'
+              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)' // Updated box shadow color to match primary theme roughly
             }}>
-              <Sparkles size={28} color="#37474F" />
+              <ListTodo size={28} color="white" />
             </div>
-            <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>콩 모으기/쓰기</span>
+            <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>할 일</span>
           </Link>
 
           <Link href="/approvals" className="card" style={{
@@ -127,7 +178,80 @@ export default function Home() {
             </div>
             <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>승인 대기열</span>
           </Link>
+
+          <Link href="/routines" className="card" style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            textDecoration: 'none', color: 'inherit', border: 'none',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
+            marginBottom: 0
+          }}>
+            <div style={{
+              background: 'var(--color-primary)', // changed from secondary to primary or a new color
+              padding: '12px',
+              borderRadius: '50%',
+              marginBottom: '10px',
+              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)'
+            }}>
+              <Calendar size={28} color="white" />
+            </div>
+            <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>루틴 관리</span>
+          </Link>
         </div>
+
+        {/* Today's Routines */}
+        {currentMember && todayRoutines.length > 0 && (
+          <div style={{ textAlign: 'left', marginBottom: '1.5rem', marginTop: '1rem' }}>
+            <h2 style={{ fontSize: '1.1rem', color: '#455A64', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Calendar size={20} color="var(--color-primary)" />
+              <span>오늘의 루틴 잔소리 🐹</span>
+            </h2>
+            <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '8px' }}>
+              {todayRoutines.map(routine => (
+                <div key={routine.id} className="card" style={{
+                  minWidth: '150px',
+                  flexShrink: 0,
+                  marginBottom: 0,
+                  opacity: routine.isCompletedDaily ? 0.6 : 1,
+                  background: routine.isCompletedDaily ? '#F5F5F5' : 'white',
+                  border: routine.isCompletedDaily ? '1px solid #E0E0E0' : '1px solid var(--color-primary)',
+                  display: 'flex', flexDirection: 'column', gap: '8px',
+                  padding: '1rem'
+                }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#37474F', minHeight: '40px' }}>{routine.title}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#78909C', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Clock size={12} /> {routine.timeOfDay}
+                    {routine.type === 'HOURGLASS' && <><Timer size={12} /> {routine.durationMinutes}분</>}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', color: '#FBC02D', fontWeight: 'bold' }}>+{routine.points}콩</div>
+                  <button
+                    disabled={routine.isCompletedDaily}
+                    onClick={() => handleRoutineClick(routine)}
+                    className="btn btn-primary"
+                    style={{
+                      padding: '6px', fontSize: '0.8rem', marginTop: 'auto', width: '100%',
+                      background: routine.isCompletedDaily ? '#B0BEC5' : 'var(--color-primary)',
+                      border: 'none'
+                    }}
+                  >
+                    {routine.isCompletedDaily ? '달성 완료 🎉' : (routine.type === 'EARN' ? '바로 완료하기' : '타이머 시작')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Member TODO Tasks */}
+        {currentMember && (
+          <div style={{ textAlign: 'left' }}>
+            <h2 style={{ fontSize: '1.2rem', color: '#455A64', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '20px' }}>⏳</span> 해야 할 일
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              <TodoTasksList memberId={currentMember.id} />
+            </div>
+          </div>
+        )}
       </section>
 
       <section>

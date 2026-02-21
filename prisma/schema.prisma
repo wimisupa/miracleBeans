@@ -20,10 +20,12 @@ model Member {
   updatedAt DateTime @updatedAt
   
   // Relations
-  assignedTasks Task[]   @relation("AssignedTasks")
-  createdTasks  Task[]   @relation("CreatedTasks")
-  transactions  Transaction[]
-  approvals     TaskApproval[]
+  assignedTasks    Task[]          @relation("AssignedTasks")
+  createdTasks     Task[]          @relation("CreatedTasks")
+  transactions     Transaction[]
+  approvals        TaskApproval[]
+  assignedRoutines Routine[]       @relation("AssignedRoutines")
+  createdRoutines  Routine[]       @relation("CreatedRoutines")
 }
 
 model Task {
@@ -40,6 +42,11 @@ model Task {
   assigneeId  String?
   assignee    Member?  @relation("AssignedTasks", fields: [assigneeId], references: [id])
   
+  durationMinutes Int?  // For HOURGLASS tasks
+
+  routineId   String?
+  routine     Routine? @relation(fields: [routineId], references: [id], onDelete: SetNull)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   approvals   TaskApproval[]
@@ -66,4 +73,26 @@ model TaskApproval {
   createdAt DateTime @default(now())
 
   @@unique([taskId, memberId])
+}
+
+model Routine {
+  id              String   @id @default(cuid())
+  title           String
+  points          Int
+  type            String   // EARN, HOURGLASS
+  durationMinutes Int?
+  
+  creatorId       String
+  creator         Member   @relation("CreatedRoutines", fields: [creatorId], references: [id])
+  assigneeId      String
+  assignee        Member   @relation("AssignedRoutines", fields: [assigneeId], references: [id])
+  
+  timeOfDay       String?  // HH:MM format
+  daysOfWeek      String   // e.g., "Mon,Tue,Wed,Thu,Fri,Sat,Sun"
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tasks           Task[]
 }

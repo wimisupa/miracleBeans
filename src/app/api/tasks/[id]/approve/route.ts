@@ -42,9 +42,11 @@ export async function POST(
             // 3. Handle Approval
             if (action === 'APPROVE') {
                 // Calculate point change
-                // EARN: +points
-                // SPEND: -points
-                const pointChange = task.type === 'EARN' ? task.points : -task.points
+                // EARN & HOURGLASS: +points
+                // SPEND, TATTLE: -points
+                const pointChange = (task.type === 'EARN' || task.type === 'HOURGLASS') ? task.points : -task.points
+
+                const targetMemberId = task.assigneeId || task.creatorId
 
                 // Check if sufficient points for SPEND
                 if (task.type === 'SPEND' && task.creator.points + pointChange < 0) {
@@ -55,7 +57,7 @@ export async function POST(
 
                 // Update Member Points
                 await tx.member.update({
-                    where: { id: task.creatorId },
+                    where: { id: targetMemberId },
                     data: { points: { increment: pointChange } }
                 })
 
@@ -64,7 +66,7 @@ export async function POST(
                     data: {
                         amount: pointChange,
                         reason: task.title, // or description
-                        memberId: task.creatorId,
+                        memberId: targetMemberId,
                     }
                 })
 

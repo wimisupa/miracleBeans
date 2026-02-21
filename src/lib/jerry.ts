@@ -71,3 +71,79 @@ export async function askJerry(description: string, type: 'EARN' | 'SPEND' | 'TA
     // Fallback if loop exits (shouldn't happen)
     return { points: 100, comment: '제리가 잠들었어요... (연결 실패)', emoji: '😴' };
 }
+
+export interface RoutineRecommendation {
+    title: string;
+    points: number;
+    type: 'EARN' | 'HOURGLASS';
+    timeOfDay: string;
+    durationMinutes?: number;
+    daysOfWeek: string;
+    comment: string;
+}
+
+export async function recommendRoutines(role: string, name: string): Promise<RoutineRecommendation[]> {
+    const prompt = `
+        You are 'Judge Jerry', a witty, fair, but slightly sarcastic hamster judge for a family point system.
+        
+        The user requesting routines is named "${name}" and their role is "${role}" (CHILD or PARENT).
+        Suggest EXACTLY 2 meaningful, healthy routines they should do every week. 
+        If CHILD, suggest things like reading, cleaning room, doing homework, drinking water.
+        If PARENT, suggest things like exercising, reading an article, spending 10 mins playing with kids.
+        
+        Fields:
+        - title: The name of the routine (e.g., "물 3잔 마시기", "영어책 10분 읽기")
+        - points: The reward points (100~500)
+        - type: EARN (immediate completion) or HOURGLASS (needs a timer)
+        - durationMinutes: If HOURGLASS, provide a number (e.g., 10, 20). If EARN, just use 0.
+        - timeOfDay: Suggested time (e.g., "08:00", "20:00")
+        - daysOfWeek: Comma separated days (e.g., "Mon,Tue,Wed,Thu,Fri", "Sat,Sun")
+        - comment: A funny, encouraging one-sentence comment from Jerry in Korean explaining why they need this routine.
+
+        Output ONLY a valid JSON ARRAY of exactly 2 objects:
+        [
+            {
+                "title": "string",
+                "points": number,
+                "type": "EARN | HOURGLASS",
+                "timeOfDay": "string",
+                "durationMinutes": number,
+                "daysOfWeek": "string",
+                "comment": "string"
+            }
+        ]
+    `;
+
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        const routines = JSON.parse(jsonStr) as RoutineRecommendation[];
+        return routines;
+    } catch (error) {
+        console.error('Routine Recommendation Error:', error);
+        // Fallback recommendations if AI fails
+        return [
+            {
+                title: role === 'CHILD' ? '양치 깨끗이 하기' : '스트레칭 10분',
+                points: 100,
+                type: 'EARN',
+                timeOfDay: '08:00',
+                daysOfWeek: 'Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+                comment: '제리가 보고 있다! 건강이 최고지 🌻'
+            },
+            {
+                title: role === 'CHILD' ? '책 읽기' : '뉴스 읽기',
+                points: 200,
+                type: 'HOURGLASS',
+                durationMinutes: 15,
+                timeOfDay: '20:00',
+                daysOfWeek: 'Mon,Wed,Fri',
+                comment: '똑똑한 가족이 되어보자 찍찍 📚'
+            }
+        ];
+    }
+}
