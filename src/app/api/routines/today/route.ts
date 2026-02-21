@@ -43,12 +43,18 @@ export async function GET(request: Request) {
             }
         })
 
-        const routinesWithStatus = routines.map(r => ({
-            ...r,
-            isCompletedDaily: r.tasks.length > 0,
-            taskId: r.tasks.length > 0 ? r.tasks[0].id : null,
-            taskStatus: r.tasks.length > 0 ? r.tasks[0].status : null
-        }))
+        const routinesWithStatus = routines.map((r: any) => {
+            const completedOrPendingTask = r.tasks.find((t: any) => t.status !== 'TODO');
+            const todoTask = r.tasks.find((t: any) => t.status === 'TODO');
+
+            return {
+                ...r,
+                isCompletedDaily: !!completedOrPendingTask,
+                activeTaskId: todoTask ? todoTask.id : null,
+                taskId: r.tasks.length > 0 ? r.tasks[0].id : null,
+                taskStatus: r.tasks.length > 0 ? r.tasks[0].status : null
+            };
+        })
 
         return NextResponse.json(routinesWithStatus)
 
