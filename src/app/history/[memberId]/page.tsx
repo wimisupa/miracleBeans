@@ -58,12 +58,12 @@ export default function HistoryPage() {
 
     return (
         <div>
-            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0' }}>
                 <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
-                    <ChevronLeft size={28} />
+                    <ChevronLeft size={32} />
                 </Link>
-                <div className="logo" style={{ flex: 1 }}>
-                    <History size={28} />
+                <div className="logo" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <History size={32} color="var(--color-secondary)" />
                     <span>{memberName ? `${memberName}의 기록` : '히스토리'}</span>
                 </div>
             </header>

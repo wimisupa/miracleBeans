@@ -85,10 +85,10 @@ export default function Home() {
 
   return (
     <main>
-      <header className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="logo">
-          <Sprout size={28} />
-          <span>Wimi Bean</span>
+      <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem' }}>
+        <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Sprout size={32} color="var(--color-secondary)" />
+          <span style={{ fontSize: '1.8rem', fontWeight: '800' }}>Wimi Bean</span>
         </div>
         {currentMember && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -98,7 +98,8 @@ export default function Home() {
               background: 'rgba(255,255,255,0.6)',
               borderRadius: '20px',
               backdropFilter: 'blur(4px)',
-              border: '1px solid rgba(255,255,255,0.5)'
+              border: '1px solid rgba(255,255,255,0.5)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
             }}>
               <span style={{ fontSize: '0.9rem', color: '#37474F' }}>
                 <span style={{ fontWeight: 'bold' }}>{currentMember.name}</span>님
@@ -117,8 +118,14 @@ export default function Home() {
                 borderRadius: '50%',
                 width: '36px', height: '36px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#FF5252'
+                color: '#FF5252',
+                border: '1px solid rgba(255,255,255,0.5)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                transition: 'transform 0.2s',
               }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             </button>
@@ -271,18 +278,20 @@ export default function Home() {
             </Link>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '16px', margin: '0 -8px', padding: '0 8px 16px 8px' }}>
             {members.map((member) => (
               <div
                 key={member.id}
                 className="card"
                 onClick={() => handleMemberClick(member)}
                 style={{
+                  minWidth: '140px',
+                  flexShrink: 0,
                   display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
                   textDecoration: 'none', color: 'inherit', cursor: 'pointer',
                   padding: '1.5rem 1rem', marginBottom: 0,
-                  border: 'none',
-                  background: 'white'
+                  border: '1px solid rgba(255, 255, 255, 0.6)',
+                  background: 'rgba(255, 255, 255, 0.65)'
                 }}>
                 <div
                   style={{
@@ -312,8 +321,6 @@ export default function Home() {
                 }}>
                   {member.points.toLocaleString()} 콩
                 </div>
-
-
               </div>
             ))}
           </div>

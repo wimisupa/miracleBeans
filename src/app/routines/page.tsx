@@ -204,12 +204,12 @@ export default function RoutinesPage() {
 
     return (
         <div>
-            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0', marginBottom: '1.5rem' }}>
                 <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
-                    <ChevronLeft size={28} />
+                    <ChevronLeft size={32} />
                 </Link>
                 <div className="logo" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Calendar size={28} color="var(--color-primary)" />
+                    <Calendar size={32} color="var(--color-primary)" />
                     <span>루틴 관리</span>
                 </div>
             </header>
@@ -267,7 +267,7 @@ export default function RoutinesPage() {
                 <h2 style={{ fontSize: '1.3rem', color: '#37474F' }}>나의 루틴</h2>
                 <button
                     onClick={() => setShowForm(!showForm)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: 'var(--color-secondary)', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' }}
                 >
                     <Plus size={18} />
                     새 루틴 추가
