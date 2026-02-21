@@ -127,7 +127,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                     opacity: item.isCompletedDaily ? 0.7 : 1,
                     padding: '12px 16px', borderRadius: '16px',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                    border: item.isRoutine ? '1px solid var(--color-primary)' : '1px solid transparent',
+                    border: '1px solid transparent',
                     transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     marginBottom: 0
                 }}>
@@ -161,7 +161,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                                 {item.isCompletedDaily ? '완료 🎉' : (item.type === 'EARN' ? <><Check size={16} /> 완료</> : <><Timer size={16} /> 시작</>)}
                             </button>
                         ) : (
-                            <Link href={`/tasks/${item.id}/execute`} className="btn btn-primary" style={{ padding: '8px 16px', borderRadius: '12px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                            <Link href={`/tasks/${item.id}/execute`} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px', border: 'none', display: 'flex', gap: '4px', alignItems: 'center' }}>
                                 <Play size={16} fill="white" />
                                 시작
                             </Link>
