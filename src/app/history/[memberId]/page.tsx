@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, History, TrendingUp, TrendingDown, Sprout } from 'lucide-react'
+import { ChevronLeft, History, TrendingUp, TrendingDown, Sprout, Calendar, Clock, Timer } from 'lucide-react'
 import TodoTasksList from '@/components/TodoTasksList'
 
 type Transaction = {
@@ -21,6 +21,7 @@ export default function HistoryPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [loading, setLoading] = useState(true)
     const [memberName, setMemberName] = useState('')
+    const [todayRoutines, setTodayRoutines] = useState<any[]>([])
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -48,6 +49,10 @@ export default function HistoryPage() {
 
         if (memberId) {
             fetchHistory()
+            fetch(`/api/routines/today?memberId=${memberId}`)
+                .then(res => res.json())
+                .then(data => setTodayRoutines(data))
+                .catch(err => console.error(err))
         }
     }, [memberId])
 
@@ -73,6 +78,40 @@ export default function HistoryPage() {
                         <TodoTasksList memberId={memberId} hideStartButton={true} />
                     </div>
                 </section>
+
+                {/* Today's Routines */}
+                {todayRoutines.length > 0 && (
+                    <section style={{ padding: '1.5rem 1rem', background: 'rgba(255,255,255,0.7)', borderRadius: '24px', marginBottom: '1rem' }}>
+                        <h2 style={{ fontSize: '1.1rem', color: '#455A64', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Calendar size={20} color="var(--color-primary)" />
+                            <span>해야 할 루틴</span>
+                        </h2>
+                        <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '8px' }}>
+                            {todayRoutines.map(routine => (
+                                <div key={routine.id} className="card" style={{
+                                    minWidth: '150px',
+                                    flexShrink: 0,
+                                    marginBottom: 0,
+                                    opacity: routine.isCompletedDaily ? 0.6 : 1,
+                                    background: routine.isCompletedDaily ? '#F5F5F5' : 'white',
+                                    border: routine.isCompletedDaily ? '1px solid #E0E0E0' : '1px solid var(--color-primary)',
+                                    display: 'flex', flexDirection: 'column', gap: '8px',
+                                    padding: '1rem'
+                                }}>
+                                    <div style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#37474F', minHeight: '40px' }}>{routine.title}</div>
+                                    <div style={{ fontSize: '0.75rem', color: '#78909C', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <Clock size={12} /> {routine.timeOfDay}
+                                        {routine.type === 'HOURGLASS' && <><Timer size={12} /> {routine.durationMinutes}분</>}
+                                    </div>
+                                    <div style={{ fontSize: '0.9rem', color: '#FBC02D', fontWeight: 'bold' }}>+{routine.points}콩</div>
+                                    <div style={{ marginTop: 'auto', textAlign: 'center', fontSize: '0.8rem', color: routine.isCompletedDaily ? '#90A4AE' : 'var(--color-primary)', fontWeight: 'bold' }}>
+                                        {routine.isCompletedDaily ? '달성 완료 🎉' : '진행 예정'}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
 
                 <h2 style={{ fontSize: '1.1rem', color: '#455A64', padding: '0 1rem', marginBottom: '1rem', marginTop: '1rem' }}>히스토리</h2>
                 {loading ? (

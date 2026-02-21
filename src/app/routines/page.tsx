@@ -77,11 +77,11 @@ export default function RoutinesPage() {
     }
 
     const fetchRoutines = async () => {
+        if (!currentMember) return
         setLoadingRoutines(true)
         const res = await fetch('/api/routines')
         const data = await res.json()
-        // Filter routines for the current family, or just show all for now
-        setRoutines(data.filter((r: Routine) => r.isActive))
+        setRoutines(data.filter((r: Routine) => r.isActive && (r.creatorId === currentMember.id || r.assigneeId === currentMember.id)))
         setLoadingRoutines(false)
     }
 
