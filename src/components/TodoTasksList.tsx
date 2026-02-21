@@ -2,71 +2,166 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Play } from 'lucide-react'
+import { Play, Check, Timer } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useMember } from '@/context/MemberContext'
 
-type Task = {
+type UnifiedTask = {
     id: string
     title: string
     points: number
-    scheduledAt: string | null
     durationMinutes: number | null
+    isRoutine: boolean
+    // Routine specific
+    type?: 'EARN' | 'HOURGLASS'
+    isCompletedDaily?: boolean
+    timeOfDay?: string
+    // Task specific
+    scheduledAt?: string | null
 }
 
 export default function TodoTasksList({ memberId, hideStartButton = false }: { memberId: string, hideStartButton?: boolean }) {
-    const [tasks, setTasks] = useState<Task[]>([])
+    const router = useRouter()
+    const { currentMember } = useMember()
+    const [items, setItems] = useState<UnifiedTask[]>([])
     const [loading, setLoading] = useState(true)
 
+    const fetchItems = async () => {
+        try {
+            const [tasksRes, routinesRes] = await Promise.all([
+                fetch('/api/tasks?status=TODO'),
+                fetch(`/api/routines/today?memberId=${memberId}`)
+            ])
+
+            const tasksData = await tasksRes.json()
+            const routinesData = await routinesRes.json()
+
+            let unifiedList: UnifiedTask[] = []
+
+            if (Array.isArray(tasksData)) {
+                const myTodoTasks = tasksData.filter(t => (t.assigneeId || t.creatorId) === memberId && t.status === 'TODO')
+                unifiedList = [...unifiedList, ...myTodoTasks.map(t => ({
+                    ...t,
+                    isRoutine: false
+                }))]
+            }
+
+            if (Array.isArray(routinesData)) {
+                unifiedList = [...unifiedList, ...routinesData.map(r => ({
+                    ...r,
+                    isRoutine: true
+                }))]
+            }
+
+            setItems(unifiedList)
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
-        fetch('/api/tasks?status=TODO')
-            .then(res => res.json())
-            .then((data: any[]) => {
-                // Filter tasks strictly by assignee. No special parent viewing here.
-                if (!Array.isArray(data)) {
-                    console.error('Expected array from /api/tasks but got:', data)
-                    setTasks([])
-                    setLoading(false)
-                    return
-                }
-                const myTodoTasks = data.filter(t => (t.assigneeId || t.creatorId) === memberId && t.status === 'TODO')
-                setTasks(myTodoTasks)
-                setLoading(false)
-            })
-            .catch(e => {
-                console.error(e)
-                setLoading(false)
-            })
+        fetchItems()
     }, [memberId])
+
+    const handleRoutineClick = async (routine: UnifiedTask) => {
+        if (routine.isCompletedDaily || !currentMember) return
+
+        if (routine.type === 'EARN') {
+            const res = await fetch('/api/tasks', {
+                method: 'POST', body: JSON.stringify({
+                    title: routine.title,
+                    description: '루틴 달성으로 인한 콩 적립! 🌱',
+                    type: 'EARN',
+                    points: routine.points,
+                    creatorId: currentMember.id,
+                    routineId: routine.id
+                })
+            })
+            if (res.ok) fetchItems()
+        } else if (routine.type === 'HOURGLASS') {
+            const res = await fetch('/api/tasks', {
+                method: 'POST', body: JSON.stringify({
+                    title: routine.title,
+                    description: '루틴 타이머 수행 중...',
+                    type: 'HOURGLASS',
+                    points: routine.points,
+                    creatorId: currentMember.id,
+                    targetMemberId: currentMember.id,
+                    durationMinutes: routine.durationMinutes,
+                    routineId: routine.id
+                })
+            })
+            const task = await res.json()
+            if (task.id) {
+                router.push(`/tasks/${task.id}/execute`)
+            }
+        }
+    }
 
     if (loading) return <div style={{ textAlign: 'center', color: '#90A4AE', fontSize: '0.9rem' }}>로딩 중...</div>
 
-    if (tasks.length === 0) {
+    if (items.length === 0) {
         return (
             <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '16px', padding: '1.5rem', textAlign: 'center', color: '#607D8B' }}>
                 <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '8px' }}>🎉</span>
-                지금 당장 해야 할 일은 없어요!<br />휴식을 취하거나 새로운 일을 찾아볼까요?
+                지금 당장 해야 할 일이나 루틴은 없어요!<br />휴식을 취하거나 새로운 일을 찾아볼까요?
             </div>
         )
     }
 
     return (
-        <>
-            {tasks.map(task => (
-                <div key={task.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', padding: '12px 16px', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            {items.map(item => (
+                <div key={`${item.isRoutine ? 'r' : 't'}-${item.id}`} className="card" style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    background: item.isCompletedDaily ? '#ECEFF1' : 'white',
+                    opacity: item.isCompletedDaily ? 0.7 : 1,
+                    padding: '12px 16px', borderRadius: '16px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                    border: item.isRoutine ? '1px solid var(--color-primary)' : '1px solid transparent',
+                    transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    marginBottom: 0
+                }}>
                     <div>
-                        <div style={{ fontWeight: 'bold', color: '#37474F', fontSize: '1.05rem', marginBottom: '4px' }}>{task.title}</div>
-                        <div style={{ fontSize: '0.85rem', color: '#78909C', display: 'flex', gap: '8px' }}>
-                            {task.durationMinutes && <span>⏱️ {task.durationMinutes}분</span>}
-                            <span style={{ color: '#FBC02D', fontWeight: 'bold' }}>+{task.points}콩</span>
+                        <div style={{ fontWeight: 'bold', color: '#37474F', fontSize: '1.05rem', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {item.title}
+                            {item.isRoutine && (
+                                <span style={{ fontSize: '0.7rem', padding: '2px 6px', background: 'rgba(255, 213, 79, 0.2)', color: '#F57F17', borderRadius: '8px', fontWeight: 'bold' }}>
+                                    루틴 🔁
+                                </span>
+                            )}
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: '#78909C', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            {item.isRoutine && item.timeOfDay && <span>⏰ {item.timeOfDay}</span>}
+                            {item.durationMinutes && <span>⏱️ {item.durationMinutes}분</span>}
+                            <span style={{ color: '#FBC02D', fontWeight: 'bold' }}>+{item.points}콩</span>
                         </div>
                     </div>
                     {!hideStartButton && (
-                        <Link href={`/tasks/${task.id}/execute`} className="btn btn-primary" style={{ padding: '8px 16px', borderRadius: '12px', display: 'flex', gap: '4px', alignItems: 'center' }}>
-                            <Play size={16} fill="white" />
-                            시작
-                        </Link>
+                        item.isRoutine ? (
+                            <button
+                                disabled={item.isCompletedDaily}
+                                onClick={() => handleRoutineClick(item)}
+                                className="btn btn-primary"
+                                style={{
+                                    padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px',
+                                    background: item.isCompletedDaily ? '#B0BEC5' : 'var(--color-primary)',
+                                    border: 'none', display: 'flex', gap: '4px', alignItems: 'center'
+                                }}
+                            >
+                                {item.isCompletedDaily ? '완료 🎉' : (item.type === 'EARN' ? <><Check size={16} /> 완료</> : <><Timer size={16} /> 시작</>)}
+                            </button>
+                        ) : (
+                            <Link href={`/tasks/${item.id}/execute`} className="btn btn-primary" style={{ padding: '8px 16px', borderRadius: '12px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                <Play size={16} fill="white" />
+                                시작
+                            </Link>
+                        )
                     )}
                 </div>
             ))}
-        </>
+        </div>
     )
 }

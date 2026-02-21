@@ -20,20 +20,6 @@ export default function Home() {
   const { currentMember } = useMember()
   const [members, setMembers] = useState<Member[]>([])
   const [pendingCount, setPendingCount] = useState(0)
-  const [todayRoutines, setTodayRoutines] = useState<any[]>([])
-
-  const fetchTodayRoutines = () => {
-    if (currentMember) {
-      fetch(`/api/routines/today?memberId=${currentMember.id}`)
-        .then(res => res.json())
-        .then(data => setTodayRoutines(data))
-    }
-  }
-
-  useEffect(() => {
-    fetchTodayRoutines()
-  }, [currentMember])
-
   useEffect(() => {
     fetch('/api/members').then(res => res.json()).then(data => setMembers(data))
     fetch('/api/tasks').then(res => res.json()).then(tasks => {
@@ -46,42 +32,6 @@ export default function Home() {
     router.push(`/history/${member.id}`)
   }
 
-  const handleRoutineClick = async (routine: any) => {
-    if (routine.isCompletedDaily) return
-
-    if (routine.type === 'EARN') {
-      const res = await fetch('/api/tasks', {
-        method: 'POST', body: JSON.stringify({
-          title: routine.title,
-          description: '루틴 달성으로 인한 콩 적립! 🌱',
-          type: 'EARN',
-          points: routine.points,
-          creatorId: currentMember?.id,
-          routineId: routine.id
-        })
-      })
-      if (res.ok) {
-        fetchTodayRoutines() // reload to show completed
-      }
-    } else if (routine.type === 'HOURGLASS') {
-      const res = await fetch('/api/tasks', {
-        method: 'POST', body: JSON.stringify({
-          title: routine.title,
-          description: '루틴 타이머 수행 중...',
-          type: 'HOURGLASS',
-          points: routine.points,
-          creatorId: currentMember?.id,
-          targetMemberId: currentMember?.id,
-          durationMinutes: routine.durationMinutes,
-          routineId: routine.id
-        })
-      })
-      const task = await res.json()
-      if (task.id) {
-        router.push(`/tasks/${task.id}/execute`)
-      }
-    }
-  }
 
   return (
     <main>
@@ -204,49 +154,6 @@ export default function Home() {
             <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>루틴 관리</span>
           </Link>
         </div>
-
-        {/* Today's Routines */}
-        {currentMember && todayRoutines.length > 0 && (
-          <div style={{ textAlign: 'left', marginBottom: '1.5rem', marginTop: '1rem' }}>
-            <h2 style={{ fontSize: '1.1rem', color: '#455A64', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Calendar size={20} color="var(--color-primary)" />
-              <span>오늘의 루틴 잔소리 🐹</span>
-            </h2>
-            <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '8px' }}>
-              {todayRoutines.map(routine => (
-                <div key={routine.id} className="card" style={{
-                  minWidth: '150px',
-                  flexShrink: 0,
-                  marginBottom: 0,
-                  opacity: routine.isCompletedDaily ? 0.6 : 1,
-                  background: routine.isCompletedDaily ? '#F5F5F5' : 'white',
-                  border: routine.isCompletedDaily ? '1px solid #E0E0E0' : '1px solid var(--color-primary)',
-                  display: 'flex', flexDirection: 'column', gap: '8px',
-                  padding: '1rem'
-                }}>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#37474F', minHeight: '40px' }}>{routine.title}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#78909C', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Clock size={12} /> {routine.timeOfDay}
-                    {routine.type === 'HOURGLASS' && <><Timer size={12} /> {routine.durationMinutes}분</>}
-                  </div>
-                  <div style={{ fontSize: '0.9rem', color: '#FBC02D', fontWeight: 'bold' }}>+{routine.points}콩</div>
-                  <button
-                    disabled={routine.isCompletedDaily}
-                    onClick={() => handleRoutineClick(routine)}
-                    className="btn btn-primary"
-                    style={{
-                      padding: '6px', fontSize: '0.8rem', marginTop: 'auto', width: '100%',
-                      background: routine.isCompletedDaily ? '#B0BEC5' : 'var(--color-primary)',
-                      border: 'none'
-                    }}
-                  >
-                    {routine.isCompletedDaily ? '달성 완료 🎉' : (routine.type === 'EARN' ? '바로 완료하기' : '타이머 시작')}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Member TODO Tasks */}
         {currentMember && (
