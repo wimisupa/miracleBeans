@@ -70,32 +70,42 @@ export default function ExecuteTaskPage() {
 
     const wakeLockRef = useRef<any>(null)
 
+    const requestWakeLock = async () => {
+        try {
+            if ('wakeLock' in navigator && document.visibilityState === 'visible') {
+                wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
+            }
+        } catch (err) {
+            console.error(`Wake Lock error: ${err}`)
+        }
+    }
+
+    const releaseWakeLock = async () => {
+        if (wakeLockRef.current !== null) {
+            try {
+                await wakeLockRef.current.release()
+                wakeLockRef.current = null
+            } catch (err) {
+                console.error(`Wake Lock release error: ${err}`)
+            }
+        }
+    }
+
+    const toggleTimer = async () => {
+        if (!isActive) {
+            setIsActive(true)
+            await requestWakeLock() // iOS requires this to be tied directly to a user gesture
+        } else {
+            setIsActive(false)
+            await releaseWakeLock()
+        }
+    }
+
+    // Handle timer interval
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null
 
-        const requestWakeLock = async () => {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
-                }
-            } catch (err) {
-                console.error(`Wake Lock error: ${err}`)
-            }
-        }
-
-        const releaseWakeLock = async () => {
-            if (wakeLockRef.current !== null) {
-                try {
-                    await wakeLockRef.current.release()
-                    wakeLockRef.current = null
-                } catch (err) {
-                    console.error(`Wake Lock release error: ${err}`)
-                }
-            }
-        }
-
         if (isActive && timeLeft > 0) {
-            requestWakeLock()
             interval = setInterval(() => {
                 setTimeLeft((time) => time - 1)
             }, 1000)
@@ -104,24 +114,34 @@ export default function ExecuteTaskPage() {
             setIsFinished(true)
             releaseWakeLock()
             if (interval) clearInterval(interval)
-        } else if (!isActive) {
-            releaseWakeLock()
         }
 
         return () => {
             if (interval) clearInterval(interval)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isActive, timeLeft])
+
+    // Re-acquire lock on visibility change and cleanup on unmount
+    useEffect(() => {
+        const handleVisibilityChange = async () => {
+            if (document.visibilityState === 'visible' && isActive) {
+                await requestWakeLock()
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
             releaseWakeLock()
         }
-    }, [isActive, timeLeft])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isActive])
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60)
         const s = seconds % 60
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
-    }
-
-    const toggleTimer = () => {
-        setIsActive(!isActive)
     }
 
     const handleComplete = async () => {
