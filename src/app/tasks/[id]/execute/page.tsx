@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Check, Play, Pause, AlertCircle } from 'lucide-react'
@@ -68,21 +68,49 @@ export default function ExecuteTaskPage() {
         fetchTask()
     }, [taskId, currentMember, router])
 
+    const wakeLockRef = useRef<any>(null)
+
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null
 
+        const requestWakeLock = async () => {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
+                }
+            } catch (err) {
+                console.error(`Wake Lock error: ${err}`)
+            }
+        }
+
+        const releaseWakeLock = async () => {
+            if (wakeLockRef.current !== null) {
+                try {
+                    await wakeLockRef.current.release()
+                    wakeLockRef.current = null
+                } catch (err) {
+                    console.error(`Wake Lock release error: ${err}`)
+                }
+            }
+        }
+
         if (isActive && timeLeft > 0) {
+            requestWakeLock()
             interval = setInterval(() => {
                 setTimeLeft((time) => time - 1)
             }, 1000)
         } else if (timeLeft === 0 && isActive) {
             setIsActive(false)
             setIsFinished(true)
+            releaseWakeLock()
             if (interval) clearInterval(interval)
+        } else if (!isActive) {
+            releaseWakeLock()
         }
 
         return () => {
             if (interval) clearInterval(interval)
+            releaseWakeLock()
         }
     }, [isActive, timeLeft])
 
