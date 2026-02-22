@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { useWakeLock } from 'react-screen-wake-lock'
+import NoSleep from 'nosleep.js'
 import { ChevronLeft, Check, Play, Pause, AlertCircle } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
@@ -69,21 +69,30 @@ export default function ExecuteTaskPage() {
         fetchTask()
     }, [taskId, currentMember, router])
 
-    const { isSupported, request, release } = useWakeLock()
+    const wakeLockRef = useRef<any>(null)
+
+    useEffect(() => {
+        wakeLockRef.current = new NoSleep()
+        return () => {
+            if (wakeLockRef.current) {
+                wakeLockRef.current.disable()
+            }
+        }
+    }, [])
 
     const toggleTimer = async () => {
         if (!isActive) {
             setIsActive(true)
-            if (isSupported) {
+            if (wakeLockRef.current) {
                 try {
-                    await request()
+                    wakeLockRef.current.enable()
                 } catch (e) {
-                    console.error('WakeLock request failed:', e)
+                    console.error('NoSleep enable failed:', e)
                 }
             }
         } else {
             setIsActive(false)
-            if (isSupported) release()
+            if (wakeLockRef.current) wakeLockRef.current.disable()
         }
     }
 
@@ -98,7 +107,7 @@ export default function ExecuteTaskPage() {
         } else if (timeLeft === 0 && isActive) {
             setIsActive(false)
             setIsFinished(true)
-            if (isSupported) release()
+            if (wakeLockRef.current) wakeLockRef.current.disable()
             if (interval) clearInterval(interval)
         }
 
@@ -106,7 +115,7 @@ export default function ExecuteTaskPage() {
             if (interval) clearInterval(interval)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isActive, timeLeft, isSupported, release])
+    }, [isActive, timeLeft])
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60)
