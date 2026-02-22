@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import NoSleep from 'nosleep.js'
 import { ChevronLeft, Check, Play, Pause, AlertCircle } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
@@ -70,34 +71,28 @@ export default function ExecuteTaskPage() {
 
     const wakeLockRef = useRef<any>(null)
 
-    const requestWakeLock = async () => {
-        try {
-            if ('wakeLock' in navigator && document.visibilityState === 'visible') {
-                wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
-            }
-        } catch (err) {
-            console.error(`Wake Lock error: ${err}`)
-        }
-    }
-
-    const releaseWakeLock = async () => {
-        if (wakeLockRef.current !== null) {
-            try {
-                await wakeLockRef.current.release()
-                wakeLockRef.current = null
-            } catch (err) {
-                console.error(`Wake Lock release error: ${err}`)
+    useEffect(() => {
+        wakeLockRef.current = new NoSleep()
+        return () => {
+            if (wakeLockRef.current) {
+                wakeLockRef.current.disable()
             }
         }
-    }
+    }, [])
 
     const toggleTimer = async () => {
         if (!isActive) {
             setIsActive(true)
-            await requestWakeLock() // iOS requires this to be tied directly to a user gesture
+            if (wakeLockRef.current) {
+                try {
+                    wakeLockRef.current.enable()
+                } catch (e) {
+                    console.error('NoSleep enable failed:', e)
+                }
+            }
         } else {
             setIsActive(false)
-            await releaseWakeLock()
+            if (wakeLockRef.current) wakeLockRef.current.disable()
         }
     }
 
@@ -112,7 +107,7 @@ export default function ExecuteTaskPage() {
         } else if (timeLeft === 0 && isActive) {
             setIsActive(false)
             setIsFinished(true)
-            releaseWakeLock()
+            if (wakeLockRef.current) wakeLockRef.current.disable()
             if (interval) clearInterval(interval)
         }
 
@@ -121,22 +116,6 @@ export default function ExecuteTaskPage() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isActive, timeLeft])
-
-    // Re-acquire lock on visibility change and cleanup on unmount
-    useEffect(() => {
-        const handleVisibilityChange = async () => {
-            if (document.visibilityState === 'visible' && isActive) {
-                await requestWakeLock()
-            }
-        }
-        document.addEventListener('visibilitychange', handleVisibilityChange)
-
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange)
-            releaseWakeLock()
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isActive])
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60)
