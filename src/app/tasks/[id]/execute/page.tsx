@@ -155,32 +155,61 @@ export default function ExecuteTaskPage() {
                     보상: <span style={{ fontWeight: 'bold', color: '#FBC02D' }}>{task.points} 콩</span>
                 </p>
 
-                {/* Timer Circle */}
-                <div style={{ position: 'relative', width: '200px', height: '200px', margin: '0 auto 2rem auto' }}>
-                    <svg width="200" height="200" viewBox="0 0 200 200">
-                        {/* Background Circle */}
-                        <circle
-                            cx="100" cy="100" r="90"
-                            fill="none" stroke="#E0E0E0" strokeWidth="12"
-                        />
-                        {/* Progress Circle */}
-                        <circle
-                            cx="100" cy="100" r="90"
-                            fill="none" stroke="var(--color-primary)" strokeWidth="12"
-                            strokeLinecap="round"
-                            strokeDasharray={2 * Math.PI * 90}
-                            strokeDashoffset={2 * Math.PI * 90 * (1 - progressPercent / 100)}
-                            transform="rotate(-90 100 100)"
-                            style={{ transition: 'stroke-dashoffset 1s linear' }}
-                        />
-                    </svg>
-                    <div style={{
-                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                        <div style={{ fontSize: '3rem', fontWeight: '900', color: '#37474F', fontFamily: 'monospace' }}>
-                            {formatTime(timeLeft)}
+                {/* Real Hourglass UI */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto 2rem auto', position: 'relative' }}>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', position: 'relative' }}>
+
+                        {/* Top Glass */}
+                        <div style={{
+                            width: '120px', height: '100px',
+                            border: '4px solid #B0BEC5', borderBottom: 'none',
+                            borderRadius: '10px 10px 50% 50%',
+                            overflow: 'hidden', position: 'relative',
+                            background: 'rgba(255,255,255,0.7)',
+                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)'
+                        }}>
+                            <div style={{
+                                position: 'absolute', bottom: 0, left: 0, right: 0,
+                                background: '#FFCA28', // Sand color
+                                height: `${progressPercent}%`,
+                                transition: 'height 1s linear'
+                            }} />
                         </div>
+
+                        {/* Neck */}
+                        <div style={{ width: '16px', height: '10px', background: '#B0BEC5', borderRadius: '4px', zIndex: 2 }} />
+
+                        {/* Bottom Glass */}
+                        <div style={{
+                            width: '120px', height: '100px',
+                            border: '4px solid #B0BEC5', borderTop: 'none',
+                            borderRadius: '50% 50% 10px 10px',
+                            overflow: 'hidden', position: 'relative',
+                            background: 'rgba(255,255,255,0.7)',
+                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)'
+                        }}>
+                            <div style={{
+                                position: 'absolute', bottom: 0, left: 0, right: 0,
+                                background: '#FFCA28',
+                                height: `${100 - progressPercent}%`,
+                                transition: 'height 1s linear'
+                            }} />
+                        </div>
+
+                        {/* Stream of sand */}
+                        {(isActive && !isFinished && progressPercent > 0) && (
+                            <div style={{
+                                position: 'absolute', top: '100px', width: '4px', height: '90px',
+                                background: '#FFCA28',
+                                opacity: 0.8,
+                                zIndex: 1
+                            }} />
+                        )}
+                    </div>
+
+                    <div style={{ marginTop: '1.5rem', fontSize: '3rem', fontWeight: '900', color: '#37474F', fontFamily: 'monospace' }}>
+                        {formatTime(timeLeft)}
                     </div>
                 </div>
 

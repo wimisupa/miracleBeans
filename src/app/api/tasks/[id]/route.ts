@@ -23,8 +23,17 @@ export async function PATCH(
             where: { id }
         })
 
-        if (!task || task.status !== 'TODO') {
-            return NextResponse.json({ error: 'Task not found or not in TODO status' }, { status: 400 })
+        if (!task) {
+            return NextResponse.json({ error: 'Task not found' }, { status: 404 })
+        }
+
+        if (task.status === status) {
+            // Idempotent success (fixes React Strict Mode double-firing)
+            return NextResponse.json(task)
+        }
+
+        if (task.status !== 'TODO') {
+            return NextResponse.json({ error: 'Task is not in TODO status' }, { status: 400 })
         }
 
         const updatedTask = await prisma.task.update({

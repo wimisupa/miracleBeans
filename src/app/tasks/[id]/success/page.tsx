@@ -13,6 +13,37 @@ export default function TaskSuccessPage() {
     const [status, setStatus] = useState<'submitting' | 'success' | 'error'>('submitting')
 
     useEffect(() => {
+        const playSuccessSound = () => {
+            try {
+                const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+                if (!AudioContextClass) return;
+                const ctx = new AudioContextClass();
+
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                // Ascending chime: C5, E5, G5, C6
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.3);
+
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+                gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.4);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.8);
+            } catch (e) {
+                console.error('Audio play error:', e)
+            }
+        }
+
         const submitTask = async () => {
             try {
                 const res = await fetch(`/api/tasks/${taskId}`, {
@@ -22,6 +53,7 @@ export default function TaskSuccessPage() {
                 })
 
                 if (res.ok) {
+                    playSuccessSound()
                     setStatus('success')
                 } else {
                     setStatus('error')
