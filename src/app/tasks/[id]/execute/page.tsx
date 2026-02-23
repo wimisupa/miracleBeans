@@ -172,7 +172,7 @@ export default function ExecuteTaskPage() {
                             <div style={{
                                 position: 'absolute', bottom: 0, left: 0, right: 0,
                                 background: '#FFCA28', // Sand color
-                                height: `${progressPercent}%`,
+                                height: `${100 - progressPercent}%`,
                                 transition: 'height 1s linear'
                             }} />
                         </div>
@@ -192,13 +192,13 @@ export default function ExecuteTaskPage() {
                             <div style={{
                                 position: 'absolute', bottom: 0, left: 0, right: 0,
                                 background: '#FFCA28',
-                                height: `${100 - progressPercent}%`,
+                                height: `${progressPercent}%`,
                                 transition: 'height 1s linear'
                             }} />
                         </div>
 
                         {/* Stream of sand */}
-                        {(isActive && !isFinished && progressPercent > 0) && (
+                        {(isActive && !isFinished && progressPercent < 100) && (
                             <div style={{
                                 position: 'absolute', top: '100px', width: '4px', height: '90px',
                                 background: '#FFCA28',
