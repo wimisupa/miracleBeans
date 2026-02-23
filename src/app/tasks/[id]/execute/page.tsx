@@ -123,7 +123,19 @@ export default function ExecuteTaskPage() {
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
     }
 
-    const handleComplete = async () => {
+    // Auto-complete when timer finishes
+    useEffect(() => {
+        let timer: NodeJS.Timeout
+        if (isFinished && !completing) {
+            timer = setTimeout(() => {
+                handleComplete(true)
+            }, 2500)
+        }
+        return () => clearTimeout(timer)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isFinished])
+
+    const handleComplete = async (isAuto = false) => {
         if (!isFinished) {
             if (!confirm('아직 시간이 남았어요! 그래도 완료할까요?')) return
         }
@@ -138,7 +150,9 @@ export default function ExecuteTaskPage() {
             })
 
             if (res.ok) {
-                alert('참 잘했어요! 부모님께 승인을 요청했어요. 🎉')
+                if (!isAuto) {
+                    alert('수고했어요! 완료 승인이 요청되었습니다. 🎉')
+                }
                 router.push('/')
             } else {
                 const data = await res.json()
@@ -148,7 +162,9 @@ export default function ExecuteTaskPage() {
             console.error(e)
             alert('오류 발생')
         } finally {
-            setCompleting(false)
+            if (!isAuto) {
+                setCompleting(false)
+            }
         }
     }
 
@@ -222,7 +238,7 @@ export default function ExecuteTaskPage() {
                             {isActive ? <Pause size={32} fill="white" /> : <Play size={32} fill="white" style={{ marginLeft: '4px' }} />}
                         </button>
                         <button
-                            onClick={handleComplete}
+                            onClick={() => handleComplete(false)}
                             className="btn"
                             style={{
                                 height: '64px', borderRadius: '32px', padding: '0 24px',
@@ -238,19 +254,19 @@ export default function ExecuteTaskPage() {
                     <div style={{ marginBottom: '2rem', animation: 'bounce 1s infinite' }}>
                         <span style={{ fontSize: '3rem' }}>🎉</span>
                         <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
-                            목표 시간 달성!
+                            {completing ? '승인 요청 중...' : '수고했어요! 달성 완료!'}
                         </div>
                     </div>
                 )}
 
-                {isFinished && (
+                {isFinished && !completing && (
                     <button
-                        onClick={handleComplete}
+                        onClick={() => handleComplete(false)}
                         disabled={completing}
                         className="btn btn-primary"
                         style={{ width: '100%', fontSize: '1.1rem', padding: '16px', background: 'var(--color-secondary)' }}
                     >
-                        {completing ? '제출 중...' : '제리에게 다 했다고 알리기 ✨'}
+                        완료 처리하기 ✨
                     </button>
                 )}
             </div>
