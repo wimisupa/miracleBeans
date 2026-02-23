@@ -200,7 +200,8 @@ export default function ExecuteTaskPage() {
                         {/* Stream of sand */}
                         {(isActive && !isFinished && progressPercent < 100) && (
                             <div style={{
-                                position: 'absolute', top: '100px', width: '4px', height: '90px',
+                                position: 'absolute', top: '100px', width: '4px',
+                                height: `${110 - (progressPercent * 0.96)}px`,
                                 background: '#FFCA28',
                                 opacity: 0.8,
                                 zIndex: 1
