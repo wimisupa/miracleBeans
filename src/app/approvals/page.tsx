@@ -72,8 +72,7 @@ export default function ApprovalsPage() {
 
             if (res.ok) {
                 if (data.message) {
-                    alert(data.message)
-                    // Refresh data to show updated approval status
+                    // Refresh data to show updated approval status seamlessly
                     fetchData()
                 } else {
                     // Fully approved
