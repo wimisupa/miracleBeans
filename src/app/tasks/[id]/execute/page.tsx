@@ -31,7 +31,6 @@ export default function ExecuteTaskPage() {
     const [timeLeft, setTimeLeft] = useState(0) // in seconds
     const [isActive, setIsActive] = useState(false)
     const [isFinished, setIsFinished] = useState(false)
-    const [completing, setCompleting] = useState(false)
 
     useEffect(() => {
         if (!currentMember) {
@@ -125,48 +124,10 @@ export default function ExecuteTaskPage() {
 
     // Auto-complete when timer finishes
     useEffect(() => {
-        let timer: NodeJS.Timeout
-        if (isFinished && !completing) {
-            timer = setTimeout(() => {
-                handleComplete(true)
-            }, 2500)
+        if (isFinished) {
+            router.push(`/tasks/${taskId}/success`)
         }
-        return () => clearTimeout(timer)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isFinished])
-
-    const handleComplete = async (isAuto = false) => {
-        if (!isFinished) {
-            if (!confirm('아직 시간이 남았어요! 그래도 완료할까요?')) return
-        }
-
-        setCompleting(true)
-        try {
-            // Move status from TODO -> PENDING
-            const res = await fetch(`/api/tasks/${taskId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'PENDING' })
-            })
-
-            if (res.ok) {
-                if (!isAuto) {
-                    alert('수고했어요! 완료 승인이 요청되었습니다. 🎉')
-                }
-                router.push('/')
-            } else {
-                const data = await res.json()
-                alert(data.error || '오류가 발생했습니다.')
-            }
-        } catch (e) {
-            console.error(e)
-            alert('오류 발생')
-        } finally {
-            if (!isAuto) {
-                setCompleting(false)
-            }
-        }
-    }
+    }, [isFinished, router, taskId])
 
     if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>로딩 중...</div>
     if (!task) return null
@@ -224,7 +185,7 @@ export default function ExecuteTaskPage() {
                 </div>
 
                 {/* Controls */}
-                {!isFinished ? (
+                {!isFinished && (
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
                         <button
                             onClick={toggleTimer}
@@ -238,7 +199,7 @@ export default function ExecuteTaskPage() {
                             {isActive ? <Pause size={32} fill="white" /> : <Play size={32} fill="white" style={{ marginLeft: '4px' }} />}
                         </button>
                         <button
-                            onClick={() => handleComplete(false)}
+                            onClick={() => router.push(`/tasks/${taskId}/success`)}
                             className="btn"
                             style={{
                                 height: '64px', borderRadius: '32px', padding: '0 24px',
@@ -250,24 +211,6 @@ export default function ExecuteTaskPage() {
                             강제로 완료하기
                         </button>
                     </div>
-                ) : (
-                    <div style={{ marginBottom: '2rem', animation: 'bounce 1s infinite' }}>
-                        <span style={{ fontSize: '3rem' }}>🎉</span>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginTop: '0.5rem' }}>
-                            {completing ? '승인 요청 중...' : '수고했어요! 달성 완료!'}
-                        </div>
-                    </div>
-                )}
-
-                {isFinished && !completing && (
-                    <button
-                        onClick={() => handleComplete(false)}
-                        disabled={completing}
-                        className="btn btn-primary"
-                        style={{ width: '100%', fontSize: '1.1rem', padding: '16px', background: 'var(--color-secondary)' }}
-                    >
-                        완료 처리하기 ✨
-                    </button>
                 )}
             </div>
 
