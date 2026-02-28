@@ -3,21 +3,13 @@
 import { useMember } from '@/context/MemberContext'
 import { LogOut, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 export default function GlobalHeader() {
     const { currentMember, logout } = useMember()
     const router = useRouter()
 
-    const [showConfirm, setShowConfirm] = useState(false)
-
     const handleLogoutClick = () => {
-        setShowConfirm(true)
-    }
-
-    const confirmLogout = () => {
         logout()
-        setShowConfirm(false)
         router.push('/')
         router.refresh()
     }
@@ -84,63 +76,6 @@ export default function GlobalHeader() {
                     <LogOut size={18} />
                 </button>
             </div>
-
-            {showConfirm && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.2)',
-                    backdropFilter: 'blur(2px)',
-                    zIndex: 2000,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }} onClick={() => setShowConfirm(false)}>
-                    <div style={{
-                        background: 'white',
-                        padding: '1.5rem',
-                        borderRadius: '16px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                        textAlign: 'center',
-                        minWidth: '280px'
-                    }} onClick={e => e.stopPropagation()}>
-                        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#37474F' }}>로그아웃 하시겠습니까?</h3>
-                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
-                            <button
-                                onClick={() => setShowConfirm(false)}
-                                style={{
-                                    flex: 1,
-                                    padding: '10px',
-                                    borderRadius: '12px',
-                                    border: 'none',
-                                    background: '#F5F5F5',
-                                    color: '#78909C',
-                                    fontWeight: 'bold',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                취소
-                            </button>
-                            <button
-                                onClick={confirmLogout}
-                                style={{
-                                    flex: 1,
-                                    padding: '10px',
-                                    borderRadius: '12px',
-                                    border: 'none',
-                                    background: '#FF5252',
-                                    color: 'white',
-                                    fontWeight: 'bold',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                로그아웃
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
 
         </>
     )

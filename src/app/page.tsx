@@ -57,11 +57,9 @@ export default function Home() {
             </div>
             <button
               onClick={() => {
-                if (confirm('로그아웃 하시겠습니까?')) {
-                  // Logout logic (clearing local storage & refresh)
-                  localStorage.removeItem('miracle_po_member');
-                  location.reload();
-                }
+                // Logout logic (clearing local storage & refresh)
+                localStorage.removeItem('miracle_po_member');
+                location.reload();
               }}
               style={{
                 background: 'rgba(255,255,255,0.6)',
