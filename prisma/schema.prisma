@@ -39,9 +39,9 @@ model Task {
   
   // Relations
   creatorId   String
-  creator     Member   @relation("CreatedTasks", fields: [creatorId], references: [id])
+  creator     Member   @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: Cascade)
   assigneeId  String?
-  assignee    Member?  @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  assignee    Member?  @relation("AssignedTasks", fields: [assigneeId], references: [id], onDelete: Cascade)
   
   durationMinutes Int?  // For HOURGLASS tasks
 
@@ -60,7 +60,7 @@ model Transaction {
   
   // Relations
   memberId  String
-  member    Member   @relation(fields: [memberId], references: [id])
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   
   createdAt DateTime @default(now())
 }
@@ -84,9 +84,9 @@ model Routine {
   durationMinutes Int?
   
   creatorId       String
-  creator         Member   @relation("CreatedRoutines", fields: [creatorId], references: [id])
+  creator         Member   @relation("CreatedRoutines", fields: [creatorId], references: [id], onDelete: Cascade)
   assigneeId      String
-  assignee        Member   @relation("AssignedRoutines", fields: [assigneeId], references: [id])
+  assignee        Member   @relation("AssignedRoutines", fields: [assigneeId], references: [id], onDelete: Cascade)
   
   timeOfDay       String?  // HH:MM format
   daysOfWeek      String   // e.g., "Mon,Tue,Wed,Thu,Fri,Sat,Sun"

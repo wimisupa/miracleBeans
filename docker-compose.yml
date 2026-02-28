@@ -15,3 +15,5 @@ services:
     environment:
       - DATABASE_URL=file:/data/prod.db
       - NODE_ENV=production
+    env_file:
+      - .env.production
