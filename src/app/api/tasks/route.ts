@@ -32,7 +32,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { title, description, type, points, creatorId, durationMinutes, routineId } = body
+        const { title, description, type, points, creatorId, assigneeId, durationMinutes, routineId } = body
 
         if (!title || !points || !creatorId || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -51,9 +51,9 @@ export async function POST(request: Request) {
                 description,
                 type,
                 points,
-                status: type === 'HOURGLASS' ? 'TODO' : 'PENDING', // HOURGLASS starts as TODO, others PENDING
+                status: 'TODO', // All new tasks, including EARN and HOURGLASS, start as TODO
                 creatorId,
-                assigneeId: type === 'TATTLE' || type === 'HOURGLASS' ? body.targetMemberId || creatorId : undefined,
+                assigneeId: assigneeId || creatorId, // Explicit assignee from frontend, fallback to creator
                 durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,
                 routineId: routineId || undefined,
             },

@@ -147,7 +147,7 @@ export default function LoginModal({ isOpen, onClose, member, onLoginSuccess }: 
                         margin: '0 auto 1rem auto',
                         fontSize: '1.8rem'
                     }}>
-                        {mode === 'LOGIN' ? (member.role === 'PARENT' ? '👑' : '🌱') : <Lock size={32} color="#37474F" />}
+                        {mode === 'LOGIN' ? (member.role === 'PARENT' ? '🪄' : '🧙') : <Lock size={32} color="#37474F" />}
                     </div>
 
                     <h2 style={{ fontSize: '1.4rem', color: '#37474F', marginBottom: '0.5rem' }}>

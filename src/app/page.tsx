@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Trophy, ClipboardList, ListTodo, Sprout, Calendar, Clock, Timer } from 'lucide-react'
+import { Plus, Trophy, ClipboardList, ListTodo, Sprout, Calendar, Clock, Timer, Gift, Settings } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 import { useRouter } from 'next/navigation'
 import TodoTasksList from '@/components/TodoTasksList'
@@ -85,9 +85,9 @@ export default function Home() {
 
       <section className="glass-panel" style={{ borderRadius: '24px', padding: '2rem', marginBottom: '2rem', textAlign: 'center' }}>
         <h1 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: '800', color: '#37474F' }}>우리 가족의 행복한 위미!</h1>
-        <p style={{ color: '#607D8B', marginBottom: '1.5rem' }}>서로 돕고 사랑하며 콩을 모아보세요 🌱</p>
+        <p style={{ color: '#607D8B', marginBottom: '1.5rem' }}>서로 돕고 사랑하며 콩을 모아보세요 🧙</p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
           <Link href="/tasks/new" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', color: 'inherit', border: 'none',
@@ -103,7 +103,7 @@ export default function Home() {
             }}>
               <ListTodo size={28} color="white" />
             </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>할 일</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>할 일 등록</span>
           </Link>
 
           <Link href="/approvals" className="card" style={{
@@ -134,6 +134,24 @@ export default function Home() {
               <ClipboardList size={28} color="white" />
             </div>
             <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>승인 대기열</span>
+          </Link>
+
+          <Link href="/points/use" className="card" style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            textDecoration: 'none', color: 'inherit', border: 'none',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
+            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
+          }}>
+            <div style={{
+              background: '#FFB74D', // distinguishing orange color for point usage
+              padding: '12px',
+              borderRadius: '50%',
+              marginBottom: '10px',
+              boxShadow: '0 4px 10px rgba(255, 183, 77, 0.3)'
+            }}>
+              <Gift size={28} color="white" />
+            </div>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>콩 사용/선물</span>
           </Link>
 
           <Link href="/routines" className="card" style={{
@@ -169,12 +187,18 @@ export default function Home() {
       </section>
 
       <section>
-        <div className="header" style={{ marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#455A64' }}>가족 구성원</h2>
-          <Link href="/register" className="btn" style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)' }}>
-            <Plus size={16} style={{ marginRight: '4px' }} />
-            가족 추가
-          </Link>
+        <div className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ fontSize: '1.2rem', color: '#455A64', margin: 0 }}>가족 구성원</h2>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Link href="/members/manage" className="btn" style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)', color: '#455A64' }}>
+              <Settings size={16} style={{ marginRight: '4px' }} />
+              가족 관리
+            </Link>
+            <Link href="/register" className="btn btn-primary" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+              <Plus size={16} style={{ marginRight: '4px' }} />
+              가족 추가
+            </Link>
+          </div>
         </div>
 
         {members.length === 0 ? (
@@ -214,11 +238,13 @@ export default function Home() {
                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                   }}
                 >
-                  {member.role === 'PARENT' ? '👑' : '🌱'}
+                  {member.role === 'PARENT' ? '🪄' : '🧙'}
                 </div>
+
                 <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: '#37474F' }}>
                   {member.name}
                 </h3>
+
                 <div style={{
                   fontSize: '1.25rem', fontWeight: '900',
                   color: 'var(--color-secondary)',

@@ -2,36 +2,31 @@
 description: Deploy changes to production (v1.x.x)
 ---
 
-This workflow automates the deployment process from the `miraclePoint` (Dev) folder to the `miraclePoint-prod` (Prod) folder.
+This workflow automates the deployment process for the production environment using Docker directly from the `miraclePoint` main folder.
 
 **Prerequisites:**
-- You must be in the `miraclePoint` (Dev) folder.
-- The `miraclePoint-prod` folder must exist as a sibling.
-- The server (Port 3000) should be stopped or will be restarted.
+- You must be in the `miraclePoint` folder.
+- Docker Desktop must be running.
 
-**Steps:**
+## The Workflow (Docker Native)
 
-1.  **Ask for Version & Message:**
-    - Prompt the user for the new version tag (e.g., `v1.0.2`).
-    - Prompt the user for a commit message.
+Now that the application is containerized, you **no longer need** the separate `miraclePoint-prod` directory. Both development and production deployments can be managed elegantly from your main `miraclePoint` repository.
 
-2.  **Dev Environment (Commit & Tag):**
-    - Run `git add .`
-    - Run `git commit -m "<message>"`
+1.  **Tag the Release:**
+    - Test your features locally in dev (`npm run dev`).
+    - Once satisfied, commit your changes.
     - Run `git tag -a <tag> -m "Release <tag>"`
+    - Run `git push --follow-tags origin main`
 
-3.  **Prod Environment (Update & Deploy):**
-    - Navigate to `../miraclePoint-prod`
-    - Run `git fetch --tags` (Fetch new tags from local dev repo)
-    - Run `git checkout <tag>` (Switch to the new release tag)
-    - Run `mkdir -p ~/miraclePoint-data` (Ensure external database directory exists)
-    - Run `docker-compose build` (Build the new Docker image based on the latest code)
-    - Run `docker-compose up -d` (Start the new container gracefully in the background)
-    - Run `docker exec miracle-point-prod npx prisma@5.22.0 db push --skip-generate` (Apply DB schema to the external `prod.db` inside the container)
+2.  **Deploy to Production:**
+    - Production now runs inside an isolated Docker container, listening on Port 3000.
+    - Run `mkdir -p ~/miraclePoint-data` (Ensure the external SQLite volume exists)
+    - Run `docker-compose build` (Builds the Next.js `standalone` image using the latest committed code)
+    - Run `docker-compose up -d` (Re-creates the `miracle-point-prod` container with zero downtime mapping to Port 3000)
+    - Run `docker exec miracle-point-prod npx prisma@5.22.0 db push --skip-generate` (Applies schema updates to the isolated `~/miraclePoint-data/prod.db`)
 
-4.  **Verify:**
-    - The server should now be running cleanly on Port 3000 via Docker.
-    - Test the application to ensure it is healthy.
+3.  **Verify:**
+    - Navigate to `http://localhost:3000` to verify the production instance is healthy.
 
 ---
 **How to Run:**

@@ -110,6 +110,23 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
         }
     }
 
+    const handleTaskClick = async (task: UnifiedTask) => {
+        if (!currentMember) return
+
+        if (task.type === 'EARN') {
+            // Directly complete the task and send to PENDING queue
+            const res = await fetch(`/api/tasks/${task.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'PENDING' })
+            })
+            if (res.ok) fetchItems()
+        } else {
+            // HOURGLASS goes to execute page
+            router.push(`/tasks/${task.id}/execute`)
+        }
+    }
+
     if (loading) return <div style={{ textAlign: 'center', color: '#90A4AE', fontSize: '0.9rem' }}>로딩 중...</div>
 
     if (items.length === 0) {
@@ -165,7 +182,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                             </button>
                         ) : (
                             <button
-                                onClick={() => router.push(`/tasks/${item.id}/execute`)}
+                                onClick={() => handleTaskClick(item)}
                                 className="btn btn-primary"
                                 style={{
                                     padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px',
@@ -173,7 +190,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                                     fontFamily: 'inherit'
                                 }}
                             >
-                                <Timer size={16} /> 시작
+                                {item.type === 'EARN' ? <><Check size={16} /> 완료</> : <><Timer size={16} /> 시작</>}
                             </button>
                         )
                     )}

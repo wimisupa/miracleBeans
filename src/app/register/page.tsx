@@ -100,7 +100,7 @@ export default function Register() {
                                     boxShadow: role === 'CHILD' ? '0 4px 12px rgba(0, 191, 165, 0.3)' : 'none'
                                 }}
                             >
-                                <span style={{ fontSize: '2rem' }}>🌱</span>
+                                <span style={{ fontSize: '2rem' }}>🧙</span>
                                 <span>자녀</span>
                             </button>
                             <button
@@ -119,8 +119,8 @@ export default function Register() {
                                     boxShadow: role === 'PARENT' ? '0 4px 12px rgba(255, 193, 7, 0.3)' : 'none'
                                 }}
                             >
-                                <span style={{ fontSize: '2rem' }}>👑</span>
-                                <span>부모님</span>
+                                <span style={{ fontSize: '2rem' }}>🪄</span>
+                                <span>부모</span>
                             </button>
                         </div>
                     </div>

@@ -52,7 +52,7 @@ export default function LoginScreen() {
                     <Sprout size={48} />
                     <span>Wimi Bean</span>
                 </div>
-                <p style={{ color: '#546E7A', fontSize: '1.1rem', fontFamily: 'var(--font-outfit)' }}>Happy Bean, Happy Family! 🌱</p>
+                <p style={{ color: '#546E7A', fontSize: '1.1rem', fontFamily: 'var(--font-outfit)' }}>Happy Bean, Happy Family! 🧙</p>
             </div>
 
             <div className="glass-panel" style={{
@@ -97,7 +97,7 @@ export default function LoginScreen() {
                             fontSize: '1.5rem',
                             boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
                         }}>
-                            {member.role === 'PARENT' ? '👑' : '🌱'}
+                            {member.role === 'PARENT' ? '🪄' : '🧙'}
                         </div>
                         <span style={{ flex: 1, textAlign: 'left' }}>{member.name}</span>
                         <span style={{ fontSize: '0.9rem', color: 'var(--color-secondary)', background: 'rgba(0, 191, 165, 0.1)', padding: '4px 8px', borderRadius: '8px' }}>
