@@ -27,7 +27,7 @@ This workflow automates the deployment process from the `miraclePoint` (Dev) fol
     - Run `mkdir -p ~/miraclePoint-data` (Ensure external database directory exists)
     - Run `docker-compose build` (Build the new Docker image based on the latest code)
     - Run `docker-compose up -d` (Start the new container gracefully in the background)
-    - Run `docker exec miracle-point-prod npx prisma migrate deploy` (Apply DB migrations to the external `prod.db` inside the container)
+    - Run `docker exec miracle-point-prod npx prisma@5.22.0 db push --skip-generate` (Apply DB schema to the external `prod.db` inside the container)
 
 4.  **Verify:**
     - The server should now be running cleanly on Port 3000 via Docker.

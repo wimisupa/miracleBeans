@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -37,6 +37,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+RUN apk add --no-cache openssl
 
 COPY --from=builder /app/public ./public
 
