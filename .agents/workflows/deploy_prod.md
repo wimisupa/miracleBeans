@@ -20,17 +20,18 @@ This workflow automates the deployment process from the `miraclePoint` (Dev) fol
     - Run `git commit -m "<message>"`
     - Run `git tag -a <tag> -m "Release <tag>"`
 
-3.  **Prod Environment (Update & Build):**
+3.  **Prod Environment (Update & Deploy):**
     - Navigate to `../miraclePoint-prod`
     - Run `git fetch --tags` (Fetch new tags from local dev repo)
     - Run `git checkout <tag>` (Switch to the new release tag)
-    - Run `npm ci` (Install/Update dependencies cleanly)
-    - Run `npx prisma migrate deploy` (Apply DB migrations to `prod.db`)
-    - Run `npm run build` (Build for production)
+    - Run `mkdir -p ~/miraclePoint-data` (Ensure external database directory exists)
+    - Run `docker-compose build` (Build the new Docker image based on the latest code)
+    - Run `docker-compose up -d` (Start the new container gracefully in the background)
+    - Run `docker exec miracle-point-prod npx prisma migrate deploy` (Apply DB migrations to the external `prod.db` inside the container)
 
-4.  **Restart Server:**
-    - Ask the user if they want to start the production server immediately.
-    - If yes, run `npm run start` (Starts on Port 3000).
+4.  **Verify:**
+    - The server should now be running cleanly on Port 3000 via Docker.
+    - Test the application to ensure it is healthy.
 
 ---
 **How to Run:**

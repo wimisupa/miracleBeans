@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  miracle-point:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: miracle-point-prod
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount the external data directory to /data inside the container
+      - ~/miraclePoint-data:/data
+    environment:
+      - DATABASE_URL=file:/data/prod.db
+      - NODE_ENV=production
