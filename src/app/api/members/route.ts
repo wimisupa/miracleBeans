@@ -25,12 +25,16 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name and role are required' }, { status: 400 })
         }
 
+        // Ideally, we'd pass familyId from the client, but for now we auto-assign to the first family
+        const defaultFamily = await prisma.family.findFirst()
+
         const member = await prisma.member.create({
             data: {
                 name,
                 role,
                 pin: pin || '0000',
                 points: 0, // Start with 0 points
+                familyId: defaultFamily?.id || undefined
             },
         })
 

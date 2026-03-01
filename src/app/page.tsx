@@ -2,261 +2,145 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Trophy, ClipboardList, ListTodo, Sprout, Calendar, Clock, Timer, Gift, Settings } from 'lucide-react'
-import { useMember } from '@/context/MemberContext'
+import { Sprout, Plus, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import TodoTasksList from '@/components/TodoTasksList'
+import { useMember } from '@/context/MemberContext'
 
-type Member = {
-  id: string
-  name: string
-  role: string
-  points: number
-  pin: string
+type Family = {
+    id: string
+    name: string
+    motto: string | null
+    location: string | null
+    _count: {
+        members: number
+    }
 }
 
 export default function Home() {
-  const router = useRouter()
-  const { currentMember } = useMember()
-  const [members, setMembers] = useState<Member[]>([])
-  const [pendingCount, setPendingCount] = useState(0)
-  useEffect(() => {
-    fetch('/api/members').then(res => res.json()).then(data => setMembers(data))
-    fetch('/api/tasks').then(res => res.json()).then(tasks => {
-      setPendingCount(tasks.filter((t: any) => t.status === 'PENDING').length)
-    })
-  }, [])
+    const router = useRouter()
+    const { logout } = useMember()
+    const [families, setFamilies] = useState<Family[]>([])
+    const [loading, setLoading] = useState(true)
 
-  const handleMemberClick = (member: Member) => {
-    // Navigate directly to history regardless of user
-    router.push(`/history/${member.id}`)
-  }
+    useEffect(() => {
+        // Clear previous session when visiting the root page to ensure clean navigation
+        // If they enter a family board later, they log in again.
+        logout()
 
+        fetch('/api/families')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setFamilies(data)
+                } else {
+                    console.error('API Error or invalid data:', data)
+                    setFamilies([])
+                }
+                setLoading(false)
+            })
+            .catch(e => {
+                console.error('Fetch error:', e)
+                setFamilies([])
+                setLoading(false)
+            })
+    }, [logout])
 
-  return (
-    <main>
-      <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem' }}>
-        <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Sprout size={32} color="var(--color-secondary)" />
-          <span style={{ fontSize: '1.8rem', fontWeight: '800' }}>Wimi Bean</span>
-        </div>
-        {currentMember && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              padding: '6px 12px',
-              background: 'rgba(255,255,255,0.6)',
-              borderRadius: '20px',
-              backdropFilter: 'blur(4px)',
-              border: '1px solid rgba(255,255,255,0.5)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-            }}>
-              <span style={{ fontSize: '0.9rem', color: '#37474F' }}>
-                <span style={{ fontWeight: 'bold' }}>{currentMember.name}</span>님
-              </span>
-            </div>
-            <button
-              onClick={() => {
-                // Logout logic (clearing local storage & refresh)
-                localStorage.removeItem('miracle_po_member');
-                location.reload();
-              }}
-              style={{
-                background: 'rgba(255,255,255,0.6)',
-                borderRadius: '50%',
-                width: '36px', height: '36px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#FF5252',
-                border: '1px solid rgba(255,255,255,0.5)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                transition: 'transform 0.2s',
-              }}
-              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
-              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
-          </div>
-        )}
-      </header>
-
-      <section className="glass-panel" style={{ borderRadius: '24px', padding: '2rem', marginBottom: '2rem', textAlign: 'center' }}>
-        <h1 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: '800', color: '#37474F' }}>우리 가족의 행복한 위미!</h1>
-        <p style={{ color: '#607D8B', marginBottom: '1.5rem' }}>서로 돕고 사랑하며 콩을 모아보세요 🧙</p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
-          <Link href="/tasks/new" className="card" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            textDecoration: 'none', color: 'inherit', border: 'none',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
-          }}>
-            <div style={{
-              background: 'var(--color-primary)',
-              padding: '12px',
-              borderRadius: '50%',
-              marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)' // Updated box shadow color to match primary theme roughly
-            }}>
-              <ListTodo size={28} color="white" />
-            </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>할 일 등록</span>
-          </Link>
-
-          <Link href="/approvals" className="card" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            textDecoration: 'none', color: 'inherit', position: 'relative',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
-          }}>
-            {pendingCount > 0 && (
-              <span style={{
-                position: 'absolute', top: '-5px', right: '-5px',
-                background: 'var(--color-accent)', color: 'white',
-                borderRadius: '50%', width: '28px', height: '28px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.85rem', fontWeight: 'bold',
-                boxShadow: '0 2px 5px rgba(255, 82, 82, 0.4)'
-              }}>
-                {pendingCount}
-              </span>
-            )}
-            <div style={{
-              background: 'var(--color-secondary)',
-              padding: '12px',
-              borderRadius: '50%',
-              marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)'
-            }}>
-              <ClipboardList size={28} color="white" />
-            </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>승인 대기열</span>
-          </Link>
-
-          <Link href="/points/use" className="card" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            textDecoration: 'none', color: 'inherit', border: 'none',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
-          }}>
-            <div style={{
-              background: '#FFB74D', // distinguishing orange color for point usage
-              padding: '12px',
-              borderRadius: '50%',
-              marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(255, 183, 77, 0.3)'
-            }}>
-              <Gift size={28} color="white" />
-            </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>콩 사용/선물</span>
-          </Link>
-
-          <Link href="/routines" className="card" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            textDecoration: 'none', color: 'inherit', border: 'none',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
-          }}>
-            <div style={{
-              background: 'var(--color-primary)', // changed from secondary to primary or a new color
-              padding: '12px',
-              borderRadius: '50%',
-              marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)'
-            }}>
-              <Calendar size={28} color="white" />
-            </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>루틴 관리</span>
-          </Link>
-        </div>
-
-        {/* Member TODO Tasks */}
-        {currentMember && (
-          <div style={{ textAlign: 'left' }}>
-            <h2 style={{ fontSize: '1.2rem', color: '#455A64', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '20px' }}>⏳</span> 해야 할 일
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              <TodoTasksList memberId={currentMember.id} />
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section>
-        <div className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#455A64', margin: 0 }}>가족 구성원</h2>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Link href="/members/manage" className="btn" style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)', color: '#455A64' }}>
-              <Settings size={16} style={{ marginRight: '4px' }} />
-              가족 관리
-            </Link>
-            <Link href="/register" className="btn btn-primary" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
-              <Plus size={16} style={{ marginRight: '4px' }} />
-              가족 추가
-            </Link>
-          </div>
-        </div>
-
-        {members.length === 0 ? (
-          <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-            <p style={{ marginBottom: '1rem', color: 'var(--color-text-muted)' }}>아직 등록된 가족이 없어요!</p>
-            <Link href="/register" className="btn btn-primary">
-              가족 등록하기
-            </Link>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '16px', margin: '0 -8px', padding: '0 8px 16px 8px' }}>
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="card"
-                onClick={() => handleMemberClick(member)}
-                style={{
-                  minWidth: '140px',
-                  flexShrink: 0,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
-                  textDecoration: 'none', color: 'inherit', cursor: 'pointer',
-                  padding: '1.5rem 1rem', marginBottom: 0,
-                  border: '1px solid rgba(255, 255, 255, 0.6)',
-                  background: 'rgba(255, 255, 255, 0.65)'
-                }}>
-                <div
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '50%',
-                    background: member.role === 'PARENT' ? 'linear-gradient(135deg, #FFD54F, #FFecb3)' : 'linear-gradient(135deg, #80CBC4, #E0F2F1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '0.75rem',
-                    fontSize: '1.8rem',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  {member.role === 'PARENT' ? '🪄' : '🧙'}
+    return (
+        <main>
+            <header className="header" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center', paddingTop: '2rem' }}>
+                <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sprout size={36} color="var(--color-secondary)" />
+                    <span style={{ fontSize: '2rem', fontWeight: '800' }}>Oh my cong</span>
                 </div>
+            </header>
 
-                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: '#37474F' }}>
-                  {member.name}
-                </h3>
+            <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#37474F', marginBottom: '0.8rem' }}>
+                    행복한 오마이콩에 오신 것을 환영합니다!
+                </h1>
+                <p style={{ color: '#607D8B', fontSize: '1rem' }}>
+                    함께 성장하고 응원할 우리 가족을 선택해주세요.
+                </p>
+            </section>
 
-                <div style={{
-                  fontSize: '1.25rem', fontWeight: '900',
-                  color: 'var(--color-secondary)',
-                  background: 'rgba(0, 191, 165, 0.1)',
-                  padding: '4px 12px',
-                  borderRadius: '12px'
-                }}>
-                  {member.points.toLocaleString()} 콩
+            <section>
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '3rem', color: '#90A4AE' }}>
+                        가족 목록을 불러오는 중입니다...
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                        {families.map(family => (
+                            <Link key={family.id} href={`/family/${family.id}`} style={{ textDecoration: 'none' }}>
+                                <div className="card" style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    padding: '1.5rem', margin: 0,
+                                    transition: 'transform 0.2s, box-shadow 0.2s',
+                                    cursor: 'pointer'
+                                }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.1)'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'none'
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <div style={{
+                                            width: '56px', height: '56px',
+                                            borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, rgba(0, 191, 165, 0.2), rgba(0, 191, 165, 0.05))',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            color: 'var(--color-primary)'
+                                        }}>
+                                            <Users size={28} />
+                                        </div>
+                                        <div>
+                                            <h2 style={{ margin: '0 0 4px 0', fontSize: '1.2rem', color: '#37474F' }}>
+                                                {family.name} 가족
+                                            </h2>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#607D8B', fontSize: '0.85rem' }}>
+                                                {family.location && <span>📍 {family.location}</span>}
+                                                {family.location && family.motto && <span style={{ opacity: 0.5 }}>|</span>}
+                                                {family.motto && <span>{family.motto}</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <span style={{
+                                            background: '#ECEFF1', color: '#546E7A',
+                                            padding: '4px 10px', borderRadius: '12px',
+                                            fontSize: '0.8rem', fontWeight: 'bold'
+                                        }}>
+                                            {family._count.members}명
+                                        </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+
+                        {Reflect.ownKeys(families || {}).length === 0 && (
+                            <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', background: 'rgba(255,255,255,0.4)', border: '1px dashed #B0BEC5' }}>
+                                <p style={{ color: '#607D8B', marginBottom: '1rem' }}>아직 등록된 첫 가족이 없어요.</p>
+                                <p style={{ fontSize: '0.9rem', color: '#90A4AE' }}>버튼을 눌러 우리 가족을 먼저 만들어주세요!</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Link href="/family/new" className="btn btn-primary" style={{
+                        padding: '12px 24px', fontSize: '1.05rem',
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        boxShadow: '0 4px 12px rgba(0, 191, 165, 0.3)'
+                    }}>
+                        <Plus size={20} />
+                        새로운 가족 그룹 만들기
+                    </Link>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </main>
-  )
+            </section>
+        </main>
+    )
 }

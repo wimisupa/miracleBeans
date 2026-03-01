@@ -74,7 +74,17 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
         if (routine.isCompletedDaily || !currentMember) return
 
         if (routine.activeTaskId) {
-            router.push(`/tasks/${routine.activeTaskId}/execute`)
+            if (routine.type === 'EARN') {
+                // If it's EARN, bypass the timer execution page and just complete it
+                const res = await fetch(`/api/tasks/${routine.activeTaskId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'PENDING' })
+                })
+                if (res.ok) fetchItems()
+            } else {
+                router.push(`/tasks/${routine.activeTaskId}/execute`)
+            }
             return
         }
 
@@ -89,7 +99,19 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                     routineId: routine.id
                 })
             })
-            if (res.ok) fetchItems()
+            // Immediately dispatch it as pending so it skips the TODO phase entirely.
+            // This is safer since /api/tasks sets new EARN to TODO.
+            if (res.ok) {
+                const createdTask = await res.json()
+                if (createdTask.id) {
+                    await fetch(`/api/tasks/${createdTask.id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'PENDING' })
+                    })
+                }
+                fetchItems()
+            }
         } else if (routine.type === 'HOURGLASS') {
             const res = await fetch('/api/tasks', {
                 method: 'POST', body: JSON.stringify({

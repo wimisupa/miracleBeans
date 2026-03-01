@@ -1,7 +1,7 @@
 {
-    "name": "위미콩 (Wimi Bean)",
-    "short_name": "위미콩",
-    "description": "우리 가족 포인트 관리 앱 - 모두 함께 행복한 위미!",
+    "name": "오마이콩 (Oh my cong)",
+    "short_name": "오마이콩",
+    "description": "우리 가족 포인트 관리 앱 - 모두 함께 행복한 오마이콩!",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#E0F2F1",

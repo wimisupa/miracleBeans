@@ -11,6 +11,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Family {
+  id        String   @id @default(cuid())
+  name      String
+  motto     String?
+  location  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  members   Member[]
+}
+
 model Member {
   id        String   @id @default(cuid())
   name      String
@@ -20,6 +31,9 @@ model Member {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
+  familyId  String?
+  family    Family?  @relation(fields: [familyId], references: [id], onDelete: SetNull)
+
   // Relations
   assignedTasks    Task[]          @relation("AssignedTasks")
   createdTasks     Task[]          @relation("CreatedTasks")

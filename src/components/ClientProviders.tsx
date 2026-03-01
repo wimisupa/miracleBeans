@@ -9,8 +9,14 @@ function MemberGuard({ children }: { children: ReactNode }) {
     const { currentMember } = useMember()
     const pathname = usePathname()
 
-    // Always allow access to the registration page, even if logged out
-    if (pathname === '/register') {
+    // Public routes that do not require authentication
+    const isPublicRoute =
+        pathname === '/' ||
+        pathname === '/register' ||
+        pathname === '/family/new' ||
+        pathname.match(/^\/family\/[^\/]+$/); // matches /family/[id] but not /family/[id]/dashboard
+
+    if (isPublicRoute) {
         return <>{children}</>
     }
 

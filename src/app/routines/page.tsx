@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Sparkles, Plus, Trash2, Timer, Coins, Calendar, Clock, Loader2 } from 'lucide-react'
+import { ChevronLeft, Sparkles, Plus, Trash2, Timer, Coins, Calendar, Clock, Loader2, Pencil } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = { id: string, name: string, role: string }
@@ -54,6 +54,7 @@ export default function RoutinesPage() {
 
     // Form State
     const [showForm, setShowForm] = useState(false)
+    const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null)
     const [title, setTitle] = useState('')
     const [points, setPoints] = useState(100)
     const [type, setType] = useState<'EARN' | 'HOURGLASS'>('EARN')
@@ -110,6 +111,18 @@ export default function RoutinesPage() {
         )
     }
 
+    const handleEdit = (routine: Routine) => {
+        setEditingRoutineId(routine.id)
+        setTitle(routine.title)
+        setPoints(routine.points)
+        setType(routine.type)
+        setDurationMinutes(routine.durationMinutes ? String(routine.durationMinutes) : '')
+        setTimeOfDay(routine.timeOfDay || '08:00')
+        setSelectedDays(routine.daysOfWeek.split(','))
+        setAssigneeId(routine.assigneeId)
+        setShowForm(true)
+    }
+
     const handleSaveRoutine = async (e?: React.FormEvent) => {
         if (e) e.preventDefault()
         if (!title || !points || selectedDays.length === 0) return
@@ -120,15 +133,18 @@ export default function RoutinesPage() {
 
         setSaving(true)
         try {
-            const res = await fetch('/api/routines', {
-                method: 'POST',
+            const url = editingRoutineId ? `/api/routines/${editingRoutineId}` : '/api/routines'
+            const method = editingRoutineId ? 'PATCH' : 'POST'
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title,
                     type,
                     points: Number(points),
                     timeOfDay,
-                    durationMinutes: type === 'HOURGLASS' ? Number(durationMinutes) : undefined,
+                    durationMinutes: type === 'HOURGLASS' ? Number(durationMinutes) : null,
                     daysOfWeek: selectedDays.join(','),
                     creatorId: currentMember?.id,
                     assigneeId: assigneeId || currentMember?.id
@@ -138,6 +154,7 @@ export default function RoutinesPage() {
                 await fetchRoutines()
                 setShowForm(false)
                 // Reset form
+                setEditingRoutineId(null)
                 setTitle('')
                 setPoints(100)
                 setType('EARN')
@@ -266,7 +283,14 @@ export default function RoutinesPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 8px' }}>
                 <h2 style={{ fontSize: '1.3rem', color: '#37474F' }}>나의 루틴</h2>
                 <button
-                    onClick={() => setShowForm(!showForm)}
+                    onClick={() => {
+                        setEditingRoutineId(null)
+                        setTitle('')
+                        setPoints(100)
+                        setType('EARN')
+                        setDurationMinutes('')
+                        setShowForm(!showForm)
+                    }}
                     style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: 'var(--color-secondary)', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' }}
                 >
                     <Plus size={18} />
@@ -282,26 +306,68 @@ export default function RoutinesPage() {
                             <input type="text" className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="예: 아침 물 한잔 마시기" required />
                         </div>
 
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                            <div style={{ flex: 1 }}>
-                                <label className="label">방식</label>
-                                <select className="input" value={type} onChange={e => { setType(e.target.value as any); setDurationMinutes(''); }}>
-                                    <option value="EARN">모으기 (즉시)</option>
-                                    <option value="HOURGLASS">모래시계 (타이머)</option>
-                                </select>
+                        {/* 2. Timer Toggle (HOURGLASS vs EARN) */}
+                        <div style={{
+                            marginBottom: '1rem',
+                            padding: '1rem',
+                            borderRadius: '12px',
+                            background: type === 'HOURGLASS' ? 'rgba(0, 191, 165, 0.05)' : 'rgba(255,255,255,0.6)',
+                            border: type === 'HOURGLASS' ? '2px solid var(--color-primary)' : '1px solid #E0E0E0',
+                            transition: 'all 0.3s ease'
+                        }}>
+                            <div
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                                onClick={() => {
+                                    if (type === 'HOURGLASS') {
+                                        setType('EARN')
+                                        setDurationMinutes('')
+                                    } else {
+                                        setType('HOURGLASS')
+                                    }
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Timer size={22} color={type === 'HOURGLASS' ? 'var(--color-primary)' : '#90A4AE'} />
+                                    <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: type === 'HOURGLASS' ? 'var(--color-primary)' : '#607D8B' }}>
+                                        이 루틴에 모래시계 타이머 적용하기
+                                    </span>
+                                </div>
+                                <div style={{
+                                    width: '44px', height: '24px', borderRadius: '12px',
+                                    background: type === 'HOURGLASS' ? 'var(--color-primary)' : '#CFD8DC',
+                                    position: 'relative', transition: 'background 0.3s'
+                                }}>
+                                    <div style={{
+                                        width: '20px', height: '20px', borderRadius: '50%', background: 'white',
+                                        position: 'absolute', top: '2px', left: type === 'HOURGLASS' ? '22px' : '2px',
+                                        transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                    }} />
+                                </div>
                             </div>
-                            <div style={{ flex: 1 }}>
-                                <label className="label">보상 콩</label>
-                                <input type="number" className="input" value={points} onChange={e => setPoints(Number(e.target.value))} min="10" step="10" required />
-                            </div>
+
+                            {type === 'HOURGLASS' && (
+                                <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
+                                    <label className="label">얼마나 진행할 예정인가요? (분)</label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input
+                                            type="number"
+                                            className="input"
+                                            value={durationMinutes}
+                                            onChange={(e) => setDurationMinutes(e.target.value)}
+                                            placeholder="예: 15"
+                                            min="1"
+                                            style={{ flex: 1 }}
+                                        />
+                                        <span style={{ color: '#607D8B', fontWeight: 'bold' }}>분</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {type === 'HOURGLASS' && (
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label className="label">진행 시간 (분)</label>
-                                <input type="number" className="input" value={durationMinutes} onChange={e => setDurationMinutes(e.target.value)} placeholder="예: 15" min="1" required />
-                            </div>
-                        )}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <label className="label">보상 콩</label>
+                            <input type="number" className="input" value={points} onChange={e => setPoints(Number(e.target.value))} min="10" step="10" required style={{ width: '100%' }} />
+                        </div>
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label className="label">알림/예정 시간</label>
@@ -338,8 +404,15 @@ export default function RoutinesPage() {
                         </div>
 
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button type="button" onClick={() => setShowForm(false)} className="btn" style={{ flex: 1, background: '#E0E0E0', color: '#546E7A' }}>취소</button>
-                            <button type="submit" disabled={saving || selectedDays.length === 0} className="btn btn-primary" style={{ flex: 2 }}>{saving ? '저장 중...' : '루틴 저장하기'}</button>
+                            <button type="button" onClick={() => {
+                                setShowForm(false)
+                                setEditingRoutineId(null)
+                                setTitle('')
+                                setPoints(100)
+                                setType('EARN')
+                                setDurationMinutes('')
+                            }} className="btn" style={{ flex: 1, background: '#E0E0E0', color: '#546E7A' }}>취소</button>
+                            <button type="submit" disabled={saving || selectedDays.length === 0} className="btn btn-primary" style={{ flex: 2 }}>{saving ? '저장 중...' : (editingRoutineId ? '루틴 수정하기' : '루틴 저장하기')}</button>
                         </div>
                     </form>
                 </div>
@@ -377,9 +450,14 @@ export default function RoutinesPage() {
                                     ))}
                                 </div>
                             </div>
-                            <button onClick={() => handleDelete(routine.id)} style={{ background: 'none', border: 'none', color: '#EF5350', cursor: 'pointer', padding: '8px' }}>
-                                <Trash2 size={20} />
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => handleEdit(routine)} style={{ background: 'none', border: 'none', color: '#78909C', cursor: 'pointer', padding: '8px' }}>
+                                    <Pencil size={20} />
+                                </button>
+                                <button onClick={() => handleDelete(routine.id)} style={{ background: 'none', border: 'none', color: '#EF5350', cursor: 'pointer', padding: '8px' }}>
+                                    <Trash2 size={20} />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

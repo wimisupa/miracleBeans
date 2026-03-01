@@ -7,6 +7,7 @@ type Member = {
     name: string
     role: string
     points: number
+    familyId?: string | null
 }
 
 type MemberContextType = {
@@ -61,8 +62,8 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     const logout = () => {
         setCurrentMember(null)
         localStorage.removeItem('miracle_po_member')
-        // Optional: Redirect to home or refresh
-        window.location.href = '/'
+        // We will remove window.location.href = '/' to prevent infinite reload loops.
+        // If a component wants to redirect after logout, it should handle the router.push itself.
     }
 
     const refreshMember = async () => {
