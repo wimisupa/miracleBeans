@@ -112,7 +112,7 @@ export default function FamilyMemberSelectionPage({ params }: { params: Promise<
                         <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-muted)' }}>
                             이 가족 그룹에 아직 구성원이 없습니다.
                         </p>
-                        <Link href="/register" className="btn btn-primary">
+                        <Link href={`/register?familyId=${familyId}`} className="btn btn-primary">
                             <Plus size={18} style={{ marginRight: '8px', display: 'inline' }} />
                             첫 구성원 등록하기
                         </Link>

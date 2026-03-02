@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, History, TrendingUp, TrendingDown, Sprout, Calendar, Clock, Timer } from 'lucide-react'
+import { useMember } from '@/context/MemberContext'
 import TodoTasksList from '@/components/TodoTasksList'
 
 type Transaction = {
@@ -17,6 +18,7 @@ type Transaction = {
 export default function HistoryPage() {
     const params = useParams()
     const memberId = params.memberId as string
+    const { currentMember } = useMember()
 
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [loading, setLoading] = useState(true)
@@ -53,7 +55,7 @@ export default function HistoryPage() {
     return (
         <div>
             <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0' }}>
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
                     <ChevronLeft size={32} />
                 </Link>
                 <div className="logo" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>

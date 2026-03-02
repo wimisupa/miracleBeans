@@ -132,7 +132,7 @@ export default function PointUsagePage() {
 
             if (res.ok) {
                 alert('정의의 이름으로 제리에게 신고 완료! 🐹⚖️')
-                router.push('/')
+                router.push(`/family/${currentMember.familyId}/dashboard`)
                 router.refresh()
             } else {
                 alert('실패했습니다.')
@@ -166,7 +166,7 @@ export default function PointUsagePage() {
 
             if (res.ok) {
                 alert('콩을 선물했어요! 🧙')
-                router.push('/')
+                router.push(`/family/${currentMember.familyId}/dashboard`)
                 router.refresh()
             } else {
                 alert(data.error || '실패했어요.')
@@ -219,7 +219,7 @@ export default function PointUsagePage() {
                 await fetch(`/api/tasks/${task.id}/approve`, { method: 'POST' })
 
                 alert(`${jerryData.points}콩을 사용하여 '${description}' 쿠폰을 발행했어요! 🎉`)
-                router.push('/')
+                router.push(`/family/${currentMember.familyId}/dashboard`)
                 router.refresh()
             } else {
                 alert('실패했습니다.')
@@ -235,7 +235,7 @@ export default function PointUsagePage() {
     return (
         <div>
             <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+                <Link href={`/family/${currentMember.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
                     <ChevronLeft size={28} />
                 </Link>
                 <div className="logo" style={{ flex: 1 }}>

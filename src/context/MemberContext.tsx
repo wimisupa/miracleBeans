@@ -39,7 +39,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
 
     const validateSession = async (member: Member) => {
         try {
-            const res = await fetch('/api/members')
+            const res = await fetch(`/api/members?familyId=${member.familyId}`)
             const members = await res.json()
             const exists = members.find((m: Member) => m.id === member.id)
             if (exists) {

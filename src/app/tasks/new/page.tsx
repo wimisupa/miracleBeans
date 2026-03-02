@@ -68,8 +68,8 @@ export default function NewTaskPage() {
     }, [currentMember, router])
 
     useEffect(() => {
-        if (currentMember) {
-            fetch('/api/members')
+        if (currentMember?.familyId) {
+            fetch(`/api/members?familyId=${currentMember.familyId}`)
                 .then(res => res.json())
                 .then((data: Member[]) => {
                     setFamilyMembers(data)
@@ -79,7 +79,7 @@ export default function NewTaskPage() {
                     }
                 })
         }
-    }, [currentMember?.id, assigneeId])
+    }, [currentMember?.familyId, currentMember?.id, assigneeId])
 
     if (!currentMember) return null
 
@@ -143,7 +143,7 @@ export default function NewTaskPage() {
             })
 
             if (res.ok) {
-                router.push('/')
+                router.push(`/family/${currentMember.familyId}/dashboard`)
                 router.refresh()
                 return // Do not reset loading state, let the page transition
             } else {
@@ -166,7 +166,7 @@ export default function NewTaskPage() {
     return (
         <div>
             <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+                <Link href={`/family/${currentMember.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
                     <ChevronLeft size={28} />
                 </Link>
                 <div className="logo" style={{ flex: 1 }}>

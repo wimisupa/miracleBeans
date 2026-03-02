@@ -71,16 +71,17 @@ export default function RoutinesPage() {
     }, [currentMember])
 
     const fetchMembers = async () => {
-        const res = await fetch('/api/members')
+        if (!currentMember?.familyId) return
+        const res = await fetch(`/api/members?familyId=${currentMember.familyId}`)
         const data = await res.json()
         setFamilyMembers(data)
         if (currentMember) setAssigneeId(currentMember.id)
     }
 
     const fetchRoutines = async () => {
-        if (!currentMember) return
+        if (!currentMember?.familyId) return
         setLoadingRoutines(true)
-        const res = await fetch('/api/routines')
+        const res = await fetch(`/api/routines?familyId=${currentMember.familyId}`)
         const data = await res.json()
         setRoutines(data.filter((r: Routine) => r.isActive && (r.creatorId === currentMember.id || r.assigneeId === currentMember.id)))
         setLoadingRoutines(false)
@@ -222,7 +223,7 @@ export default function RoutinesPage() {
     return (
         <div>
             <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0', marginBottom: '1.5rem' }}>
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
                     <ChevronLeft size={32} />
                 </Link>
                 <div className="logo" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>

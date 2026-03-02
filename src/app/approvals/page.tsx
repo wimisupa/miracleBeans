@@ -31,10 +31,11 @@ export default function ApprovalsPage() {
     const [loading, setLoading] = useState(true)
 
     const fetchData = async () => {
+        if (!currentMember?.familyId) return;
         try {
             const [tasksRes, membersRes] = await Promise.all([
-                fetch('/api/tasks?status=PENDING'),
-                fetch('/api/members')
+                fetch(`/api/tasks?status=PENDING&familyId=${currentMember.familyId}`),
+                fetch(`/api/members?familyId=${currentMember.familyId}`)
             ])
 
             if (tasksRes.ok && membersRes.ok) {
@@ -90,7 +91,7 @@ export default function ApprovalsPage() {
     return (
         <div>
             <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
                     <ChevronLeft size={28} />
                 </Link>
                 <div className="logo" style={{ flex: 1 }}>

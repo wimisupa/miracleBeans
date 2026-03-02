@@ -63,7 +63,7 @@ export default function FamilyManagePage() {
                     body: JSON.stringify({ name, motto, location })
                 })
                 if (res.ok) {
-                    router.push('/')
+                    router.push(`/family/${currentMember.familyId}/dashboard`)
                 } else {
                     setError('가족 정보 수정에 실패했습니다.')
                 }
@@ -77,7 +77,7 @@ export default function FamilyManagePage() {
                 if (res.ok) {
                     // Update current member to be attached to this family
                     // We need a member update endpoint for this, omitted for brevity as seeding handles initial
-                    router.push('/')
+                    router.push(currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/')
                 } else {
                     setError('가족 등록에 실패했습니다.')
                 }
@@ -96,7 +96,7 @@ export default function FamilyManagePage() {
             <div className="header" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}
                     style={{
                         background: 'rgba(255,255,255,0.8)', border: 'none', padding: '10px', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', color: '#546E7A', borderRadius: '50%',

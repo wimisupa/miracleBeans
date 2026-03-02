@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Trophy, ClipboardList, ListTodo, Sprout, Calendar, Clock, Timer, Gift, Settings } from 'lucide-react'
+import { Plus, Trophy, ClipboardList, ListTodo, Sprout, Calendar, Clock, Timer, Gift, Settings, Home } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 import { useRouter } from 'next/navigation'
 import TodoTasksList from '@/components/TodoTasksList'
@@ -46,10 +46,11 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
   }, [familyId])
 
   useEffect(() => {
-    fetch('/api/tasks').then(res => res.json()).then(tasks => {
+    if (!currentMember?.familyId) return
+    fetch(`/api/tasks?familyId=${currentMember.familyId}`).then(res => res.json()).then(tasks => {
       setPendingCount(tasks.filter((t: any) => t.status === 'PENDING').length)
     })
-  }, [])
+  }, [currentMember?.familyId])
 
   const handleMemberClick = (member: Member) => {
     // Navigate directly to history regardless of user
@@ -60,9 +61,14 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
   return (
     <main>
       <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem' }}>
-        <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Sprout size={32} color="var(--color-secondary)" />
-          <span style={{ fontSize: '1.8rem', fontWeight: '800' }}>Oh my cong</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', color: '#607D8B', textDecoration: 'none' }}>
+            <Home size={28} />
+          </Link>
+          <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sprout size={32} color="var(--color-secondary)" />
+            <span style={{ fontSize: '1.8rem', fontWeight: '800' }}>Oh my cong</span>
+          </div>
         </div>
         {currentMember && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -232,7 +238,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
               <Settings size={16} style={{ marginRight: '4px' }} />
               구성원 관리
             </Link>
-            <Link href="/register" className="btn btn-primary" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+            <Link href={`/register?familyId=${currentMember?.familyId}`} className="btn btn-primary" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
               <Plus size={16} style={{ marginRight: '4px' }} />
               구성원 추가
             </Link>
@@ -242,7 +248,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
         {members.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
             <p style={{ marginBottom: '1rem', color: 'var(--color-text-muted)' }}>아직 등록된 구성원이 없어요!</p>
-            <Link href="/register" className="btn btn-primary">
+            <Link href={`/register?familyId=${currentMember?.familyId}`} className="btn btn-primary">
               구성원 추가하기
             </Link>
           </div>

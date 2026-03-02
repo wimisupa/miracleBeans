@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle, Home } from 'lucide-react'
+import { useMember } from '@/context/MemberContext'
 
 export default function TaskSuccessPage() {
     const router = useRouter()
     const params = useParams()
     const taskId = params.id as string
+    const { currentMember } = useMember()
 
     const [status, setStatus] = useState<'submitting' | 'success' | 'error'>('submitting')
 
@@ -92,7 +94,7 @@ export default function TaskSuccessPage() {
                     <p style={{ color: '#607D8B', fontSize: '1.2rem', marginBottom: '2rem' }}>달성 완료! 승인 요청이 성공적으로 전송되었습니다.</p>
 
                     <button
-                        onClick={() => router.push('/')}
+                        onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}
                         className="btn btn-primary"
                         style={{
                             display: 'inline-flex',
@@ -115,7 +117,7 @@ export default function TaskSuccessPage() {
                     <h2 style={{ fontSize: '1.5rem', color: 'var(--color-accent)', marginBottom: '0.5rem' }}>오류가 발생했습니다</h2>
                     <p style={{ color: '#607D8B', marginBottom: '2rem' }}>승인 요청 전송에 실패했습니다. 다시 시도해 주세요.</p>
                     <button
-                        onClick={() => router.push('/')}
+                        onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}
                         className="btn"
                         style={{ padding: '10px 20px', background: '#E0E0E0' }}
                     >

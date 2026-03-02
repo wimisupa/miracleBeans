@@ -47,7 +47,7 @@ export default function ExecuteTaskPage() {
                 if (found) {
                     if (currentMember.role !== 'PARENT' && (found.assigneeId || found.creatorId) !== currentMember.id) {
                         alert('내 할 일이 아니에요!')
-                        router.push('/')
+                        router.push(`/family/${currentMember.familyId}/dashboard`)
                         return
                     }
 
@@ -57,7 +57,7 @@ export default function ExecuteTaskPage() {
                     }
                 } else {
                     alert('할 일을 찾을 수 없습니다.')
-                    router.push('/')
+                    router.push(`/family/${currentMember.familyId}/dashboard`)
                 }
             } catch (e) {
                 console.error(e)
@@ -137,7 +137,7 @@ export default function ExecuteTaskPage() {
     return (
         <div>
             <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
                     <ChevronLeft size={28} />
                 </Link>
                 <div className="logo" style={{ flex: 1 }}>

@@ -5,9 +5,15 @@ export const dynamic = 'force-dynamic'
 
 // GET: List all routines
 export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url)
+    const familyId = searchParams.get('familyId')
+
     try {
         const routines = await prisma.routine.findMany({
-            where: { isActive: true },
+            where: {
+                isActive: true,
+                ...(familyId ? { creator: { familyId } } : {})
+            },
             include: {
                 creator: true,
                 assignee: true,

@@ -7,10 +7,14 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
+    const familyId = searchParams.get('familyId')
 
     try {
         const tasks = await prisma.task.findMany({
-            where: status ? { status: status } : undefined,
+            where: {
+                ...(status ? { status } : {}),
+                ...(familyId ? { creator: { familyId } } : {})
+            },
             include: {
                 creator: true,
                 assignee: true,

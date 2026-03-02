@@ -1,15 +1,20 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Link, Sparkles, UserPlus, Sprout, ArrowLeft } from 'lucide-react'
+import { useMember } from '@/context/MemberContext'
 
-export default function Register() {
+function RegisterForm() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const familyId = searchParams.get('familyId')
+
     const [name, setName] = useState('')
-    const [role, setRole] = useState<'PARENT' | 'CHILD'>('CHILD') // Default to child
+    const [role, setRole] = useState<'PARENT' | 'CHILD'>('CHILD')
     const [pin, setPin] = useState('')
     const [loading, setLoading] = useState(false)
+    const { currentMember, login } = useMember()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -25,11 +30,21 @@ export default function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, role, pin }),
+                body: JSON.stringify({ name, role, pin, familyId }),
             })
 
             if (res.ok) {
-                router.push('/') // Redirect to dashboard
+                const newMember = await res.json()
+                // If there is no one logged in currently, log in the newly created member
+                if (!currentMember) {
+                    login(newMember)
+                }
+
+                if (familyId) {
+                    router.push(`/family/${familyId}/dashboard`)
+                } else {
+                    router.push('/')
+                }
                 router.refresh()
             } else {
                 alert('등록에 실패했습니다.')
@@ -45,13 +60,12 @@ export default function Register() {
     return (
         <div>
             <header className="header">
-                {/* Back button manually since we might come from login */}
                 <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#37474F' }}>
                     <ArrowLeft size={28} />
                 </button>
                 <div className="logo" style={{ flex: 1, justifyContent: 'center', paddingRight: '28px' }}>
                     <Sprout size={28} />
-                    <span>Wime Bean Family</span>
+                    <span>Oh my cong</span>
                 </div>
             </header>
 
@@ -156,5 +170,13 @@ export default function Register() {
                 </form>
             </div>
         </div>
+    )
+}
+
+export default function Register() {
+    return (
+        <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>로딩 중...</div>}>
+            <RegisterForm />
+        </Suspense>
     )
 }

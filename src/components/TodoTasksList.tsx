@@ -28,9 +28,10 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
     const [loading, setLoading] = useState(true)
 
     const fetchItems = async () => {
+        if (!currentMember?.familyId) return
         try {
             const [tasksRes, routinesRes] = await Promise.all([
-                fetch('/api/tasks?status=TODO'),
+                fetch(`/api/tasks?status=TODO&familyId=${currentMember.familyId}`),
                 fetch(`/api/routines/today?memberId=${memberId}`)
             ])
 

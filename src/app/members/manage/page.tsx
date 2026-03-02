@@ -23,8 +23,9 @@ export default function ManageMembers() {
     const [memberToDelete, setMemberToDelete] = useState<Member | null>(null)
 
     const fetchMembers = async () => {
+        if (!currentMember?.familyId) return;
         try {
-            const res = await fetch('/api/members')
+            const res = await fetch(`/api/members?familyId=${currentMember.familyId}`)
             const data = await res.json()
             setMembers(data)
         } catch (err) {
@@ -33,8 +34,10 @@ export default function ManageMembers() {
     }
 
     useEffect(() => {
-        fetchMembers()
-    }, [])
+        if (currentMember?.familyId) {
+            fetchMembers()
+        }
+    }, [currentMember?.familyId])
 
     const handleEditClick = (member: Member) => {
         setEditingId(member.id)
@@ -108,7 +111,7 @@ export default function ManageMembers() {
     return (
         <main style={{ paddingBottom: '2rem' }}>
             <header className="header" style={{ marginBottom: '2rem' }}>
-                <button className="icon-btn" onClick={() => router.push('/')}>
+                <button className="icon-btn" onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}>
                     <ArrowLeft size={24} />
                 </button>
                 <h1>가족 관리</h1>

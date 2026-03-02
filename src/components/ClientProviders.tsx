@@ -1,9 +1,9 @@
 'use client'
 
+import { SessionProvider } from "next-auth/react"
 import { MemberProvider, useMember } from "@/context/MemberContext"
-import LoginScreen from "@/components/LoginScreen"
-import { ReactNode } from "react"
-import { usePathname } from "next/navigation"
+import { ReactNode, useEffect } from "react"
+import { usePathname, useRouter } from "next/navigation"
 
 function MemberGuard({ children }: { children: ReactNode }) {
     const { currentMember } = useMember()
@@ -16,13 +16,21 @@ function MemberGuard({ children }: { children: ReactNode }) {
         pathname === '/family/new' ||
         pathname.match(/^\/family\/[^\/]+$/); // matches /family/[id] but not /family/[id]/dashboard
 
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!isPublicRoute && !currentMember) {
+            router.push('/')
+        }
+    }, [isPublicRoute, currentMember, router])
+
     if (isPublicRoute) {
         return <>{children}</>
     }
 
-    // If not logged in, show login screen
+    // If not logged in, return null while redirecting
     if (!currentMember) {
-        return <LoginScreen />
+        return null
     }
 
     return <>{children}</>
@@ -30,10 +38,12 @@ function MemberGuard({ children }: { children: ReactNode }) {
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
     return (
-        <MemberProvider>
-            <MemberGuard>
-                {children}
-            </MemberGuard>
-        </MemberProvider>
+        <SessionProvider>
+            <MemberProvider>
+                <MemberGuard>
+                    {children}
+                </MemberGuard>
+            </MemberProvider>
+        </SessionProvider>
     )
 }
