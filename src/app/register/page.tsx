@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Link, Sparkles, UserPlus, Sprout, ArrowLeft } from 'lucide-react'
+import { Link, Sparkles, UserPlus, Sprout, ChevronLeft } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 function RegisterForm() {
@@ -59,32 +59,30 @@ function RegisterForm() {
 
     return (
         <div>
-            <header className="header">
-                <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#37474F' }}>
-                    <ArrowLeft size={28} />
+            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <button
+                    onClick={() => router.back()}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#1A252C', marginRight: '1rem', padding: 0 }}
+                >
+                    <ChevronLeft size={32} />
                 </button>
-                <div className="logo" style={{ flex: 1, justifyContent: 'center', paddingRight: '28px' }}>
-                    <Sprout size={28} />
-                    <span>Oh my cong</span>
+                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                    <UserPlus size={32} color="var(--color-secondary)" />
+                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                        구성원 추가
+                    </span>
                 </div>
             </header>
 
             <div className="card">
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{
-                        width: '80px', height: '80px', background: 'white', borderRadius: '50%',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto',
-                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                    }}>
-                        <UserPlus size={40} color="var(--color-secondary)" />
-                    </div>
                     <h2 style={{ fontSize: '1.5rem', color: '#37474F' }}>새로운 가족을 환영해요!</h2>
                     <p style={{ color: '#90A4AE' }}>함께 콩을 모아볼까요?</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label className="label">이름 (누구인가요?)</label>
+                        <label className="label">누구인가요?</label>
                         <input
                             type="text"
                             className="input"
@@ -164,8 +162,7 @@ function RegisterForm() {
                         style={{ width: '100%', padding: '16px' }}
                         disabled={loading}
                     >
-                        {loading ? '등록 중...' : '등록 완료'}
-                        <UserPlus size={20} style={{ marginLeft: '8px' }} />
+                        {loading ? '추가 중...' : '추가 완료'}
                     </button>
                 </form>
             </div>

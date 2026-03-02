@@ -17,3 +17,17 @@ services:
       - NODE_ENV=production
     env_file:
       - .env.production
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: miracle-point-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ~/caddy-data:/data
+      - ~/caddy-config:/config
+    depends_on:
+      - miracle-point

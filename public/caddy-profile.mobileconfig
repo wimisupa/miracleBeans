@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadCertificateFileName</key>
+			<string>Caddy Root CA.crt</string>
+			<key>PayloadContent</key>
+			<data>
+MIIBpDCCAUqgAwIBAgIRAJGgjWcRlcrUvYHom/KPULAwCgYIKoZIzj0EAwIwMDEuMCwGA1UEAxMlQ2FkZHkgTG9jYWwgQXV0aG9yaXR5IC0gMjAyNiBFQ0MgUm9vdDAeFw0yNjAzMDIwNDIwMjRaFw0zNjAxMDkwNDIwMjRaMDAxLjAsBgNVBAMTJUNhZGR5IExvY2FsIEF1dGhvcml0eSAtIDIwMjYgRUNDIFJvb3QwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAS3dY8uZpaOckM6/jQEtVlVjMDHDH3eO88h7nX566sp2cswT29YspWRWoXANeYqyO1COVNOZZf6xXIrzZDKbWS3o0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4EFgQUzk0mB/6kzYqm0IP3kcqspoq4BXUwCgYIKoZIzj0EAwIDSAAwRQIgQTScv49yAWz4/3vJywCP19WXXdidsEMWD408r37b8fcCIQCYSsJZ4B80NlkYSL/5JcOIoc/pA4WEy8PI7fHTiHEEog==
+			</data>
+			<key>PayloadDescription</key>
+			<string>Adds a CA root certificate</string>
+			<key>PayloadDisplayName</key>
+			<string>Caddy Local Root Authority</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.security.root.certificate</string>
+			<key>PayloadType</key>
+			<string>com.apple.security.root</string>
+			<key>PayloadUUID</key>
+			<string>A1B2C3D4-E5F6-4A5B-8C9D-0E1F2A3B4C5D</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>PayloadDisplayName</key>
+	<string>Caddy Local Root Authority Trust</string>
+	<key>PayloadIdentifier</key>
+	<string>com.wimi.caddy.root</string>
+	<key>PayloadRemovalDisallowed</key>
+	<false/>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>F6E5D4C3-B2A1-4D9C-8E7F-6A5B4C3D2E1F</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

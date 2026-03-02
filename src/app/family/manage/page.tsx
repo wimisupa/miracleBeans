@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMember } from '@/context/MemberContext'
-import { ArrowLeft, Save, Users, Home, Heart, MapPin } from 'lucide-react'
+import { ChevronLeft, Save, Users, Home, Heart, MapPin, Settings } from 'lucide-react'
 
 export default function FamilyManagePage() {
     const router = useRouter()
@@ -15,34 +15,37 @@ export default function FamilyManagePage() {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
 
+    const searchParams = useSearchParams()
+    const urlFamilyId = searchParams.get('familyId')
+    const activeFamilyId = currentMember?.familyId || urlFamilyId
+
     useEffect(() => {
-        if (!currentMember) {
+        if (!activeFamilyId) {
             router.push('/')
             return
         }
-        if (currentMember.role !== 'PARENT') {
+
+        if (currentMember && currentMember.role !== 'PARENT') {
             router.push('/')
             return
         }
 
         const loadFamily = async () => {
-            if (currentMember.familyId) {
-                try {
-                    const res = await fetch(`/api/families/${currentMember.familyId}`)
-                    if (res.ok) {
-                        const data = await res.json()
-                        setName(data.name || '')
-                        setMotto(data.motto || '')
-                        setLocation(data.location || '')
-                    }
-                } catch (e) {
-                    console.error('Failed to load family data', e)
+            try {
+                const res = await fetch(`/api/families/${activeFamilyId}`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setName(data.name || '')
+                    setMotto(data.motto || '')
+                    setLocation(data.location || '')
                 }
+            } catch (e) {
+                console.error('Failed to load family data', e)
             }
             setLoading(false)
         }
         loadFamily()
-    }, [currentMember, router])
+    }, [currentMember, activeFamilyId, router])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -55,15 +58,19 @@ export default function FamilyManagePage() {
         setError('')
 
         try {
-            if (currentMember?.familyId) {
+            if (activeFamilyId) {
                 // Update existing family
-                const res = await fetch(`/api/families/${currentMember.familyId}`, {
+                const res = await fetch(`/api/families/${activeFamilyId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, motto, location })
                 })
                 if (res.ok) {
-                    router.push(`/family/${currentMember.familyId}/dashboard`)
+                    if (currentMember) {
+                        router.push(`/family/${activeFamilyId}/dashboard`)
+                    } else {
+                        router.push(`/family/${activeFamilyId}`)
+                    }
                 } else {
                     setError('가족 정보 수정에 실패했습니다.')
                 }
@@ -75,9 +82,7 @@ export default function FamilyManagePage() {
                     body: JSON.stringify({ name, motto, location })
                 })
                 if (res.ok) {
-                    // Update current member to be attached to this family
-                    // We need a member update endpoint for this, omitted for brevity as seeding handles initial
-                    router.push(currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/')
+                    router.push(activeFamilyId ? `/family/${activeFamilyId}/dashboard` : '/')
                 } else {
                     setError('가족 등록에 실패했습니다.')
                 }
@@ -93,45 +98,28 @@ export default function FamilyManagePage() {
 
     return (
         <main style={{ paddingBottom: '3rem' }}>
-            <div className="header" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
                 <button
-                    type="button"
-                    onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}
-                    style={{
-                        background: 'rgba(255,255,255,0.8)', border: 'none', padding: '10px', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', color: '#546E7A', borderRadius: '50%',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'all 0.2s ease'
+                    onClick={() => {
+                        if (currentMember?.familyId) {
+                            router.push(`/family/${currentMember.familyId}/dashboard`)
+                        } else if (urlFamilyId) {
+                            router.push(`/family/${urlFamilyId}`)
+                        } else {
+                            router.push('/')
+                        }
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.background = '#fff' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.8)' }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#1A252C', marginRight: '1rem', padding: 0 }}
                 >
-                    <ArrowLeft size={22} />
+                    <ChevronLeft size={32} />
                 </button>
-            </div>
-
-            <section style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '72px',
-                    height: '72px',
-                    borderRadius: '24px',
-                    background: 'linear-gradient(135deg, #81D4FA 0%, #B39DDB 100%)',
-                    color: 'white',
-                    marginBottom: '1rem',
-                    boxShadow: '0 8px 16px rgba(129, 212, 250, 0.3)',
-                    transform: 'rotate(-5deg)'
-                }}>
-                    <Users size={36} style={{ transform: 'rotate(5deg)' }} />
+                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                    <Settings size={32} color="var(--color-secondary)" />
+                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                        가족 정보 수정
+                    </span>
                 </div>
-                <h1 style={{ fontSize: '2rem', fontWeight: '900', color: '#263238', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>
-                    가족 정보 관리
-                </h1>
-                <p style={{ color: '#607D8B', fontSize: '1.05rem', lineHeight: '1.5' }}>
-                    우리 가족을 소개하는 소중한 정보를<br />언제든지 자유롭게 수정해보세요!
-                </p>
-            </section>
+            </header>
 
             <section className="glass-panel" style={{ padding: '2.5rem 2rem', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
                 {error && (
@@ -218,7 +206,7 @@ export default function FamilyManagePage() {
                             </span>
                         ) : (
                             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Save size={22} /> 새롭게 저장하기!
+                                <Save size={22} /> 저장하기
                             </span>
                         )}
                     </button>

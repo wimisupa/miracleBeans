@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Users, Sprout, ArrowLeft, Plus } from 'lucide-react'
+import { Users, Sprout, ArrowLeft, Plus, Settings, UserCog } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = {
@@ -86,20 +86,22 @@ export default function FamilyMemberSelectionPage({ params }: { params: Promise<
                 >
                     <ArrowLeft size={24} />
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Sprout size={28} color="var(--color-secondary)" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                    <Users size={28} color="var(--color-secondary)" />
                     <h1 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#37474F', margin: 0 }}>
-                        {family.name} 가족
+                        {family.name}
                     </h1>
                 </div>
             </header>
 
+
+
             <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#37474F', marginBottom: '0.5rem' }}>
-                    본인의 프로필을 선택해주세요
-                </h2>
-                <p style={{ color: '#607D8B', fontSize: '1rem' }}>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#2C3E50', marginBottom: '0.8rem', letterSpacing: '-0.02em' }}>
                     {family.motto || '오늘도 행복한 하루 보내세요!'}
+                </h2>
+                <p style={{ color: '#7F8C8D', fontSize: '0.95rem', fontWeight: '500' }}>
+                    본인을 선택해주세요.
                 </p>
             </section>
 
@@ -128,10 +130,9 @@ export default function FamilyMemberSelectionPage({ params }: { params: Promise<
                             <div
                                 key={member.id}
                                 className="card"
-                                onClick={() => handleMemberLogin(member)}
                                 style={{
                                     display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
-                                    textDecoration: 'none', color: 'inherit', cursor: 'pointer',
+                                    textDecoration: 'none', color: 'inherit', position: 'relative',
                                     padding: '2rem 1rem', marginBottom: 0,
                                     transition: 'transform 0.2s, box-shadow 0.2s',
                                     border: '1px solid rgba(255, 255, 255, 0.6)',
@@ -147,41 +148,121 @@ export default function FamilyMemberSelectionPage({ params }: { params: Promise<
                                 }}
                             >
                                 <div
-                                    style={{
-                                        width: '72px',
-                                        height: '72px',
-                                        borderRadius: '50%',
-                                        background: member.role === 'PARENT' ? 'linear-gradient(135deg, #FFD54F, #FFecb3)' : 'linear-gradient(135deg, #80CBC4, #E0F2F1)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        marginBottom: '1rem',
-                                        fontSize: '2rem',
-                                        boxShadow: '0 4px 10px rgba(0,0,0,0.15)'
-                                    }}
+                                    onClick={() => handleMemberLogin(member)}
+                                    style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
                                 >
-                                    {member.role === 'PARENT' ? '🪄' : '🧙'}
-                                </div>
+                                    <div
+                                        style={{
+                                            width: '72px',
+                                            height: '72px',
+                                            borderRadius: '50%',
+                                            background: member.role === 'PARENT' ? 'linear-gradient(135deg, #FFD54F, #FFecb3)' : 'linear-gradient(135deg, #80CBC4, #E0F2F1)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            marginBottom: '1rem',
+                                            fontSize: '2rem',
+                                            boxShadow: '0 4px 10px rgba(0,0,0,0.15)'
+                                        }}
+                                    >
+                                        {member.role === 'PARENT' ? '🪄' : '🧙'}
+                                    </div>
 
-                                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#37474F', fontWeight: 'bold' }}>
-                                    {member.name}
-                                </h3>
+                                    <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#37474F', fontWeight: 'bold' }}>
+                                        {member.name}
+                                    </h3>
 
-                                <div style={{
-                                    fontSize: '0.9rem',
-                                    color: member.role === 'PARENT' ? '#F57F17' : '#00796B',
-                                    background: member.role === 'PARENT' ? 'rgba(255, 213, 79, 0.2)' : 'rgba(128, 203, 196, 0.2)',
-                                    padding: '4px 12px',
-                                    borderRadius: '12px',
-                                    fontWeight: 'bold'
-                                }}>
-                                    {member.role === 'PARENT' ? '대표' : '자녀'}
+                                    <div style={{
+                                        fontSize: '0.9rem',
+                                        color: member.role === 'PARENT' ? '#F57F17' : '#00796B',
+                                        background: member.role === 'PARENT' ? 'rgba(255, 213, 79, 0.2)' : 'rgba(128, 203, 196, 0.2)',
+                                        padding: '4px 12px',
+                                        borderRadius: '12px',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        {member.role === 'PARENT' ? '대표' : '자녀'}
+                                    </div>
                                 </div>
                             </div>
                         ))}
+
+                        <Link href={`/register?familyId=${familyId}`} className="card" style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', justifyContent: 'center',
+                            textDecoration: 'none', color: '#607D8B', cursor: 'pointer',
+                            padding: '2rem 1rem', marginBottom: 0,
+                            border: '2px dashed rgba(0, 191, 165, 0.4)',
+                            background: 'rgba(255, 255, 255, 0.5)',
+                            transition: 'all 0.2s',
+                        }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'rgba(0, 191, 165, 0.05)'
+                                e.currentTarget.style.borderColor = 'var(--color-primary)'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.5)'
+                                e.currentTarget.style.borderColor = 'rgba(0, 191, 165, 0.4)'
+                            }}>
+                            <div style={{
+                                width: '72px', height: '72px', borderRadius: '50%',
+                                background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                marginBottom: '1rem', boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
+                            }}>
+                                <Plus size={32} color="var(--color-primary)" />
+                            </div>
+                            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                구성원 추가
+                            </h3>
+                        </Link>
                     </div>
                 )}
             </section>
+
+            {members.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '3rem', paddingBottom: '2rem' }}>
+                    <Link
+                        href={`/members/manage?familyId=${familyId}`}
+                        style={{
+                            background: 'transparent',
+                            padding: '8px 16px', cursor: 'pointer', borderRadius: '24px',
+                            display: 'flex', alignItems: 'center', color: '#78909C', fontSize: '0.9rem',
+                            textDecoration: 'none', transition: 'all 0.2s',
+                            border: '1px solid rgba(96, 125, 139, 0.2)'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.5)'
+                            e.currentTarget.style.color = '#455A64'
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent'
+                            e.currentTarget.style.color = '#78909C'
+                        }}
+                    >
+                        <UserCog size={16} style={{ marginRight: '6px' }} />
+                        구성원 수정
+                    </Link>
+                    <Link
+                        href={`/family/manage?familyId=${familyId}`}
+                        style={{
+                            background: 'transparent',
+                            padding: '8px 16px', cursor: 'pointer', borderRadius: '24px',
+                            display: 'flex', alignItems: 'center', color: '#78909C', fontSize: '0.9rem',
+                            textDecoration: 'none', transition: 'all 0.2s',
+                            border: '1px solid rgba(96, 125, 139, 0.2)'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.5)'
+                            e.currentTarget.style.color = '#455A64'
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent'
+                            e.currentTarget.style.color = '#78909C'
+                        }}
+                    >
+                        <Settings size={16} style={{ marginRight: '6px' }} />
+                        가족 정보 수정
+                    </Link>
+                </div>
+            )}
         </main>
     )
 }

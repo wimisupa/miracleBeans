@@ -165,13 +165,15 @@ export default function NewTaskPage() {
 
     return (
         <div>
-            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <Link href={`/family/${currentMember.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
-                    <ChevronLeft size={28} />
+            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <Link href={`/family/${currentMember?.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: '#1A252C', textDecoration: 'none', marginRight: '1rem' }}>
+                    <ChevronLeft size={32} />
                 </Link>
-                <div className="logo" style={{ flex: 1 }}>
-                    <ListTodo size={28} />
-                    <span>할 일 등록</span>
+                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                    <ListTodo size={32} color="var(--color-primary)" />
+                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                        할 일 등록
+                    </span>
                 </div>
             </header>
 
@@ -180,7 +182,7 @@ export default function NewTaskPage() {
 
                     {/* 1. Who? (Assignee) */}
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label className="label">누가 할 건가요? (담당자)</label>
+                        <label className="label">누가 할 건가요?</label>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '0.5rem' }}>
                             {familyMembers.map(m => (
                                 <div
@@ -223,7 +225,7 @@ export default function NewTaskPage() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <Timer size={24} color={useTimer ? 'var(--color-primary)' : '#90A4AE'} />
                                 <span style={{ fontWeight: 'bold', color: useTimer ? 'var(--color-primary)' : '#607D8B' }}>
-                                    이 할 일에 모래시계 타이머 적용하기
+                                    모래시계 적용
                                 </span>
                             </div>
                             {/* Simple CSS Toggle Switch */}
@@ -242,7 +244,7 @@ export default function NewTaskPage() {
 
                         {useTimer && (
                             <div style={{ marginTop: '1.5rem', animation: 'fadeIn 0.3s ease' }}>
-                                <label className="label">얼마나 할 예정인가요? (분)</label>
+                                <label className="label">얼마나 할 건가요?</label>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <input
                                         type="number"
@@ -261,7 +263,7 @@ export default function NewTaskPage() {
 
                     {/* 3. What? (Title) */}
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label className="label">어떤 착한 일을 할건가요?</label>
+                        <label className="label">어떤 일을 할 건가요?</label>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <input
                                 type="text"
@@ -285,7 +287,7 @@ export default function NewTaskPage() {
                                 }}
                                 disabled={isJerryThinking || cooldown > 0 || !title}
                             >
-                                {isJerryThinking ? '...' : cooldown > 0 ? `${cooldown}초 대기` : '콩 묻기'}
+                                {isJerryThinking ? '...' : cooldown > 0 ? `${cooldown}초 대기` : '제리?'}
                             </button>
                         </div>
                     </div>
@@ -335,7 +337,7 @@ export default function NewTaskPage() {
                         style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }}
                         disabled={loading || !jerryVerdict || !assigneeId || (useTimer && !durationMinutes)}
                     >
-                        {loading ? '등록 중...' : '할 일 등록하기 ✨'}
+                        {loading ? '등록 중...' : '등록하기 ✨'}
                     </button>
                 </form>
             </div>

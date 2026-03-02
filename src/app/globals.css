@@ -2,21 +2,21 @@
 
 :root {
   /* Brand Colors - Oh my cong */
-  --color-primary: #FFD54F;
-  /* Bean Gold */
+  --color-primary: #FFCA28;
+  /* Premium Gold */
   --color-secondary: #00BFA5;
   /* Jeju Teal */
   --color-accent: #FF5252;
   /* Bloom Red */
 
   /* Glassmorphism Palette */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15);
 
   /* Text */
-  --color-text-main: #263238;
-  --color-text-muted: #607D8B;
+  --color-text-main: #2C3E50;
+  --color-text-muted: #7F8C8D;
 
   /* Spacing & Radius */
   --spacing-sm: 0.5rem;
@@ -34,8 +34,8 @@
 }
 
 body {
-  /* Jeju Nature Gradient Background */
-  background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 50%, #FFF9C4 100%);
+  /* Jeju Nature Premium Gradient Background */
+  background: linear-gradient(135deg, #E0F7FA 0%, #B2DFDB 50%, #FFF9C4 100%);
   background-attachment: fixed;
   color: var(--color-text-main);
   font-family: var(--font-outfit), Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
@@ -57,53 +57,53 @@ button {
 /* Glassmorphism Utilities */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  /* Slightly stronger border for pop */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
 }
 
 .container {
-  max-width: 600px;
+  max-width: 500px;
   margin: 0 auto;
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   margin-bottom: var(--spacing-md);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .card:active {
   transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 28px;
+  padding: 16px 32px;
   border-radius: var(--radius-full);
   font-weight: 700;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
 }
 
 .btn:active {
@@ -112,9 +112,14 @@ button {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #FFD54F 0%, #FFCA28 100%);
-  color: #37474F;
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+  background: linear-gradient(135deg, #FFD54F 0%, #FFB300 100%);
+  color: #3E2723;
+  box-shadow: 0 6px 20px rgba(255, 179, 0, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(255, 179, 0, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-primary:disabled {
@@ -126,9 +131,14 @@ button {
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #4DB6AC 0%, #009688 100%);
+  background: linear-gradient(135deg, #4DB6AC 0%, #00897B 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 150, 136, 0.3);
+}
+
+.btn-secondary:hover {
+  box-shadow: 0 8px 24px rgba(0, 150, 136, 0.4);
+  transform: translateY(-2px);
 }
 
 .input {

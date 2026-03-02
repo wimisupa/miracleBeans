@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Trophy, ClipboardList, ListTodo, Sprout, Calendar, Clock, Timer, Gift, Settings, Home } from 'lucide-react'
+import { Plus, Trophy, ClipboardCheck, ListTodo, Sprout, Calendar, Clock, Timer, Gift, Settings, Home, Users } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 import { useRouter } from 'next/navigation'
 import TodoTasksList from '@/components/TodoTasksList'
@@ -62,12 +62,11 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
     <main>
       <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', color: '#607D8B', textDecoration: 'none' }}>
-            <Home size={28} />
-          </Link>
-          <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Sprout size={32} color="var(--color-secondary)" />
-            <span style={{ fontSize: '1.8rem', fontWeight: '800' }}>Oh my cong</span>
+          <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+            <Users size={32} color="var(--color-secondary)" />
+            <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+              {family?.name}
+            </span>
           </div>
         </div>
         {currentMember && (
@@ -87,9 +86,9 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
             </div>
             <button
               onClick={() => {
-                // Logout logic (clearing local storage & refresh)
+                // Logout logic (clearing local storage & route to selection)
                 localStorage.removeItem('miracle_po_member');
-                location.reload();
+                window.location.href = `/family/${currentMember.familyId}`;
               }}
               style={{
                 background: 'rgba(255,255,255,0.6)',
@@ -112,20 +111,25 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
       </header>
 
       <section className="glass-panel" style={{ borderRadius: '24px', padding: '2rem', marginBottom: '2rem', textAlign: 'center' }}>
-        <h1 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: '800', color: '#37474F' }}>
-          {family ? `${family.name} 가족의 기적의 콩` : '우리 가족의 기적의 콩'}
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '1rem' }}>
+          <Link href="/" className="btn" style={{ padding: '6px 14px', fontSize: '0.85rem', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(4px)', color: '#455A64', textDecoration: 'none', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.6)', borderRadius: '20px' }}>
+            <Sprout size={16} style={{ marginRight: '4px' }} />
+            오마이콩
+          </Link>
+        </div>
+        <h1 style={{ marginBottom: '0.5rem', fontSize: '1.8rem', fontWeight: '800', color: '#2C3E50', letterSpacing: '-0.02em', minHeight: '40px' }}>
+          {family === null ? '' : (family.motto ? family.motto : '서로 돕고 사랑하며 콩을 모아보세요 🧙')}
         </h1>
-        <p style={{ color: '#607D8B', marginBottom: '0.5rem' }}>
-          {family?.motto ? family.motto : '서로 돕고 사랑하며 콩을 모아보세요 🧙'}
-        </p>
-        {family?.location && (
+        {family === null || !family.location ? (
+          <div style={{ marginBottom: '1.5rem', minHeight: '20px' }} />
+        ) : (
           <p style={{ color: '#90A4AE', fontSize: '0.85rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
             📍 {family.location}
           </p>
         )}
-        {!family?.location && <div style={{ marginBottom: '1.5rem' }} />}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
+          {/* 1. 할 일 등록 */}
           <Link href="/tasks/new" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', color: 'inherit', border: 'none',
@@ -137,13 +141,52 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
               padding: '12px',
               borderRadius: '50%',
               marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)' // Updated box shadow color to match primary theme roughly
+              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)'
             }}>
               <ListTodo size={28} color="white" />
             </div>
             <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>할 일 등록</span>
           </Link>
 
+          {/* 2. 루틴 관리 */}
+          <Link href="/routines" className="card" style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            textDecoration: 'none', color: 'inherit', border: 'none',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
+            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
+          }}>
+            <div style={{
+              background: 'var(--color-primary)',
+              padding: '12px',
+              borderRadius: '50%',
+              marginBottom: '10px',
+              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)'
+            }}>
+              <Calendar size={28} color="white" />
+            </div>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>루틴 관리</span>
+          </Link>
+
+          {/* 3. 콩 쓰기 */}
+          <Link href="/points/use" className="card" style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            textDecoration: 'none', color: 'inherit', border: 'none',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
+            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
+          }}>
+            <div style={{
+              background: 'var(--color-primary)',
+              padding: '12px',
+              borderRadius: '50%',
+              marginBottom: '10px',
+              boxShadow: '0 4px 10px rgba(255, 213, 79, 0.3)'
+            }}>
+              <Gift size={28} color="white" />
+            </div>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>콩 쓰기</span>
+          </Link>
+
+          {/* 4. 승인 대기 */}
           <Link href="/approvals" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', color: 'inherit', position: 'relative',
@@ -167,47 +210,11 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
               padding: '12px',
               borderRadius: '50%',
               marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)'
+              boxShadow: '0 4px 10px rgba(128, 203, 196, 0.3)'
             }}>
-              <ClipboardList size={28} color="white" />
+              <ClipboardCheck size={28} color="white" />
             </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>승인 대기열</span>
-          </Link>
-
-          <Link href="/points/use" className="card" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            textDecoration: 'none', color: 'inherit', border: 'none',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
-          }}>
-            <div style={{
-              background: '#FFB74D', // distinguishing orange color for point usage
-              padding: '12px',
-              borderRadius: '50%',
-              marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(255, 183, 77, 0.3)'
-            }}>
-              <Gift size={28} color="white" />
-            </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>콩 사용/선물</span>
-          </Link>
-
-          <Link href="/routines" className="card" style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            textDecoration: 'none', color: 'inherit', border: 'none',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
-            marginBottom: 0, padding: '1.2rem 0.5rem', textAlign: 'center'
-          }}>
-            <div style={{
-              background: 'var(--color-primary)', // changed from secondary to primary or a new color
-              padding: '12px',
-              borderRadius: '50%',
-              marginBottom: '10px',
-              boxShadow: '0 4px 10px rgba(0, 191, 165, 0.3)'
-            }}>
-              <Calendar size={28} color="white" />
-            </div>
-            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>루틴 관리</span>
+            <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#37474F', wordBreak: 'keep-all' }}>승인 대기</span>
           </Link>
         </div>
 
@@ -226,21 +233,15 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
 
       <section>
         <div className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#455A64', margin: 0 }}>가족 구성원</h2>
+          <h2 style={{ fontSize: '1.3rem', color: '#2C3E50', fontWeight: '800', margin: 0, letterSpacing: '-0.01em' }}>구성원</h2>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-            {currentMember?.role === 'PARENT' && (
-              <Link href="/family/manage" className="btn" style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)', color: '#455A64' }}>
-                <Settings size={16} style={{ marginRight: '4px' }} />
-                가족 정보 수정
-              </Link>
-            )}
-            <Link href="/members/manage" className="btn" style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)', color: '#455A64' }}>
+            <Link href="/members/manage" className="btn" style={{ padding: '6px 14px', fontSize: '0.85rem', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(4px)', color: '#455A64', textDecoration: 'none', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.6)', borderRadius: '20px' }}>
               <Settings size={16} style={{ marginRight: '4px' }} />
-              구성원 관리
+              수정
             </Link>
-            <Link href={`/register?familyId=${currentMember?.familyId}`} className="btn btn-primary" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+            <Link href={`/register?familyId=${currentMember?.familyId}`} className="btn" style={{ padding: '6px 14px', fontSize: '0.85rem', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(4px)', color: '#455A64', textDecoration: 'none', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.6)', borderRadius: '20px' }}>
               <Plus size={16} style={{ marginRight: '4px' }} />
-              구성원 추가
+              추가
             </Link>
           </div>
         </div>

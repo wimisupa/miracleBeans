@@ -234,13 +234,15 @@ export default function PointUsagePage() {
 
     return (
         <div>
-            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link href={`/family/${currentMember.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
-                    <ChevronLeft size={28} />
+            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <Link href={`/family/${currentMember.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: '#1A252C', textDecoration: 'none', marginRight: '1rem' }}>
+                    <ChevronLeft size={32} />
                 </Link>
-                <div className="logo" style={{ flex: 1 }}>
-                    <Sprout size={28} />
-                    <span>콩 사용/선물</span>
+                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                    <Gift size={32} color="var(--color-primary)" />
+                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                        콩 쓰기
+                    </span>
                 </div>
             </header>
 

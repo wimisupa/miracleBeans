@@ -15,12 +15,14 @@ type MemberContextType = {
     login: (member: Member) => void
     logout: () => void
     refreshMember: () => Promise<void>
+    isLoaded: boolean
 }
 
 const MemberContext = createContext<MemberContextType | undefined>(undefined)
 
 export function MemberProvider({ children }: { children: ReactNode }) {
     const [currentMember, setCurrentMember] = useState<Member | null>(null)
+    const [isLoaded, setIsLoaded] = useState(false)
 
     // Load from localStorage on mount and validate
     useEffect(() => {
@@ -30,10 +32,13 @@ export function MemberProvider({ children }: { children: ReactNode }) {
                 const parsed = JSON.parse(saved)
                 setCurrentMember(parsed)
                 // Validate existence immediately
-                validateSession(parsed)
+                validateSession(parsed).finally(() => setIsLoaded(true))
             } catch (e) {
                 localStorage.removeItem('miracle_po_member')
+                setIsLoaded(true)
             }
+        } else {
+            setIsLoaded(true)
         }
     }, [])
 
@@ -72,7 +77,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <MemberContext.Provider value={{ currentMember, login, logout, refreshMember }}>
+        <MemberContext.Provider value={{ currentMember, login, logout, refreshMember, isLoaded }}>
             {children}
         </MemberContext.Provider>
     )

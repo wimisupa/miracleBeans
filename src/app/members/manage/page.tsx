@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { ArrowLeft, Trash2, Save, Edit2, X } from 'lucide-react'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ChevronLeft, Trash2, Save, Edit2, X, Settings } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = {
@@ -13,7 +13,7 @@ type Member = {
     points: number
 }
 
-export default function ManageMembers() {
+function ManageMembersContent() {
     const router = useRouter()
     const { currentMember } = useMember()
     const [members, setMembers] = useState<Member[]>([])
@@ -22,10 +22,14 @@ export default function ManageMembers() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [memberToDelete, setMemberToDelete] = useState<Member | null>(null)
 
+    const searchParams = useSearchParams();
+    const urlFamilyId = searchParams.get('familyId');
+    const activeFamilyId = currentMember?.familyId || urlFamilyId;
+
     const fetchMembers = async () => {
-        if (!currentMember?.familyId) return;
+        if (!activeFamilyId) return;
         try {
-            const res = await fetch(`/api/members?familyId=${currentMember.familyId}`)
+            const res = await fetch(`/api/members?familyId=${activeFamilyId}`)
             const data = await res.json()
             setMembers(data)
         } catch (err) {
@@ -34,10 +38,10 @@ export default function ManageMembers() {
     }
 
     useEffect(() => {
-        if (currentMember?.familyId) {
+        if (activeFamilyId) {
             fetchMembers()
         }
-    }, [currentMember?.familyId])
+    }, [activeFamilyId])
 
     const handleEditClick = (member: Member) => {
         setEditingId(member.id)
@@ -110,12 +114,27 @@ export default function ManageMembers() {
 
     return (
         <main style={{ paddingBottom: '2rem' }}>
-            <header className="header" style={{ marginBottom: '2rem' }}>
-                <button className="icon-btn" onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}>
-                    <ArrowLeft size={24} />
+            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <button
+                    onClick={() => {
+                        if (currentMember?.familyId) {
+                            router.push(`/family/${currentMember.familyId}/dashboard`)
+                        } else if (urlFamilyId) {
+                            router.push(`/family/${urlFamilyId}`)
+                        } else {
+                            router.push('/')
+                        }
+                    }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#1A252C', marginRight: '1rem', padding: 0 }}
+                >
+                    <ChevronLeft size={32} />
                 </button>
-                <h1>가족 관리</h1>
-                <div style={{ width: 40 }} /> {/* Spacer */}
+                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                    <Settings size={32} color="var(--color-secondary)" />
+                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                        구성원 수정
+                    </span>
+                </div>
             </header>
 
             <section className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px' }}>
@@ -295,5 +314,13 @@ export default function ManageMembers() {
                 </div>
             )}
         </main>
+    )
+}
+
+export default function ManageMembers() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ManageMembersContent />
+        </Suspense>
     )
 }

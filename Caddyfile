@@ -1,0 +1,8 @@
+{
+    local_certs
+}
+
+ohmycong.wimi.com {
+    tls internal
+    reverse_proxy miracle-point-prod:3000
+}
