@@ -72,7 +72,7 @@ export default function PointUsagePage() {
         }
 
         if ((activeTab === 'GIFT' || activeTab === 'TATTLE') && currentMember) {
-            fetch('/api/members')
+            fetch(`/api/members?familyId=${currentMember.familyId}`)
                 .then(res => res.json())
                 .then((data: Member[]) => {
                     setOtherMembers(data.filter(m => m.id !== currentMember.id))
@@ -91,7 +91,7 @@ export default function PointUsagePage() {
         try {
             const res = await fetch('/api/jerry/consult', {
                 method: 'POST',
-                body: JSON.stringify({ description, type: 'TATTLE' })
+                body: JSON.stringify({ description, type: activeTab === 'TATTLE' ? 'TATTLE' : 'SPEND' })
             })
 
             if (res.status === 429) {
@@ -131,7 +131,6 @@ export default function PointUsagePage() {
             })
 
             if (res.ok) {
-                alert('정의의 이름으로 제리에게 신고 완료! 🐹⚖️')
                 router.push(`/family/${currentMember.familyId}/dashboard`)
                 router.refresh()
             } else {
@@ -165,7 +164,6 @@ export default function PointUsagePage() {
             const data = await res.json()
 
             if (res.ok) {
-                alert('콩을 선물했어요! 🧙')
                 router.push(`/family/${currentMember.familyId}/dashboard`)
                 router.refresh()
             } else {
@@ -180,27 +178,15 @@ export default function PointUsagePage() {
 
     const handleSubmitSpend = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!description) {
-            alert('무엇에 사용할 건가요?')
+        if (!jerryVerdict || !description) return
+
+        if (currentMember.points < jerryVerdict.points) {
+            alert(`콩이 부족해요! (필요: ${jerryVerdict.points}콩, 현재: ${currentMember.points}콩)`)
             return
         }
 
-        // Spend logic: deduct points immediately
         setLoading(true)
         try {
-            const evaluateRes = await fetch('/api/jerry/consult', {
-                method: 'POST',
-                body: JSON.stringify({ description, type: 'SPEND' })
-            })
-            if (!evaluateRes.ok) throw new Error('Jerry consultation failed')
-            const jerryData = await evaluateRes.json()
-
-            if (currentMember.points < jerryData.points) {
-                alert(`콩이 부족해요! (필요: ${jerryData.points}콩, 현재: ${currentMember.points}콩)`)
-                setLoading(false)
-                return
-            }
-
             const res = await fetch('/api/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -208,17 +194,19 @@ export default function PointUsagePage() {
                     title: description,
                     description: description,
                     type: 'SPEND',
-                    points: -jerryData.points, // Deduct
+                    points: -jerryVerdict.points, // Deduct
                     creatorId: currentMember.id,
                 }),
             })
 
             if (res.ok) {
-                // Auto approve SPEND tasks for immediate deduction
                 const task = await res.json()
-                await fetch(`/api/tasks/${task.id}/approve`, { method: 'POST' })
+                await fetch(`/api/tasks/${task.id}/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'APPROVE' })
+                })
 
-                alert(`${jerryData.points}콩을 사용하여 '${description}' 쿠폰을 발행했어요! 🎉`)
                 router.push(`/family/${currentMember.familyId}/dashboard`)
                 router.refresh()
             } else {
@@ -250,7 +238,7 @@ export default function PointUsagePage() {
                 {/* Mode Selection */}
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '6px', borderRadius: '20px', overflowX: 'auto' }}>
                     {([
-                        { id: 'SPEND', icon: <ArrowRight size={16} />, label: '쓰기' },
+                        { id: 'SPEND', icon: <Sprout size={16} />, label: '쓰기' },
                         { id: 'GIFT', icon: <Gift size={16} />, label: '선물' },
                         { id: 'TATTLE', icon: <Siren size={16} />, label: '이르기' }
                     ] as const).map(mode => (
@@ -289,6 +277,17 @@ export default function PointUsagePage() {
                 {/* Sub Forms based on Tab */}
                 {activeTab === 'GIFT' ? (
                     <form onSubmit={handleTransfer}>
+                        <div style={{ marginBottom: '1.5rem', background: '#FFF3E0', padding: '1rem', borderRadius: '16px', border: '1px solid #FFE0B2' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#E65100', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                <Gift size={20} />
+                                <span>가족에게 콩 선물하기</span>
+                            </div>
+                            <p style={{ fontSize: '0.9rem', color: '#EF6C00' }}>
+                                응원하거나 칭찬하고 싶은 가족에게<br />
+                                나의 콩을 선물해 보세요! 🎁
+                            </p>
+                        </div>
+
                         <div style={{ marginBottom: '1.5rem', background: 'linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(255, 255, 255, 0.4))', padding: '1.5rem', borderRadius: '24px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.6)' }}>
                             <div style={{ fontSize: '0.9rem', color: '#607D8B', marginBottom: '0.5rem' }}>나의 콩</div>
                             <div style={{ fontSize: '2rem', fontWeight: '900', color: '#FBC02D', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
@@ -353,7 +352,7 @@ export default function PointUsagePage() {
                             style={{ width: '100%', background: '#FFB74D', color: '#fff' }}
                             disabled={loading || !receiverId || Number(amount) <= 0 || Number(amount) > currentMember.points}
                         >
-                            {loading ? '보내는 중...' : '콩 보내기 🧙'}
+                            {loading ? '보내는 중...' : '보내기 🧙'}
                         </button>
                     </form>
                 ) : activeTab === 'TATTLE' ? (
@@ -469,12 +468,22 @@ export default function PointUsagePage() {
                             style={{ width: '100%', background: 'linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)', color: 'white', boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)' }}
                             disabled={loading || !jerryVerdict || !receiverId || isJerryThinking}
                         >
-                            {loading ? '신고 접수 중...' : '정의구현 하기 ⚖️'}
-                            <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+                            {loading ? '신고 접수 중...' : '정의구현 ⚖️'}
                         </button>
                     </form>
                 ) : (
                     <form onSubmit={handleSubmitSpend}>
+                        <div style={{ marginBottom: '1.5rem', background: '#E0F2F1', padding: '1rem', borderRadius: '16px', border: '1px solid #B2DFDB' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#00796B', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                <Sprout size={20} />
+                                <span>사용할 콩 제리에게 묻기</span>
+                            </div>
+                            <p style={{ fontSize: '0.9rem', color: '#00695C' }}>
+                                콩을 어디에 사용할지 적어주세요.<br />
+                                제리가 공정하게 가격을 책정합니다! 🐹✨
+                            </p>
+                        </div>
+
                         <div style={{ marginBottom: '1.5rem', background: 'linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(255, 255, 255, 0.4))', padding: '1.5rem', borderRadius: '24px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.6)' }}>
                             <div style={{ fontSize: '0.9rem', color: '#607D8B', marginBottom: '0.5rem' }}>나의 콩</div>
                             <div style={{ fontSize: '2rem', fontWeight: '900', color: '#FBC02D', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
@@ -484,24 +493,78 @@ export default function PointUsagePage() {
 
                         <div style={{ marginBottom: '1.5rem' }}>
                             <label className="label">콩을 어디에 사용할까요?</label>
-                            <input
-                                type="text"
-                                className="input"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                placeholder="예: 게임기 30분, 외식 메뉴 선택권"
-                                required
-                            />
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="예: 게임기 30분, 간식 구매"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleAskJerry}
+                                    className="btn btn-primary"
+                                    style={{
+                                        minWidth: '80px',
+                                        padding: '0 16px',
+                                        borderRadius: '12px',
+                                        background: (isJerryThinking || cooldown > 0) ? '#B0BEC5' : 'var(--color-primary)',
+                                        cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
+                                        opacity: (isJerryThinking || cooldown > 0) ? 0.7 : 1
+                                    }}
+                                    disabled={isJerryThinking || cooldown > 0 || !description}
+                                >
+                                    {isJerryThinking ? '...' : cooldown > 0 ? `${cooldown}초 대기` : '판정'}
+                                </button>
+                            </div>
                         </div>
+
+                        {/* Jerry's Verdict or Thinking State */}
+                        {isJerryThinking ? (
+                            <div style={{
+                                background: 'rgba(255, 255, 255, 0.9)',
+                                border: '2px dashed #B0BEC5',
+                                borderRadius: '20px',
+                                padding: '2rem',
+                                marginBottom: '1.5rem',
+                                textAlign: 'center',
+                                animation: 'pulse 1.5s infinite ease-in-out'
+                            }}>
+                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🐹💭</div>
+                                <div style={{ color: '#546E7A', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                                    {thinkingMessage}
+                                </div>
+                            </div>
+                        ) : jerryVerdict && (
+                            <div style={{
+                                background: 'rgba(255, 255, 255, 0.9)',
+                                border: '2px solid var(--color-primary)',
+                                borderRadius: '20px',
+                                padding: '1.5rem',
+                                marginBottom: '1.5rem',
+                                animation: 'fadeIn 0.3s ease',
+                                boxShadow: '0 8px 20px rgba(0, 191, 165, 0.15)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                                    <span style={{ fontSize: '1.5rem' }}>{jerryVerdict.emoji}</span>
+                                    <span>제리의 결정:</span>
+                                </div>
+                                <p style={{ marginBottom: '0.5rem', color: '#37474F', fontSize: '1.1rem' }}>"{jerryVerdict.comment}"</p>
+                                <div style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--color-primary)' }}>
+                                    {jerryVerdict.points} 콩 (필요)
+                                </div>
+                            </div>
+                        )}
 
                         <button
                             type="submit"
                             className="btn btn-primary"
-                            style={{ width: '100%', background: 'var(--color-primary)' }}
-                            disabled={loading || !description}
+                            style={{ width: '100%', background: 'var(--color-primary)', boxShadow: '0 4px 12px rgba(0, 191, 165, 0.3)' }}
+                            disabled={loading || !jerryVerdict || isJerryThinking || currentMember.points < jerryVerdict.points}
                         >
-                            {loading ? '승인 및 결제 진행 중...' : '콩 사용하기 ✨'}
-                            <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+                            {loading ? '승인 및 결제 진행 중...' : '사용하기 ✨'}
                         </button>
                     </form>
                 )}

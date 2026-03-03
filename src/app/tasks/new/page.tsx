@@ -209,7 +209,21 @@ export default function NewTaskPage() {
                         </div>
                     </div>
 
-                    {/* 2. Timer Toggle (HOURGLASS) */}
+                    {/* 2. What? (Title) */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label className="label">어떤 일을 할 건가요?</label>
+                        <input
+                            type="text"
+                            className="input"
+                            value={title}
+                            onChange={handleTitleChange}
+                            placeholder="예: 설거지, 수학문제 풀기, 책 30쪽 읽기"
+                            required
+                            style={{ width: '100%' }}
+                        />
+                    </div>
+
+                    {/* 3. Timer Toggle (HOURGLASS) */}
                     <div style={{
                         marginBottom: '1.5rem',
                         padding: '1.5rem',
@@ -261,35 +275,45 @@ export default function NewTaskPage() {
                         )}
                     </div>
 
-                    {/* 3. What? (Title) */}
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label className="label">어떤 일을 할 건가요?</label>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <input
-                                type="text"
-                                className="input"
-                                value={title}
-                                onChange={handleTitleChange}
-                                placeholder="예: 설거지, 수학문제 풀기, 책 30쪽 읽기"
-                                required
-                            />
-                            <button
-                                type="button"
-                                onClick={handleAskJerry}
-                                className="btn btn-primary"
-                                style={{
-                                    minWidth: '80px',
-                                    padding: '0 16px',
-                                    borderRadius: '12px',
-                                    background: (isJerryThinking || cooldown > 0) ? '#B0BEC5' : 'var(--color-primary)',
-                                    cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
-                                    opacity: (isJerryThinking || cooldown > 0) ? 0.7 : 1
-                                }}
-                                disabled={isJerryThinking || cooldown > 0 || !title}
-                            >
-                                {isJerryThinking ? '...' : cooldown > 0 ? `${cooldown}초 대기` : '제리?'}
-                            </button>
-                        </div>
+                    {/* 4. Jerry Consultation */}
+                    <div style={{ marginBottom: '2.5rem', marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+                        <button
+                            type="button"
+                            onClick={handleAskJerry}
+                            style={{
+                                padding: '16px 40px',
+                                fontSize: '1.2rem',
+                                fontWeight: '900',
+                                borderRadius: '24px',
+                                border: 'none',
+                                background: (isJerryThinking || cooldown > 0) ? '#CFD8DC' : 'linear-gradient(135deg, var(--color-primary) 0%, #00897B 100%)',
+                                color: 'white',
+                                cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
+                                opacity: (isJerryThinking || cooldown > 0) ? 0.8 : 1,
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: (isJerryThinking || cooldown > 0) ? 'none' : '0 8px 24px rgba(0, 191, 165, 0.4)',
+                                transform: (isJerryThinking || cooldown > 0) ? 'scale(1)' : 'scale(1.02)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                            disabled={isJerryThinking || cooldown > 0 || !title}
+                            onMouseEnter={(e) => {
+                                if (!isJerryThinking && cooldown === 0 && title) {
+                                    e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)'
+                                    e.currentTarget.style.boxShadow = '0 12px 28px rgba(0, 191, 165, 0.5)'
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (!isJerryThinking && cooldown === 0 && title) {
+                                    e.currentTarget.style.transform = 'scale(1.02)'
+                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 191, 165, 0.4)'
+                                }
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5rem' }}>{isJerryThinking ? '🐹💭' : cooldown > 0 ? '⏳' : '🐹'}</span>
+                            <span>{isJerryThinking ? '제리가 궁리중...' : cooldown > 0 ? `${cooldown}초 대기` : '제리의 판결'}</span>
+                        </button>
                     </div>
 
                     {/* Jerry's Verdict or Thinking State */}

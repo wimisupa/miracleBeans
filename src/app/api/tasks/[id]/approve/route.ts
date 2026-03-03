@@ -43,8 +43,8 @@ export async function POST(
             if (action === 'APPROVE') {
                 // Calculate point change
                 // EARN & HOURGLASS: +points
-                // SPEND, TATTLE: -points
-                const pointChange = (task.type === 'EARN' || task.type === 'HOURGLASS') ? task.points : -task.points
+                // SPEND, TATTLE: -abs(points)
+                const pointChange = (task.type === 'EARN' || task.type === 'HOURGLASS') ? Math.abs(task.points) : -Math.abs(task.points)
 
                 const targetMemberId = task.assigneeId || task.creatorId
 

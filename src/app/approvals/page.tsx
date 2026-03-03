@@ -140,7 +140,7 @@ export default function ApprovalsPage() {
                                             fontSize: '1.1rem',
                                             color: (task.type === 'EARN' || task.type === 'HOURGLASS') ? 'var(--color-secondary)' : 'var(--color-accent)'
                                         }}>
-                                            {(task.type === 'EARN' || task.type === 'HOURGLASS') ? '+' : '-'}{task.points} 콩
+                                            {(task.type === 'EARN' || task.type === 'HOURGLASS') ? '+' : '-'}{Math.abs(task.points)} 콩
                                         </div>
                                     </div>
 

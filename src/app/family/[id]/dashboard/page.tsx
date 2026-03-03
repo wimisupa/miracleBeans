@@ -234,24 +234,11 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
       <section>
         <div className="header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ fontSize: '1.3rem', color: '#2C3E50', fontWeight: '800', margin: 0, letterSpacing: '-0.01em' }}>구성원</h2>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-            <Link href="/members/manage" className="btn" style={{ padding: '6px 14px', fontSize: '0.85rem', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(4px)', color: '#455A64', textDecoration: 'none', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.6)', borderRadius: '20px' }}>
-              <Settings size={16} style={{ marginRight: '4px' }} />
-              수정
-            </Link>
-            <Link href={`/register?familyId=${currentMember?.familyId}`} className="btn" style={{ padding: '6px 14px', fontSize: '0.85rem', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(4px)', color: '#455A64', textDecoration: 'none', boxShadow: '0 2px 6px rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.6)', borderRadius: '20px' }}>
-              <Plus size={16} style={{ marginRight: '4px' }} />
-              추가
-            </Link>
-          </div>
         </div>
 
         {members.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
             <p style={{ marginBottom: '1rem', color: 'var(--color-text-muted)' }}>아직 등록된 구성원이 없어요!</p>
-            <Link href={`/register?familyId=${currentMember?.familyId}`} className="btn btn-primary">
-              구성원 추가하기
-            </Link>
           </div>
         ) : (
           <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '16px', margin: '0 -8px', padding: '0 8px 16px 8px' }}>

@@ -13,9 +13,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Cannot send points to yourself' }, { status: 400 })
         }
 
-        // 1. Check sender's balance
+        // 1. Check sender and receiver
         const sender = await prisma.member.findUnique({ where: { id: senderId } })
+        const receiver = await prisma.member.findUnique({ where: { id: receiverId } })
+
         if (!sender) return NextResponse.json({ error: 'Sender not found' }, { status: 404 })
+        if (!receiver) return NextResponse.json({ error: 'Receiver not found' }, { status: 404 })
 
         if (sender.points < amount) {
             return NextResponse.json({ error: '포인트가 부족해요!' }, { status: 400 })
@@ -39,7 +42,7 @@ export async function POST(req: Request) {
             await tx.transaction.create({
                 data: {
                     amount: -amount,
-                    reason: `선물 보냄: ${message} (to ${receiverId})`, // Ideally fetch receiver name, but ID for now or improve
+                    reason: `선물 보냄: ${message} (to ${receiver.name})`,
                     memberId: senderId
                 }
             })

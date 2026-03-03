@@ -12,8 +12,8 @@ type UnifiedTask = {
     points: number
     durationMinutes: number | null
     isRoutine: boolean
-    // Routine specific
-    type?: 'EARN' | 'HOURGLASS'
+    // Routine / Task specific
+    type?: 'EARN' | 'HOURGLASS' | 'SPEND' | 'TATTLE'
     isCompletedDaily?: boolean
     timeOfDay?: string
     activeTaskId?: string | null
@@ -144,6 +144,22 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                 body: JSON.stringify({ status: 'PENDING' })
             })
             if (res.ok) fetchItems()
+        } else if (task.type === 'SPEND' || task.type === 'TATTLE') {
+            // For SPEND or TATTLE, immediately complete and AUTO-APPROVE
+            const res = await fetch(`/api/tasks/${task.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'PENDING' })
+            })
+            if (res.ok) {
+                // Instantly call the auto-approve API to deductive points
+                await fetch(`/api/tasks/${task.id}/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'APPROVE' })
+                })
+                fetchItems()
+            }
         } else {
             // HOURGLASS goes to execute page
             router.push(`/tasks/${task.id}/execute`)
@@ -186,7 +202,9 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                         <div style={{ fontSize: '0.85rem', color: '#78909C', display: 'flex', gap: '8px', alignItems: 'center' }}>
                             {item.isRoutine && item.timeOfDay && <span>⏰ {item.timeOfDay}</span>}
                             {item.durationMinutes && <span>⏱️ {item.durationMinutes}분</span>}
-                            <span style={{ color: '#FBC02D', fontWeight: 'bold' }}>+{item.points}콩</span>
+                            <span style={{ color: (item.type === 'SPEND' || item.type === 'TATTLE') ? '#FF5252' : '#FBC02D', fontWeight: 'bold' }}>
+                                {(item.type === 'SPEND' || item.type === 'TATTLE') ? '-' : '+'}{Math.abs(item.points)}콩
+                            </span>
                         </div>
                     </div>
                     {!hideStartButton && (
@@ -201,7 +219,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                                     ...(item.isCompletedDaily ? { background: '#B0BEC5', color: 'white', boxShadow: 'none' } : {})
                                 }}
                             >
-                                {item.isCompletedDaily ? '완료 🎉' : (item.type === 'EARN' ? <><Check size={16} /> 완료</> : <><Timer size={16} /> 시작</>)}
+                                {item.isCompletedDaily ? '완료 🎉' : (item.type === 'HOURGLASS' ? <><Timer size={16} /> 시작</> : <><Check size={16} /> 완료</>)}
                             </button>
                         ) : (
                             <button
@@ -213,7 +231,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                                     fontFamily: 'inherit'
                                 }}
                             >
-                                {item.type === 'EARN' ? <><Check size={16} /> 완료</> : <><Timer size={16} /> 시작</>}
+                                {item.type === 'HOURGLASS' ? <><Timer size={16} /> 시작</> : <><Check size={16} /> 완료</>}
                             </button>
                         )
                     )}

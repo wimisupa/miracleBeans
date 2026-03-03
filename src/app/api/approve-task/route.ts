@@ -29,10 +29,19 @@ export async function POST(request: Request) {
             }
 
             if (action === 'APPROVE') {
+                const targetMemberId = task.assigneeId || task.creatorId;
+                const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN') ? targetMemberId : task.creatorId;
+
                 // Prevent self-approval if multiple members exist
-                const totalMembers = await tx.member.count()
-                if (totalMembers > 1 && task.creatorId === memberId) {
+                const totalMembers = await tx.member.count({
+                    where: { familyId: task.creator.familyId }
+                })
+
+                if (totalMembers > 1 && personWhoDidIt === memberId) {
                     throw new Error('본인의 요청은 승인할 수 없습니다.')
+                }
+                if (totalMembers > 2 && task.type === 'TATTLE' && task.assigneeId === memberId) {
+                    throw new Error('당사자는 승인할 수 없습니다.')
                 }
 
                 // Record approval (idempotent)
@@ -61,21 +70,24 @@ export async function POST(request: Request) {
                 if (approvalCount >= required) {
                     // Finalize based on Task Type
                     let pointChange = 0;
-                    let targetMemberId = task.creatorId;
+                    let finalTargetMemberId = task.creatorId;
 
-                    if (task.type === 'EARN') {
-                        pointChange = task.points;
-                    } else if (task.type === 'SPEND') {
-                        pointChange = -task.points;
-                    } else if (task.type === 'TATTLE') {
-                        pointChange = -task.points; // Penalty
+                    if (task.type === 'EARN' || task.type === 'HOURGLASS') {
+                        pointChange = Math.abs(task.points);
                         if (task.assigneeId) {
-                            targetMemberId = task.assigneeId; // Deduct from the accused
+                            finalTargetMemberId = task.assigneeId;
+                        }
+                    } else if (task.type === 'SPEND') {
+                        pointChange = -Math.abs(task.points);
+                    } else if (task.type === 'TATTLE') {
+                        pointChange = -Math.abs(task.points); // Penalty
+                        if (task.assigneeId) {
+                            finalTargetMemberId = task.assigneeId; // Deduct from the accused
                         }
                     }
 
                     await tx.member.update({
-                        where: { id: targetMemberId },
+                        where: { id: finalTargetMemberId },
                         data: { points: { increment: pointChange } }
                     })
 
@@ -83,7 +95,7 @@ export async function POST(request: Request) {
                         data: {
                             amount: pointChange,
                             reason: task.title,
-                            memberId: targetMemberId,
+                            memberId: finalTargetMemberId,
                         }
                     })
 

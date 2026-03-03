@@ -23,6 +23,8 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Generate prisma client before build
+ENV HOME=/tmp
+RUN npm config set cache /tmp/.npm-cache --global
 RUN npx prisma generate
 
 RUN npm run build
