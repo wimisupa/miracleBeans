@@ -55,7 +55,7 @@ export async function POST(request: Request) {
                 description,
                 type,
                 points,
-                status: 'TODO', // All new tasks, including EARN and HOURGLASS, start as TODO
+                status: type === 'EARN' ? 'PENDING' : 'TODO', // EARN skips TODO and goes straight to PENDING
                 creatorId,
                 assigneeId: assigneeId || creatorId, // Explicit assignee from frontend, fallback to creator
                 durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, History, TrendingUp, TrendingDown, Sprout, Calendar, Clock, Timer } from 'lucide-react'
+import { ChevronLeft, History, TrendingUp, TrendingDown, Sprout, Calendar, Clock, Timer, XCircle } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 import TodoTasksList from '@/components/TodoTasksList'
 
@@ -88,20 +88,20 @@ export default function HistoryPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '0 1rem' }}>
                         {transactions.map(tx => (
                             <div key={tx.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                     <div style={{
-                                        width: '44px', height: '44px',
+                                        width: '44px', height: '44px', minWidth: '44px',
                                         borderRadius: '50%',
-                                        background: tx.amount > 0 ? '#E0F2F1' : '#FFEBEE',
+                                        background: tx.amount > 0 ? '#E0F2F1' : (tx.amount < 0 ? '#FFEBEE' : '#ECEFF1'),
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        color: tx.amount > 0 ? 'var(--color-secondary)' : 'var(--color-accent)',
+                                        color: tx.amount > 0 ? 'var(--color-secondary)' : (tx.amount < 0 ? 'var(--color-accent)' : '#90A4AE'),
                                         boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
                                     }}>
-                                        {tx.amount > 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                                        {tx.amount > 0 ? <TrendingUp size={20} /> : (tx.amount < 0 ? <TrendingDown size={20} /> : <XCircle size={20} />)}
                                     </div>
-                                    <div>
-                                        <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F' }}>{tx.reason}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#90A4AE' }}>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: '1.4' }}>{tx.reason}</div>
+                                        <div style={{ fontSize: '0.8rem', color: '#90A4AE', marginTop: '4px' }}>
                                             {new Date(tx.createdAt).toLocaleString()}
                                         </div>
                                     </div>
@@ -109,7 +109,8 @@ export default function HistoryPage() {
                                 <div style={{
                                     fontWeight: '900',
                                     fontSize: '1.2rem',
-                                    color: tx.amount > 0 ? 'var(--color-secondary)' : 'var(--color-accent)'
+                                    color: tx.amount > 0 ? 'var(--color-secondary)' : (tx.amount < 0 ? 'var(--color-accent)' : '#90A4AE'),
+                                    marginLeft: '1rem'
                                 }}>
                                     {tx.amount > 0 ? '+' : ''}{tx.amount}
                                 </div>

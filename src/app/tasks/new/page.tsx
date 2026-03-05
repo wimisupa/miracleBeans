@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Sprout, Timer, ListTodo } from 'lucide-react'
+import { ChevronLeft, Sprout, Timer, ListTodo, ClipboardCheck } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = {
@@ -26,6 +26,9 @@ export default function NewTaskPage() {
     // Timer toggle
     const [useTimer, setUseTimer] = useState(false)
     const [durationMinutes, setDurationMinutes] = useState<number | ''>('')
+
+    // Mission toggle
+    const [isMission, setIsMission] = useState(true)
 
     // Jerry specific state
     const [jerryVerdict, setJerryVerdict] = useState<{ points: number, comment: string, emoji: string } | null>(null)
@@ -134,7 +137,7 @@ export default function NewTaskPage() {
                 body: JSON.stringify({
                     title: title,
                     description: title,
-                    type: useTimer ? 'HOURGLASS' : 'EARN',
+                    type: isMission ? 'MISSION' : (useTimer ? 'HOURGLASS' : 'EARN'),
                     points: jerryVerdict.points,
                     creatorId: currentMember.id,
                     assigneeId: assigneeId,
@@ -223,6 +226,39 @@ export default function NewTaskPage() {
                         />
                     </div>
 
+                    {/* 2.5. Mission Toggle (MISSION) */}
+                    <div style={{
+                        marginBottom: '1.5rem',
+                        padding: '1.5rem',
+                        borderRadius: '20px',
+                        background: isMission ? 'rgba(0, 191, 165, 0.05)' : 'rgba(255,255,255,0.6)',
+                        border: isMission ? '2px solid var(--color-primary)' : '1px solid #E0E0E0',
+                        transition: 'all 0.3s ease'
+                    }}>
+                        <div
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                            onClick={() => { setIsMission(!isMission); if (!isMission) setUseTimer(false); }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <ClipboardCheck size={24} color={isMission ? 'var(--color-primary)' : '#90A4AE'} />
+                                <span style={{ fontWeight: 'bold', color: isMission ? 'var(--color-primary)' : '#607D8B' }}>
+                                    결과 보고 필요 (미션)
+                                </span>
+                            </div>
+                            <div style={{
+                                width: '50px', height: '28px', borderRadius: '14px',
+                                background: isMission ? 'var(--color-primary)' : '#CFD8DC',
+                                position: 'relative', transition: 'background 0.3s'
+                            }}>
+                                <div style={{
+                                    width: '24px', height: '24px', borderRadius: '50%', background: 'white',
+                                    position: 'absolute', top: '2px', left: isMission ? '24px' : '2px',
+                                    transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                }} />
+                            </div>
+                        </div>
+                    </div>
+
                     {/* 3. Timer Toggle (HOURGLASS) */}
                     <div style={{
                         marginBottom: '1.5rem',
@@ -234,7 +270,7 @@ export default function NewTaskPage() {
                     }}>
                         <div
                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                            onClick={() => setUseTimer(!useTimer)}
+                            onClick={() => { setUseTimer(!useTimer); if (!useTimer) setIsMission(false); }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <Timer size={24} color={useTimer ? 'var(--color-primary)' : '#90A4AE'} />

@@ -68,6 +68,8 @@ model Task {
   routineId String?
   routine   Routine? @relation(fields: [routineId], references: [id], onDelete: SetNull)
 
+  resultMessage String? // For MISSION tasks requiring an explicit result
+
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   approvals TaskApproval[]
@@ -91,6 +93,7 @@ model TaskApproval {
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   memberId  String
   member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  comment   String?
   createdAt DateTime @default(now())
 
   @@unique([taskId, memberId])

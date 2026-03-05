@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { id, action, memberId } = body
+        const { id, action, memberId, comment } = body
 
         if (!id || !action || !memberId) {
             return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
@@ -22,6 +22,17 @@ export async function POST(request: Request) {
             if (task.status !== 'PENDING') throw new Error('Task is not pending')
 
             if (action === 'REJECT') {
+                const targetMemberId = task.assigneeId || task.creatorId;
+                const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN' || task.type === 'MISSION') ? targetMemberId : task.creatorId;
+
+                await tx.transaction.create({
+                    data: {
+                        amount: 0,
+                        reason: `❌ 반려됨: ${task.title}${task.resultMessage ? `\n📝 보고: "${task.resultMessage}"` : ''}${comment ? `\n💬 심사: "${comment}"` : ''}`,
+                        memberId: personWhoDidIt,
+                    }
+                })
+
                 return await tx.task.update({
                     where: { id },
                     data: { status: 'REJECTED' }
@@ -30,7 +41,7 @@ export async function POST(request: Request) {
 
             if (action === 'APPROVE') {
                 const targetMemberId = task.assigneeId || task.creatorId;
-                const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN') ? targetMemberId : task.creatorId;
+                const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN' || task.type === 'MISSION') ? targetMemberId : task.creatorId;
 
                 // Prevent self-approval if multiple members exist
                 const totalMembers = await tx.member.count({
@@ -51,7 +62,11 @@ export async function POST(request: Request) {
 
                 if (!existing) {
                     await tx.taskApproval.create({
-                        data: { taskId: id, memberId }
+                        data: {
+                            taskId: id,
+                            memberId,
+                            comment: comment || null
+                        }
                     })
                 }
 
@@ -72,7 +87,7 @@ export async function POST(request: Request) {
                     let pointChange = 0;
                     let finalTargetMemberId = task.creatorId;
 
-                    if (task.type === 'EARN' || task.type === 'HOURGLASS') {
+                    if (task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION') {
                         pointChange = Math.abs(task.points);
                         if (task.assigneeId) {
                             finalTargetMemberId = task.assigneeId;
@@ -94,7 +109,7 @@ export async function POST(request: Request) {
                     await tx.transaction.create({
                         data: {
                             amount: pointChange,
-                            reason: task.title,
+                            reason: `${task.title}${task.resultMessage ? `\n📝 보고: "${task.resultMessage}"` : ''}`,
                             memberId: finalTargetMemberId,
                         }
                     })

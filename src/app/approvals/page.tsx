@@ -10,11 +10,12 @@ type Task = {
     id: string
     title: string
     points: number
-    type: 'EARN' | 'SPEND' | 'TATTLE' | 'HOURGLASS'
+    type: 'EARN' | 'SPEND' | 'TATTLE' | 'HOURGLASS' | 'MISSION'
+    resultMessage?: string | null
     creator: { id: string; name: string }
     assigneeId?: string
     createdAt: string
-    approvals: { member: { id: string; name: string } }[]
+    approvals: { member: { id: string; name: string }, comment?: string | null }[]
 }
 
 type Member = {
@@ -29,6 +30,11 @@ export default function ApprovalsPage() {
     const [tasks, setTasks] = useState<Task[]>([])
     const [allMembers, setAllMembers] = useState<Member[]>([])
     const [loading, setLoading] = useState(true)
+
+    // Feedback modal state
+    const [actionTask, setActionTask] = useState<{ id: string, action: 'APPROVE' | 'REJECT', title: string } | null>(null)
+    const [feedback, setFeedback] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const fetchData = async () => {
         if (!currentMember?.familyId) return;
@@ -55,17 +61,24 @@ export default function ApprovalsPage() {
         fetchData()
     }, [])
 
-    const handleAction = async (id: string, action: 'APPROVE' | 'REJECT') => {
-        if (!currentMember) return
+    const promptAction = (task: Task, action: 'APPROVE' | 'REJECT') => {
+        setActionTask({ id: task.id, action, title: task.title })
+        setFeedback('')
+    }
 
+    const handleConfirmAction = async () => {
+        if (!currentMember || !actionTask) return
+
+        setIsSubmitting(true)
         try {
             const res = await fetch('/api/approve-task', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    id,
-                    action,
-                    memberId: currentMember.id
+                    id: actionTask.id,
+                    action: actionTask.action,
+                    memberId: currentMember.id,
+                    comment: feedback.trim()
                 })
             })
 
@@ -77,14 +90,17 @@ export default function ApprovalsPage() {
                     fetchData()
                 } else {
                     // Fully approved
-                    setTasks(prev => prev.filter(t => t.id !== id))
+                    setTasks(prev => prev.filter(t => t.id !== actionTask.id))
                     router.refresh()
                 }
+                setActionTask(null)
             } else {
                 alert(data.error || '처리 실패')
             }
         } catch (error) {
             alert('오류 발생')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -112,7 +128,7 @@ export default function ApprovalsPage() {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {tasks.map(task => {
-                        const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN') ? (task.assigneeId || task.creator.id) : task.creator.id;
+                        const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN' || task.type === 'MISSION') ? (task.assigneeId || task.creator.id) : task.creator.id;
                         const isPersonWhoDidIt = currentMember?.id === personWhoDidIt;
                         const alreadyApproved = task.approvals.some(a => a.member.id === currentMember?.id)
 
@@ -138,23 +154,38 @@ export default function ApprovalsPage() {
                                         <div style={{
                                             fontWeight: 'bold',
                                             fontSize: '1.1rem',
-                                            color: (task.type === 'EARN' || task.type === 'HOURGLASS') ? 'var(--color-secondary)' : 'var(--color-accent)'
+                                            color: (task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION') ? 'var(--color-secondary)' : 'var(--color-accent)'
                                         }}>
-                                            {(task.type === 'EARN' || task.type === 'HOURGLASS') ? '+' : '-'}{Math.abs(task.points)} 콩
+                                            {(task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION') ? '+' : '-'}{Math.abs(task.points)} 콩
                                         </div>
+                                        {task.resultMessage && (
+                                            <div style={{
+                                                marginTop: '0.75rem',
+                                                padding: '0.75rem',
+                                                background: '#F5F5F5',
+                                                borderRadius: '8px',
+                                                borderLeft: '4px solid var(--color-primary)',
+                                                fontSize: '0.9rem',
+                                                color: '#455A64',
+                                                whiteSpace: 'pre-wrap'
+                                            }}>
+                                                <div style={{ fontWeight: 'bold', marginBottom: '4px', color: 'var(--color-primary)', fontSize: '0.8rem' }}>결과 보고:</div>
+                                                {task.resultMessage}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {!isPersonWhoDidIt && !alreadyApproved && !(task.type === 'TATTLE' && currentMember?.id === task.assigneeId) && (
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
-                                                onClick={() => handleAction(task.id, 'APPROVE')}
+                                                onClick={() => promptAction(task, 'APPROVE')}
                                                 className="btn"
                                                 style={{ padding: '10px', borderRadius: '50%', background: '#E0F2F1', color: 'var(--color-secondary)', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
                                             >
                                                 <CheckCircle size={24} />
                                             </button>
                                             <button
-                                                onClick={() => handleAction(task.id, 'REJECT')}
+                                                onClick={() => promptAction(task, 'REJECT')}
                                                 className="btn"
                                                 style={{ padding: '10px', borderRadius: '50%', background: '#FFEBEE', color: 'var(--color-accent)', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
                                             >
@@ -171,23 +202,39 @@ export default function ApprovalsPage() {
                                     fontSize: '0.85rem'
                                 }}>
                                     <div style={{ color: '#78909C', marginBottom: '0.5rem', fontSize: '0.8rem' }}>승인 현황:</div>
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         {requiredApprovers.map(approver => {
-                                            const isApproved = task.approvals.some(a => a.member.id === approver.id)
+                                            const approvalRecord = task.approvals.find(a => a.member.id === approver.id)
+                                            const isApproved = !!approvalRecord
                                             return (
                                                 <div key={approver.id} style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: '4px',
-                                                    padding: '4px 8px',
+                                                    gap: '8px',
+                                                    padding: '6px 12px',
                                                     borderRadius: '12px',
                                                     background: isApproved ? '#E0F2F1' : '#ECEFF1',
                                                     color: isApproved ? 'var(--color-secondary)' : '#B0BEC5',
                                                     opacity: isApproved ? 1 : 0.8,
-                                                    transition: 'all 0.2s'
+                                                    transition: 'all 0.2s',
+                                                    fontSize: '0.85rem'
                                                 }}>
-                                                    {isApproved ? <CheckCircle size={14} /> : <UserIcon size={14} />}
-                                                    <span>{approver.name}</span>
+                                                    {isApproved ? <CheckCircle size={16} /> : <UserIcon size={16} />}
+                                                    <span style={{ fontWeight: isApproved ? 'bold' : 'normal' }}>{approver.name}</span>
+                                                    {isApproved && approvalRecord.comment && (
+                                                        <span style={{
+                                                            marginLeft: '4px',
+                                                            color: '#455A64',
+                                                            fontStyle: 'italic',
+                                                            background: 'rgba(255,255,255,0.7)',
+                                                            padding: '2px 8px',
+                                                            borderRadius: '8px',
+                                                            flex: 1,
+                                                            wordBreak: 'break-word'
+                                                        }}>
+                                                            "{approvalRecord.comment}"
+                                                        </span>
+                                                    )}
                                                 </div>
                                             )
                                         })}
@@ -198,6 +245,61 @@ export default function ApprovalsPage() {
                     })}
                 </div>
             )}
+
+            {/* Feedback Modal */}
+            {actionTask && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '1rem'
+                }}>
+                    <div className="card" style={{ width: '100%', maxWidth: '400px', animation: 'fadeIn 0.2s ease-out' }}>
+                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#37474F', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {actionTask.action === 'APPROVE' ? <CheckCircle color="var(--color-secondary)" /> : <XCircle color="var(--color-accent)" />}
+                            {actionTask.action === 'APPROVE' ? '승인하기' : '거절하기'}
+                        </h3>
+                        <p style={{ color: '#607D8B', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                            <strong>{actionTask.title}</strong> 에 대한 한마디를 남겨보세요. (선택사항)
+                        </p>
+                        <textarea
+                            className="input"
+                            placeholder="예: 참 잘했어요! 정말 고마워~ 💕"
+                            value={feedback}
+                            onChange={e => setFeedback(e.target.value)}
+                            style={{ width: '100%', minHeight: '100px', marginBottom: '1.5rem', resize: 'vertical' }}
+                            autoFocus
+                        />
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button
+                                onClick={() => setActionTask(null)}
+                                className="btn"
+                                style={{ flex: 1, background: '#ECEFF1', color: '#607D8B' }}
+                                disabled={isSubmitting}
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={handleConfirmAction}
+                                className="btn btn-primary"
+                                style={{ flex: 1, background: actionTask.action === 'APPROVE' ? 'var(--color-secondary)' : 'var(--color-accent)' }}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? '처리 중...' : '확인'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <style jsx global>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: scale(0.95); }
+                    to { opacity: 1; transform: scale(1); }
+                }
+            `}</style>
         </div>
     )
 }

@@ -8,7 +8,7 @@ export async function PATCH(
     try {
         const { id } = await params
         const body = await request.json()
-        const { status } = body
+        const { status, resultMessage } = body
 
         if (!id || !status) {
             return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
@@ -38,7 +38,10 @@ export async function PATCH(
 
         const updatedTask = await prisma.task.update({
             where: { id },
-            data: { status }
+            data: {
+                status,
+                resultMessage: resultMessage || null
+            }
         })
 
         return NextResponse.json(updatedTask)
