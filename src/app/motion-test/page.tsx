@@ -3,123 +3,19 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, Activity, RotateCcw } from 'lucide-react'
+import { useSquatCounter } from '@/hooks/useSquatCounter'
 
 export default function MotionTestPage() {
-    const [permissionGranted, setPermissionGranted] = useState(false)
-    const [permissionNeedsRequest, setPermissionNeedsRequest] = useState(false)
-    const [isMeasuring, setIsMeasuring] = useState(false)
-
-    const [currentCount, setCurrentCount] = useState(0)
-    const [debugInfo, setDebugInfo] = useState({ y: 0, delta: 0, state: 0 })
-
-    // Algorithm State
-    const lastY = useRef<number | null>(null)
-    // -1 = going down, 1 = going up, 0 = stable
-    const state = useRef<number>(0)
-    const isReadyForNext = useRef(true)
-    const lastCountTime = useRef<number>(0)
-
-    useEffect(() => {
-        checkSensorPermission()
-    }, [])
-
-    const checkSensorPermission = () => {
-        // @ts-ignore
-        if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-            setPermissionNeedsRequest(true)
-        } else {
-            // Android or non-iOS 13+ devices usually grant permission by default
-            setPermissionGranted(true)
-        }
-    }
-
-    const requestPermission = async () => {
-        try {
-            // @ts-ignore
-            const permission = await DeviceMotionEvent.requestPermission()
-            if (permission === 'granted') {
-                setPermissionGranted(true)
-                setPermissionNeedsRequest(false)
-                setIsMeasuring(true)
-            } else {
-                alert('센서 접근 권한이 거부되었습니다. 설정에서 권한을 허용해주세요.')
-            }
-        } catch (error) {
-            console.error('Permission request error:', error)
-            alert('센서 권한 요청 중 오류가 발생했습니다. (HTTPS 웹사이트 환경 필수)')
-        }
-    }
-
-    const startMeasuring = () => {
-        if (permissionNeedsRequest) {
-            requestPermission()
-        } else {
-            setIsMeasuring(true)
-            setPermissionGranted(true)
-        }
-    }
-
-    const stopMeasuring = () => {
-        setIsMeasuring(false)
-    }
-
-    const resetCount = () => {
-        setCurrentCount(0)
-        state.current = 0
-        lastY.current = null
-        isReadyForNext.current = true
-        lastCountTime.current = 0
-        setDebugInfo({ y: 0, delta: 0, state: 0 })
-    }
-
-    useEffect(() => {
-        if (!isMeasuring || !permissionGranted) return
-
-        const handleMotion = (event: DeviceMotionEvent) => {
-            const y = event.accelerationIncludingGravity?.y
-
-            if (y === null || y === undefined) return
-
-            let currentDelta = 0
-
-            if (lastY.current !== null) {
-                const delta = y - lastY.current
-                currentDelta = delta
-
-                // Heuristic for Up/Down movement detection
-                const THRESHOLD = 1.5 // Increased threshold slightly for strictness
-
-                if (delta > THRESHOLD && state.current !== 1) {
-                    // Moving Up
-                    state.current = 1
-                } else if (delta < -THRESHOLD && state.current !== -1) {
-                    // Moving Down
-                    state.current = -1
-                    isReadyForNext.current = true
-                }
-
-                // If we went down, and now we went up, count 1
-                // Add a debounce of 800ms to prevent double counting a single squat
-                const now = Date.now()
-                if (state.current === 1 && isReadyForNext.current && (now - lastCountTime.current > 800)) {
-                    setCurrentCount(prev => prev + 1)
-                    isReadyForNext.current = false
-                    lastCountTime.current = now
-                }
-            }
-            lastY.current = y
-
-            // Update debug info occasionally to avoid too many re-renders
-            setDebugInfo({
-                y: Number(y.toFixed(2)),
-                delta: Number(currentDelta.toFixed(2)),
-                state: state.current
-            })
-        }
-
-        window.addEventListener('devicemotion', handleMotion)
-        return () => window.removeEventListener('devicemotion', handleMotion)
-    }, [isMeasuring, permissionGranted])
+    const {
+        permissionGranted,
+        permissionNeedsRequest,
+        isMeasuring,
+        currentCount,
+        debugInfo,
+        startMeasuring,
+        stopMeasuring,
+        resetCount
+    } = useSquatCounter({ threshold: 0.8, debounceMs: 800 })
 
     return (
         <div style={{ paddingBottom: '2rem' }}>

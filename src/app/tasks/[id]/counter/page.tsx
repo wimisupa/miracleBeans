@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, CheckCircle, Target, Activity } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
+import { useSquatCounter } from '@/hooks/useSquatCounter'
 
 export default function CounterTaskExecutePage() {
     const router = useRouter()
@@ -16,115 +17,9 @@ export default function CounterTaskExecutePage() {
     const [loading, setLoading] = useState(true)
     const [finishing, setFinishing] = useState(false)
 
-    // Motion Sensor State
-    const [permissionGranted, setPermissionGranted] = useState(false)
-    const [permissionNeedsRequest, setPermissionNeedsRequest] = useState(false)
-    const [isMeasuring, setIsMeasuring] = useState(false)
-
-    const [currentCount, setCurrentCount] = useState(0)
     const targetCount = task?.targetCount || 10
 
-    // Algorithm State
-    const lastY = useRef<number | null>(null)
-    // -1 = going down, 1 = going up, 0 = stable
-    const state = useRef<number>(0)
-    const isReadyForNext = useRef(true)
-    const lastCountTime = useRef<number>(0)
-
-    useEffect(() => {
-        fetch(`/api/tasks/${taskId}`)
-            .then(res => res.json())
-            .then(data => {
-                setTask(data)
-                setLoading(false)
-                checkSensorPermission()
-            })
-    }, [taskId])
-
-    const checkSensorPermission = () => {
-        // @ts-ignore
-        if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-            setPermissionNeedsRequest(true)
-        } else {
-            // Android or non-iOS 13+ devices usually grant permission by default
-            setPermissionGranted(true)
-        }
-    }
-
-    const requestPermission = async () => {
-        try {
-            // @ts-ignore
-            const permission = await DeviceMotionEvent.requestPermission()
-            if (permission === 'granted') {
-                setPermissionGranted(true)
-                setPermissionNeedsRequest(false)
-                setIsMeasuring(true)
-            } else {
-                alert('센서 접근 권한이 거부되었습니다. 설정에서 권한을 허용해주세요.')
-            }
-        } catch (error) {
-            console.error('Permission request error:', error)
-            alert('센서 권한 요청 중 오류가 발생했습니다. (HTTPS 환경이 필수일 수 있습니다)')
-        }
-    }
-
-    const startMeasuring = () => {
-        if (permissionNeedsRequest) {
-            requestPermission()
-        } else {
-            setIsMeasuring(true)
-            setPermissionGranted(true)
-        }
-    }
-
-    useEffect(() => {
-        if (!isMeasuring || !permissionGranted) return
-
-        const handleMotion = (event: DeviceMotionEvent) => {
-            // We use Y axis for squat motion detection (assuming phone is held upright)
-            // Can add Z axis considerations for other holds, but Y is a good starting point.
-            const y = event.accelerationIncludingGravity?.y
-
-            if (y === null || y === undefined) return
-
-            if (lastY.current !== null) {
-                const delta = y - lastY.current
-
-                // Very basic heuristic for Up/Down movement detection
-                const THRESHOLD = 1.8 // Increased threshold for real usage to avoid false positives
-
-                if (delta > THRESHOLD && state.current !== 1) {
-                    // Moving Up
-                    state.current = 1
-                } else if (delta < -THRESHOLD && state.current !== -1) {
-                    // Moving Down
-                    state.current = -1
-                    isReadyForNext.current = true
-                }
-
-                // If we went down, and now we went up, count 1
-                const now = Date.now()
-                if (state.current === 1 && isReadyForNext.current && (now - lastCountTime.current > 800)) {
-                    setCurrentCount(prev => {
-                        const newCount = prev + 1
-                        if (newCount >= targetCount) {
-                            handleComplete()
-                        }
-                        return newCount
-                    })
-                    isReadyForNext.current = false
-                    lastCountTime.current = now
-                }
-            }
-            lastY.current = y
-        }
-
-        window.addEventListener('devicemotion', handleMotion)
-        return () => window.removeEventListener('devicemotion', handleMotion)
-    }, [isMeasuring, permissionGranted, targetCount])
-
     const handleComplete = async () => {
-        setIsMeasuring(false)
         setFinishing(true)
 
         try {
@@ -161,6 +56,28 @@ export default function CounterTaskExecutePage() {
             })
         })
     }
+
+    const {
+        permissionGranted,
+        permissionNeedsRequest,
+        isMeasuring,
+        currentCount,
+        startMeasuring
+    } = useSquatCounter({
+        threshold: 0.8,
+        debounceMs: 800,
+        targetCount: targetCount,
+        onComplete: handleComplete
+    })
+
+    useEffect(() => {
+        fetch(`/api/tasks/${taskId}`)
+            .then(res => res.json())
+            .then(data => {
+                setTask(data)
+                setLoading(false)
+            })
+    }, [taskId])
 
     if (loading) return <div style={{ textAlign: 'center', padding: '3rem', color: '#607D8B' }}>불러오는 중...</div>
     if (!task) return null
