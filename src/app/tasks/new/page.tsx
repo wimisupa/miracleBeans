@@ -242,10 +242,10 @@ export default function NewTaskPage() {
                             boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
                         }}>
                             {[
-                                { id: 'EARN', label: '⚡️ 즉시 완료', icon: <Zap size={18} /> },
-                                { id: 'MISSION', label: '📝 결과 보고', icon: <PenTool size={18} /> },
-                                { id: 'HOURGLASS', label: '⏳ 타이머', icon: <Timer size={18} /> },
-                                { id: 'COUNTER', label: '🏃 동작 측정', icon: <Activity size={18} /> },
+                                { id: 'EARN', label: '즉시 완료', icon: <Zap size={18} /> },
+                                { id: 'MISSION', label: '결과 보고', icon: <PenTool size={18} /> },
+                                { id: 'HOURGLASS', label: '타이머', icon: <Timer size={18} /> },
+                                { id: 'COUNTER', label: '동작 측정', icon: <Activity size={18} /> },
                             ].map((typeOption) => {
                                 const isSelected = taskType === typeOption.id;
                                 return (
