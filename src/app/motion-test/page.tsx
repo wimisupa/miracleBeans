@@ -15,7 +15,7 @@ export default function MotionTestPage() {
         startMeasuring,
         stopMeasuring,
         resetCount
-    } = useSquatCounter({ threshold: 0.8, debounceMs: 800 })
+    } = useSquatCounter({ threshold: 0.5, debounceMs: 800 })
 
     return (
         <div style={{ paddingBottom: '2rem' }}>

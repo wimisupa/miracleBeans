@@ -8,7 +8,7 @@ interface SquatCounterOptions {
 }
 
 export function useSquatCounter({
-    threshold = 0.8,
+    threshold = 0.5,
     debounceMs = 800,
     onComplete,
     targetCount

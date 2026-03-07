@@ -64,7 +64,7 @@ export default function CounterTaskExecutePage() {
         currentCount,
         startMeasuring
     } = useSquatCounter({
-        threshold: 0.8,
+        threshold: 0.5,
         debounceMs: 800,
         targetCount: targetCount,
         onComplete: handleComplete
