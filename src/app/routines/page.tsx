@@ -417,7 +417,7 @@ export default function RoutinesPage() {
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label className="label">알림/예정 시간</label>
-                            <input type="time" className="input" value={timeOfDay} onChange={e => setTimeOfDay(e.target.value)} required />
+                            <input type="time" className="input" value={timeOfDay} onChange={e => setTimeOfDay(e.target.value)} required style={{ width: '100%', maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none', display: 'block' }} />
                         </div>
 
                         <div style={{ marginBottom: '1rem' }}>
