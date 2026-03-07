@@ -10,7 +10,7 @@ type Task = {
     id: string
     title: string
     points: number
-    type: 'EARN' | 'SPEND' | 'TATTLE' | 'HOURGLASS' | 'MISSION'
+    type: 'EARN' | 'SPEND' | 'TATTLE' | 'HOURGLASS' | 'MISSION' | 'COUNTER'
     resultMessage?: string | null
     creator: { id: string; name: string }
     assigneeId?: string
@@ -128,7 +128,7 @@ export default function ApprovalsPage() {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {tasks.map(task => {
-                        const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN' || task.type === 'MISSION') ? (task.assigneeId || task.creator.id) : task.creator.id;
+                        const personWhoDidIt = (task.type === 'HOURGLASS' || task.type === 'EARN' || task.type === 'MISSION' || task.type === 'COUNTER') ? (task.assigneeId || task.creator.id) : task.creator.id;
                         const isPersonWhoDidIt = currentMember?.id === personWhoDidIt;
                         const alreadyApproved = task.approvals.some(a => a.member.id === currentMember?.id)
 
@@ -154,9 +154,9 @@ export default function ApprovalsPage() {
                                         <div style={{
                                             fontWeight: 'bold',
                                             fontSize: '1.1rem',
-                                            color: (task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION') ? 'var(--color-secondary)' : 'var(--color-accent)'
+                                            color: (task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION' || task.type === 'COUNTER') ? 'var(--color-secondary)' : 'var(--color-accent)'
                                         }}>
-                                            {(task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION') ? '+' : '-'}{Math.abs(task.points)} 콩
+                                            {(task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION' || task.type === 'COUNTER') ? '+' : '-'}{Math.abs(task.points)} 콩
                                         </div>
                                         {task.resultMessage && (
                                             <div style={{
