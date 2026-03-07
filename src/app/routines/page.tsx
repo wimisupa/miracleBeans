@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Sparkles, Plus, Trash2, Timer, Coins, Calendar, Clock, Loader2, Pencil, Activity } from 'lucide-react'
+import { ChevronLeft, Sparkles, Plus, Trash2, Timer, Coins, Calendar, Clock, Loader2, Pencil, Activity, Zap, PenTool, ClipboardCheck } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = { id: string, name: string, role: string }
@@ -57,7 +57,7 @@ export default function RoutinesPage() {
     const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null)
     const [title, setTitle] = useState('')
     const [points, setPoints] = useState(100)
-    const [type, setType] = useState<'EARN' | 'HOURGLASS' | 'COUNTER'>('EARN')
+    const [type, setType] = useState<'EARN' | 'MISSION' | 'HOURGLASS' | 'COUNTER'>('EARN')
     const [durationMinutes, setDurationMinutes] = useState('')
     const [targetCount, setTargetCount] = useState<number | ''>('')
     const [timeOfDay, setTimeOfDay] = useState('08:00')
@@ -319,123 +319,96 @@ export default function RoutinesPage() {
                             <input type="text" className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="예: 아침 물 한잔 마시기" required />
                         </div>
 
-                        {/* 2. Timer Toggle (HOURGLASS vs EARN) */}
-                        <div style={{
-                            marginBottom: '1rem',
-                            padding: '1rem',
-                            borderRadius: '12px',
-                            background: type === 'HOURGLASS' ? 'rgba(0, 191, 165, 0.05)' : 'rgba(255,255,255,0.6)',
-                            border: type === 'HOURGLASS' ? '2px solid var(--color-primary)' : '1px solid #E0E0E0',
-                            transition: 'all 0.3s ease'
-                        }}>
-                            <div
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                                onClick={() => {
-                                    if (type === 'HOURGLASS') {
-                                        setType('EARN')
-                                        setDurationMinutes('')
-                                    } else {
-                                        setType('HOURGLASS')
-                                        setTargetCount('') // 횟수 초기화
-                                    }
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Timer size={22} color={type === 'HOURGLASS' ? 'var(--color-primary)' : '#90A4AE'} />
-                                    <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: type === 'HOURGLASS' ? 'var(--color-primary)' : '#607D8B' }}>
-                                        이 루틴에 모래시계 타이머 적용하기
-                                    </span>
-                                </div>
-                                <div style={{
-                                    width: '44px', height: '24px', borderRadius: '12px',
-                                    background: type === 'HOURGLASS' ? 'var(--color-primary)' : '#CFD8DC',
-                                    position: 'relative', transition: 'background 0.3s'
-                                }}>
-                                    <div style={{
-                                        width: '20px', height: '20px', borderRadius: '50%', background: 'white',
-                                        position: 'absolute', top: '2px', left: type === 'HOURGLASS' ? '22px' : '2px',
-                                        transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                    }} />
-                                </div>
+                        {/* 2. Task Type Selection (Segmented Control) */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label className="label">어떤 종류의 루틴인가요?</label>
+                            <div style={{
+                                display: 'flex',
+                                background: 'rgba(236, 239, 241, 0.6)',
+                                padding: '4px',
+                                borderRadius: '16px',
+                                gap: '4px',
+                                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+                            }}>
+                                {[
+                                    { id: 'EARN', label: '즉시 완료', icon: <Zap size={18} /> },
+                                    { id: 'MISSION', label: '결과 보고', icon: <PenTool size={18} /> },
+                                    { id: 'HOURGLASS', label: '타이머', icon: <Timer size={18} /> },
+                                    { id: 'COUNTER', label: '동작 측정', icon: <Activity size={18} /> },
+                                ].map((typeOption) => {
+                                    const isSelected = type === typeOption.id;
+                                    return (
+                                        <div
+                                            key={typeOption.id}
+                                            onClick={() => {
+                                                setType(typeOption.id as 'EARN' | 'MISSION' | 'HOURGLASS' | 'COUNTER')
+                                                if (typeOption.id !== 'HOURGLASS') setDurationMinutes('')
+                                                if (typeOption.id !== 'COUNTER') setTargetCount('')
+                                            }}
+                                            style={{
+                                                flex: 1,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '4px',
+                                                padding: '10px 4px',
+                                                borderRadius: '12px',
+                                                background: isSelected ? 'white' : 'transparent',
+                                                color: isSelected ? 'var(--color-primary)' : '#78909C',
+                                                fontWeight: isSelected ? '800' : '600',
+                                                fontSize: '0.75rem',
+                                                whiteSpace: 'nowrap',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                boxShadow: isSelected ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+                                                transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                                            }}
+                                        >
+                                            {typeOption.icon}
+                                            <span>{typeOption.label}</span>
+                                        </div>
+                                    )
+                                })}
                             </div>
-
-                            {type === 'HOURGLASS' && (
-                                <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
-                                    <label className="label">얼마나 진행할 예정인가요? (분)</label>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <input
-                                            type="number"
-                                            className="input"
-                                            value={durationMinutes}
-                                            onChange={(e) => setDurationMinutes(e.target.value)}
-                                            placeholder="예: 15"
-                                            min="1"
-                                            style={{ flex: 1 }}
-                                        />
-                                        <span style={{ color: '#607D8B', fontWeight: 'bold' }}>분</span>
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
-                        {/* 2.5 Counter Toggle (COUNTER) */}
-                        <div style={{
-                            marginBottom: '1rem',
-                            padding: '1rem',
-                            borderRadius: '12px',
-                            background: type === 'COUNTER' ? 'rgba(0, 191, 165, 0.05)' : 'rgba(255,255,255,0.6)',
-                            border: type === 'COUNTER' ? '2px solid var(--color-primary)' : '1px solid #E0E0E0',
-                            transition: 'all 0.3s ease'
-                        }}>
-                            <div
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                                onClick={() => {
-                                    if (type === 'COUNTER') {
-                                        setType('EARN')
-                                        setTargetCount('')
-                                    } else {
-                                        setType('COUNTER')
-                                        setDurationMinutes('') // 시간 초기화
-                                    }
-                                }}
-                            >
+                        {/* Extra Inputs based on Type */}
+                        {type === 'HOURGLASS' && (
+                            <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'white', borderRadius: '16px', border: '1px solid #ECEFF1', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
+                                <label className="label">얼마나 진행할 예정인가요? (타이머)</label>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Activity size={22} color={type === 'COUNTER' ? 'var(--color-primary)' : '#90A4AE'} />
-                                    <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: type === 'COUNTER' ? 'var(--color-primary)' : '#607D8B' }}>
-                                        이 루틴에 동작 횟수 적용하기
-                                    </span>
-                                </div>
-                                <div style={{
-                                    width: '44px', height: '24px', borderRadius: '12px',
-                                    background: type === 'COUNTER' ? 'var(--color-primary)' : '#CFD8DC',
-                                    position: 'relative', transition: 'background 0.3s'
-                                }}>
-                                    <div style={{
-                                        width: '20px', height: '20px', borderRadius: '50%', background: 'white',
-                                        position: 'absolute', top: '2px', left: type === 'COUNTER' ? '22px' : '2px',
-                                        transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                    }} />
+                                    <input
+                                        type="number"
+                                        className="input"
+                                        value={durationMinutes}
+                                        onChange={(e) => setDurationMinutes(e.target.value)}
+                                        placeholder="예: 15"
+                                        min="1"
+                                        style={{ flex: 1 }}
+                                    />
+                                    <span style={{ color: '#607D8B', fontWeight: 'bold' }}>분</span>
                                 </div>
                             </div>
+                        )}
 
-                            {type === 'COUNTER' && (
-                                <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
-                                    <label className="label">몇 번 할 예정인가요? (회)</label>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <input
-                                            type="number"
-                                            className="input"
-                                            value={targetCount}
-                                            onChange={(e) => setTargetCount(Number(e.target.value))}
-                                            placeholder="예: 10"
-                                            min="1"
-                                            style={{ flex: 1 }}
-                                        />
-                                        <span style={{ color: '#607D8B', fontWeight: 'bold' }}>회</span>
-                                    </div>
+                        {type === 'COUNTER' && (
+                            <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'white', borderRadius: '16px', border: '1px solid #ECEFF1', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
+                                <label className="label">몇 번 하실 건가요? (동작 측정)</label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="number"
+                                        className="input"
+                                        value={targetCount}
+                                        onChange={(e) => setTargetCount(Number(e.target.value))}
+                                        placeholder="예: 10"
+                                        min="1"
+                                        style={{ flex: 1 }}
+                                    />
+                                    <span style={{ color: '#607D8B', fontWeight: 'bold' }}>회 (번)</span>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label className="label">보상 콩</label>
