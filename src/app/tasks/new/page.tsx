@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Sprout, Timer, ListTodo, ClipboardCheck, Activity } from 'lucide-react'
+import { ChevronLeft, Sprout, Timer, ListTodo, ClipboardCheck, Activity, Zap, PenTool } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = {
@@ -242,10 +242,10 @@ export default function NewTaskPage() {
                             boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
                         }}>
                             {[
-                                { id: 'EARN', label: '일반', icon: <Sprout size={18} /> },
-                                { id: 'MISSION', label: '인증 미션', icon: <ClipboardCheck size={18} /> },
-                                { id: 'HOURGLASS', label: '사색 시간', icon: <Timer size={18} /> },
-                                { id: 'COUNTER', label: '운동 모션', icon: <Activity size={18} /> },
+                                { id: 'EARN', label: '⚡️ 즉시 완료', icon: <Zap size={18} /> },
+                                { id: 'MISSION', label: '📝 결과 보고', icon: <PenTool size={18} /> },
+                                { id: 'HOURGLASS', label: '⏳ 타이머', icon: <Timer size={18} /> },
+                                { id: 'COUNTER', label: '🏃 동작 측정', icon: <Activity size={18} /> },
                             ].map((typeOption) => {
                                 const isSelected = taskType === typeOption.id;
                                 return (
@@ -282,7 +282,7 @@ export default function NewTaskPage() {
                     {/* Extra Inputs based on Type */}
                     {taskType === 'HOURGLASS' && (
                         <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'white', borderRadius: '16px', border: '1px solid #ECEFF1', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
-                            <label className="label">얼마나 할 건가요? (모래시계)</label>
+                            <label className="label">얼마나 할 건가요? (타이머)</label>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <input
                                     type="number"
@@ -300,7 +300,7 @@ export default function NewTaskPage() {
 
                     {taskType === 'COUNTER' && (
                         <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'white', borderRadius: '16px', border: '1px solid #ECEFF1', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
-                            <label className="label">몇 번 할 건가요? (횟수 측정)</label>
+                            <label className="label">몇 번 하실 건가요? (동작 측정)</label>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <input
                                     type="number"
