@@ -61,6 +61,7 @@ export default function CounterTaskExecutePage() {
         permissionGranted,
         permissionNeedsRequest,
         isMeasuring,
+        isReady,
         currentCount,
         startMeasuring
     } = useSquatCounter({
@@ -135,7 +136,15 @@ export default function CounterTaskExecutePage() {
                     </button>
                 )}
 
-                {isMeasuring && !finishing && (
+                {isMeasuring && !isReady && !finishing && (
+                    <div style={{ animation: 'pulse 1s infinite ease-in-out' }}>
+                        <p style={{ color: '#FBC02D', fontWeight: 'bold', fontSize: '1.4rem', marginBottom: '1rem' }}>
+                            ⏳ 잠시 후 시작합니다...<br />(자세를 잡아주세요!)
+                        </p>
+                    </div>
+                )}
+
+                {isMeasuring && isReady && !finishing && (
                     <div style={{ animation: 'pulse 1.5s infinite ease-in-out' }}>
                         <p style={{ color: '#FBC02D', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '1rem' }}>
                             🐹 "자, 시작해볼까? 제리가 지켜보고 있어요!"

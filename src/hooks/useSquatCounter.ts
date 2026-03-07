@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 interface SquatCounterOptions {
     threshold?: number
     debounceMs?: number
+    readyDelayMs?: number
     onComplete?: () => void
     targetCount?: number
 }
@@ -10,12 +11,14 @@ interface SquatCounterOptions {
 export function useSquatCounter({
     threshold = 0.5,
     debounceMs = 800,
+    readyDelayMs = 1000,
     onComplete,
     targetCount
 }: SquatCounterOptions = {}) {
     const [permissionGranted, setPermissionGranted] = useState(false)
     const [permissionNeedsRequest, setPermissionNeedsRequest] = useState(false)
     const [isMeasuring, setIsMeasuring] = useState(false)
+    const [isReady, setIsReady] = useState(false)
     const [currentCount, setCurrentCount] = useState(0)
 
     // For debugging and testing purposes
@@ -55,6 +58,8 @@ export function useSquatCounter({
                 setPermissionGranted(true)
                 setPermissionNeedsRequest(false)
                 setIsMeasuring(true)
+                setIsReady(false)
+                setTimeout(() => setIsReady(true), readyDelayMs)
             } else {
                 alert('센서 접근 권한이 거부되었습니다. 설정에서 권한을 허용해주세요.')
             }
@@ -62,7 +67,7 @@ export function useSquatCounter({
             console.error('Permission request error:', error)
             alert('센서 권한 요청 중 오류가 발생했습니다. (HTTPS 웹사이트 환경 필수)')
         }
-    }, [])
+    }, [readyDelayMs])
 
     const startMeasuring = useCallback(() => {
         if (permissionNeedsRequest) {
@@ -70,11 +75,14 @@ export function useSquatCounter({
         } else {
             setIsMeasuring(true)
             setPermissionGranted(true)
+            setIsReady(false)
+            setTimeout(() => setIsReady(true), readyDelayMs)
         }
-    }, [permissionNeedsRequest, requestPermission])
+    }, [permissionNeedsRequest, requestPermission, readyDelayMs])
 
     const stopMeasuring = useCallback(() => {
         setIsMeasuring(false)
+        setIsReady(false)
     }, [])
 
     const resetCount = useCallback(() => {
@@ -83,6 +91,7 @@ export function useSquatCounter({
         lastY.current = null
         isReadyForNext.current = true
         lastCountTime.current = 0
+        setIsReady(false)
         setDebugInfo({ y: 0, delta: 0, state: 0 })
     }, [])
 
@@ -100,32 +109,36 @@ export function useSquatCounter({
                 const delta = y - lastY.current
                 currentDelta = delta
 
-                if (delta > threshold && state.current !== 1) {
-                    // Moving Up
-                    state.current = 1
-                } else if (delta < -threshold && state.current !== -1) {
-                    // Moving Down
-                    state.current = -1
-                    isReadyForNext.current = true
-                }
+                // Only process moves/counts if ready delay has passed
+                if (isReady) {
+                    if (delta > threshold && state.current !== 1) {
+                        // Moving Up
+                        state.current = 1
+                    } else if (delta < -threshold && state.current !== -1) {
+                        // Moving Down
+                        state.current = -1
+                        isReadyForNext.current = true
+                    }
 
-                // If we went down, and now we went up, count 1
-                const now = Date.now()
-                if (state.current === 1 && isReadyForNext.current && (now - lastCountTime.current > debounceMs)) {
-                    setCurrentCount(prev => {
-                        const newCount = prev + 1
+                    // If we went down, and now we went up, count 1
+                    const now = Date.now()
+                    if (state.current === 1 && isReadyForNext.current && (now - lastCountTime.current > debounceMs)) {
+                        setCurrentCount(prev => {
+                            const newCount = prev + 1
 
-                        // Check completion condition
-                        if (targetCount && newCount >= targetCount) {
-                            setIsMeasuring(false)
-                            if (onCompleteRef.current) {
-                                onCompleteRef.current()
+                            // Check completion condition
+                            if (targetCount && newCount >= targetCount) {
+                                setIsMeasuring(false)
+                                setIsReady(false)
+                                if (onCompleteRef.current) {
+                                    onCompleteRef.current()
+                                }
                             }
-                        }
-                        return newCount
-                    })
-                    isReadyForNext.current = false
-                    lastCountTime.current = now
+                            return newCount
+                        })
+                        isReadyForNext.current = false
+                        lastCountTime.current = now
+                    }
                 }
             }
             lastY.current = y
@@ -141,12 +154,13 @@ export function useSquatCounter({
 
         window.addEventListener('devicemotion', handleMotion)
         return () => window.removeEventListener('devicemotion', handleMotion)
-    }, [isMeasuring, permissionGranted, targetCount, threshold, debounceMs])
+    }, [isMeasuring, permissionGranted, isReady, targetCount, threshold, debounceMs])
 
     return {
         permissionGranted,
         permissionNeedsRequest,
         isMeasuring,
+        isReady,
         currentCount,
         debugInfo,
         startMeasuring,

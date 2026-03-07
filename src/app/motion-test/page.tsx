@@ -10,12 +10,13 @@ export default function MotionTestPage() {
         permissionGranted,
         permissionNeedsRequest,
         isMeasuring,
+        isReady,
         currentCount,
         debugInfo,
         startMeasuring,
         stopMeasuring,
         resetCount
-    } = useSquatCounter({ threshold: 0.5, debounceMs: 800 })
+    } = useSquatCounter({ threshold: 0.5, debounceMs: 800, readyDelayMs: 1000 })
 
     return (
         <div style={{ paddingBottom: '2rem' }}>
@@ -59,6 +60,10 @@ export default function MotionTestPage() {
                         <Activity size={20} />
                         {permissionNeedsRequest ? '센서 접근 허용 및 시작' : '테스트 시작하기'}
                     </button>
+                ) : !isReady ? (
+                    <div style={{ width: '100%', padding: '16px', fontSize: '1.1rem', background: '#FFF3E0', color: '#E65100', borderRadius: '8px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '1rem', animation: 'pulse 1s infinite ease-in-out' }}>
+                        ⏳ 잠시 후 시작됩니다... 자세를 잡으세요!
+                    </div>
                 ) : (
                     <button
                         onClick={stopMeasuring}
