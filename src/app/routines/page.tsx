@@ -422,9 +422,35 @@ export default function RoutinesPage() {
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label className="label">누가 할까요?</label>
-                            <select className="input" value={assigneeId} onChange={e => setAssigneeId(e.target.value)}>
-                                {familyMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                            </select>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                                {familyMembers.map(m => (
+                                    <div
+                                        key={m.id}
+                                        onClick={() => setAssigneeId(m.id)}
+                                        style={{
+                                            padding: '0.5rem',
+                                            borderRadius: '12px',
+                                            border: assigneeId === m.id ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.5)',
+                                            background: assigneeId === m.id ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
+                                            color: assigneeId === m.id ? 'white' : '#37474F',
+                                            textAlign: 'center',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.9rem',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <div style={{ fontSize: '1rem', marginBottom: '0.1rem' }}>
+                                            {m.role === 'PARENT' ? '🪄' : '🧙'}
+                                        </div>
+                                        {m.name}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         <div style={{ marginBottom: '1.5rem' }}>
