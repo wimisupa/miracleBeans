@@ -15,6 +15,7 @@ function MemberGuard({ children }: { children: ReactNode }) {
         pathname === '/register' ||
         pathname === '/family/new' ||
         pathname === '/members/manage' ||
+        pathname === '/motion-test' ||
         pathname.match(/^\/family\/[^\/]+$/); // matches /family/[id] and /family/manage
 
     const router = useRouter()
