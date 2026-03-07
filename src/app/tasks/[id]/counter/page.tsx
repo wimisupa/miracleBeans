@@ -29,6 +29,7 @@ export default function CounterTaskExecutePage() {
     // -1 = going down, 1 = going up, 0 = stable
     const state = useRef<number>(0)
     const isReadyForNext = useRef(true)
+    const lastCountTime = useRef<number>(0)
 
     useEffect(() => {
         fetch(`/api/tasks/${taskId}`)
@@ -90,7 +91,7 @@ export default function CounterTaskExecutePage() {
                 const delta = y - lastY.current
 
                 // Very basic heuristic for Up/Down movement detection
-                const THRESHOLD = 1.2
+                const THRESHOLD = 1.8 // Increased threshold for real usage to avoid false positives
 
                 if (delta > THRESHOLD && state.current !== 1) {
                     // Moving Up
@@ -102,7 +103,8 @@ export default function CounterTaskExecutePage() {
                 }
 
                 // If we went down, and now we went up, count 1
-                if (state.current === 1 && isReadyForNext.current) {
+                const now = Date.now()
+                if (state.current === 1 && isReadyForNext.current && (now - lastCountTime.current > 800)) {
                     setCurrentCount(prev => {
                         const newCount = prev + 1
                         if (newCount >= targetCount) {
@@ -111,6 +113,7 @@ export default function CounterTaskExecutePage() {
                         return newCount
                     })
                     isReadyForNext.current = false
+                    lastCountTime.current = now
                 }
             }
             lastY.current = y

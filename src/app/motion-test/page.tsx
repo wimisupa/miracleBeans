@@ -17,6 +17,7 @@ export default function MotionTestPage() {
     // -1 = going down, 1 = going up, 0 = stable
     const state = useRef<number>(0)
     const isReadyForNext = useRef(true)
+    const lastCountTime = useRef<number>(0)
 
     useEffect(() => {
         checkSensorPermission()
@@ -67,6 +68,7 @@ export default function MotionTestPage() {
         state.current = 0
         lastY.current = null
         isReadyForNext.current = true
+        lastCountTime.current = 0
         setDebugInfo({ y: 0, delta: 0, state: 0 })
     }
 
@@ -85,7 +87,7 @@ export default function MotionTestPage() {
                 currentDelta = delta
 
                 // Heuristic for Up/Down movement detection
-                const THRESHOLD = 1.2
+                const THRESHOLD = 1.5 // Increased threshold slightly for strictness
 
                 if (delta > THRESHOLD && state.current !== 1) {
                     // Moving Up
@@ -97,9 +99,12 @@ export default function MotionTestPage() {
                 }
 
                 // If we went down, and now we went up, count 1
-                if (state.current === 1 && isReadyForNext.current) {
+                // Add a debounce of 800ms to prevent double counting a single squat
+                const now = Date.now()
+                if (state.current === 1 && isReadyForNext.current && (now - lastCountTime.current > 800)) {
                     setCurrentCount(prev => prev + 1)
                     isReadyForNext.current = false
+                    lastCountTime.current = now
                 }
             }
             lastY.current = y
