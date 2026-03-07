@@ -1,5 +1,29 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params
+        const task = await prisma.task.findUnique({
+            where: { id },
+            include: {
+                creator: true,
+                assignee: true,
+            }
+        })
+
+        if (!task) {
+            return NextResponse.json({ error: 'Task not found' }, { status: 404 })
+        }
+
+        return NextResponse.json(task)
+    } catch (error: any) {
+        console.error('Task fetch error:', error)
+        return NextResponse.json({ error: error.message || 'Failed to fetch task' }, { status: 500 })
+    }
+}
 
 export async function PATCH(
     request: Request,

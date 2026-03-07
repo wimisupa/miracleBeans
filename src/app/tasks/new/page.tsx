@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Sprout, Timer, ListTodo, ClipboardCheck } from 'lucide-react'
+import { ChevronLeft, Sprout, Timer, ListTodo, ClipboardCheck, Activity } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = {
@@ -29,6 +29,10 @@ export default function NewTaskPage() {
 
     // Mission toggle
     const [isMission, setIsMission] = useState(true)
+
+    // Counter toggle
+    const [useCounter, setUseCounter] = useState(false)
+    const [targetCount, setTargetCount] = useState<number | ''>('')
 
     // Jerry specific state
     const [jerryVerdict, setJerryVerdict] = useState<{ points: number, comment: string, emoji: string } | null>(null)
@@ -129,6 +133,11 @@ export default function NewTaskPage() {
             return
         }
 
+        if (useCounter && !targetCount) {
+            alert('횟수 목표를 입력해주세요.')
+            return
+        }
+
         setLoading(true)
         try {
             const res = await fetch('/api/tasks', {
@@ -137,11 +146,12 @@ export default function NewTaskPage() {
                 body: JSON.stringify({
                     title: title,
                     description: title,
-                    type: isMission ? 'MISSION' : (useTimer ? 'HOURGLASS' : 'EARN'),
+                    type: isMission ? 'MISSION' : (useTimer ? 'HOURGLASS' : (useCounter ? 'COUNTER' : 'EARN')),
                     points: jerryVerdict.points,
                     creatorId: currentMember.id,
                     assigneeId: assigneeId,
-                    durationMinutes: useTimer ? Number(durationMinutes) : undefined
+                    durationMinutes: useTimer ? Number(durationMinutes) : undefined,
+                    targetCount: useCounter ? Number(targetCount) : undefined
                 }),
             })
 
@@ -237,7 +247,7 @@ export default function NewTaskPage() {
                     }}>
                         <div
                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                            onClick={() => { setIsMission(!isMission); if (!isMission) setUseTimer(false); }}
+                            onClick={() => { setIsMission(!isMission); if (!isMission) { setUseTimer(false); setUseCounter(false); } }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <ClipboardCheck size={24} color={isMission ? 'var(--color-primary)' : '#90A4AE'} />
@@ -270,7 +280,7 @@ export default function NewTaskPage() {
                     }}>
                         <div
                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                            onClick={() => { setUseTimer(!useTimer); if (!useTimer) setIsMission(false); }}
+                            onClick={() => { setUseTimer(!useTimer); if (!useTimer) { setIsMission(false); setUseCounter(false); } }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <Timer size={24} color={useTimer ? 'var(--color-primary)' : '#90A4AE'} />
@@ -306,6 +316,57 @@ export default function NewTaskPage() {
                                         style={{ flex: 1 }}
                                     />
                                     <span style={{ color: '#607D8B', fontWeight: 'bold' }}>분</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 3.5. Counter Toggle (COUNTER) */}
+                    <div style={{
+                        marginBottom: '1.5rem',
+                        padding: '1.5rem',
+                        borderRadius: '20px',
+                        background: useCounter ? 'rgba(0, 191, 165, 0.05)' : 'rgba(255,255,255,0.6)',
+                        border: useCounter ? '2px solid var(--color-primary)' : '1px solid #E0E0E0',
+                        transition: 'all 0.3s ease'
+                    }}>
+                        <div
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                            onClick={() => { setUseCounter(!useCounter); if (!useCounter) { setIsMission(false); setUseTimer(false); } }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Activity size={24} color={useCounter ? 'var(--color-primary)' : '#90A4AE'} />
+                                <span style={{ fontWeight: 'bold', color: useCounter ? 'var(--color-primary)' : '#607D8B' }}>
+                                    운동/동작 횟수 측정
+                                </span>
+                            </div>
+                            <div style={{
+                                width: '50px', height: '28px', borderRadius: '14px',
+                                background: useCounter ? 'var(--color-primary)' : '#CFD8DC',
+                                position: 'relative', transition: 'background 0.3s'
+                            }}>
+                                <div style={{
+                                    width: '24px', height: '24px', borderRadius: '50%', background: 'white',
+                                    position: 'absolute', top: '2px', left: useCounter ? '24px' : '2px',
+                                    transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                }} />
+                            </div>
+                        </div>
+
+                        {useCounter && (
+                            <div style={{ marginTop: '1.5rem', animation: 'fadeIn 0.3s ease' }}>
+                                <label className="label">몇 번 할 건가요?</label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="number"
+                                        className="input"
+                                        value={targetCount}
+                                        onChange={(e) => setTargetCount(Number(e.target.value))}
+                                        placeholder="예: 100"
+                                        min="1"
+                                        style={{ flex: 1 }}
+                                    />
+                                    <span style={{ color: '#607D8B', fontWeight: 'bold' }}>회 (번)</span>
                                 </div>
                             </div>
                         )}
@@ -395,7 +456,7 @@ export default function NewTaskPage() {
                         type="submit"
                         className="btn btn-primary"
                         style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }}
-                        disabled={loading || !jerryVerdict || !assigneeId || (useTimer && !durationMinutes)}
+                        disabled={loading || !jerryVerdict || !assigneeId || (useTimer && !durationMinutes) || (useCounter && !targetCount)}
                     >
                         {loading ? '등록 중...' : '등록하기 ✨'}
                     </button>

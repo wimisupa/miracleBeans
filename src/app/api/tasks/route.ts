@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { title, description, type, points, creatorId, assigneeId, durationMinutes, routineId } = body
+        const { title, description, type, points, creatorId, assigneeId, durationMinutes, targetCount, routineId } = body
 
         if (!title || !points || !creatorId || !type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -46,6 +46,12 @@ export async function POST(request: Request) {
         if (type === 'HOURGLASS') {
             if (durationMinutes === undefined) {
                 return NextResponse.json({ error: 'HOURGLASS tasks require durationMinutes' }, { status: 400 })
+            }
+        }
+
+        if (type === 'COUNTER') {
+            if (targetCount === undefined || targetCount < 1) {
+                return NextResponse.json({ error: 'COUNTER tasks require a valid targetCount' }, { status: 400 })
             }
         }
 
@@ -59,6 +65,7 @@ export async function POST(request: Request) {
                 creatorId,
                 assigneeId: assigneeId || creatorId, // Explicit assignee from frontend, fallback to creator
                 durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,
+                targetCount: targetCount ? Number(targetCount) : undefined,
                 routineId: routineId || undefined,
             },
         })

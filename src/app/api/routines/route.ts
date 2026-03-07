@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { title, type, points, creatorId, assigneeId, timeOfDay, daysOfWeek, durationMinutes } = body
+        const { title, type, points, creatorId, assigneeId, timeOfDay, daysOfWeek, durationMinutes, targetCount } = body
 
         if (!title || !type || !points || !creatorId || !assigneeId || !daysOfWeek) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -38,6 +38,10 @@ export async function POST(request: Request) {
 
         if (type === 'HOURGLASS' && !durationMinutes) {
             return NextResponse.json({ error: 'HOURGLASS routines require durationMinutes' }, { status: 400 })
+        }
+
+        if (type === 'COUNTER' && (!targetCount || targetCount < 1)) {
+            return NextResponse.json({ error: 'COUNTER routines require a valid targetCount' }, { status: 400 })
         }
 
         const routine = await prisma.routine.create({
@@ -50,6 +54,7 @@ export async function POST(request: Request) {
                 timeOfDay,
                 daysOfWeek,
                 durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,
+                targetCount: targetCount ? Number(targetCount) : undefined,
             },
             include: {
                 creator: true,

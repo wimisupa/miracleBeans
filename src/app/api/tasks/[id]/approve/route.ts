@@ -42,9 +42,9 @@ export async function POST(
             // 3. Handle Approval
             if (action === 'APPROVE') {
                 // Calculate point change
-                // EARN & HOURGLASS: +points
+                // EARN, HOURGLASS, MISSION, COUNTER: +points
                 // SPEND, TATTLE: -abs(points)
-                const pointChange = (task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION') ? Math.abs(task.points) : -Math.abs(task.points)
+                const pointChange = (task.type === 'EARN' || task.type === 'HOURGLASS' || task.type === 'MISSION' || task.type === 'COUNTER') ? Math.abs(task.points) : -Math.abs(task.points)
 
                 const targetMemberId = task.assigneeId || task.creatorId
 

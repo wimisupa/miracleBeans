@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Sparkles, Plus, Trash2, Timer, Coins, Calendar, Clock, Loader2, Pencil } from 'lucide-react'
+import { ChevronLeft, Sparkles, Plus, Trash2, Timer, Coins, Calendar, Clock, Loader2, Pencil, Activity } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
 
 type Member = { id: string, name: string, role: string }
@@ -11,7 +11,7 @@ type Routine = {
     id: string
     title: string
     points: number
-    type: 'EARN' | 'HOURGLASS'
+    type: 'EARN' | 'HOURGLASS' | 'COUNTER'
     durationMinutes: number | null
     timeOfDay: string | null
     daysOfWeek: string
@@ -23,7 +23,7 @@ type Routine = {
 type Recommendation = {
     title: string
     points: number
-    type: 'EARN' | 'HOURGLASS'
+    type: 'EARN' | 'HOURGLASS' | 'COUNTER'
     timeOfDay: string
     durationMinutes?: number
     daysOfWeek: string
@@ -57,8 +57,9 @@ export default function RoutinesPage() {
     const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null)
     const [title, setTitle] = useState('')
     const [points, setPoints] = useState(100)
-    const [type, setType] = useState<'EARN' | 'HOURGLASS'>('EARN')
+    const [type, setType] = useState<'EARN' | 'HOURGLASS' | 'COUNTER'>('EARN')
     const [durationMinutes, setDurationMinutes] = useState('')
+    const [targetCount, setTargetCount] = useState<number | ''>('')
     const [timeOfDay, setTimeOfDay] = useState('08:00')
     const [selectedDays, setSelectedDays] = useState<string[]>(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
     const [assigneeId, setAssigneeId] = useState('')
@@ -118,6 +119,8 @@ export default function RoutinesPage() {
         setPoints(routine.points)
         setType(routine.type)
         setDurationMinutes(routine.durationMinutes ? String(routine.durationMinutes) : '')
+        // @ts-ignore
+        setTargetCount(routine.targetCount ? Number(routine.targetCount) : '')
         setTimeOfDay(routine.timeOfDay || '08:00')
         setSelectedDays(routine.daysOfWeek.split(','))
         setAssigneeId(routine.assigneeId)
@@ -129,6 +132,10 @@ export default function RoutinesPage() {
         if (!title || !points || selectedDays.length === 0) return
         if (type === 'HOURGLASS' && !durationMinutes) {
             alert('타이머 시간을 입력해주세요!')
+            return
+        }
+        if (type === 'COUNTER' && !targetCount) {
+            alert('목표 횟수를 입력해주세요!')
             return
         }
 
@@ -146,6 +153,7 @@ export default function RoutinesPage() {
                     points: Number(points),
                     timeOfDay,
                     durationMinutes: type === 'HOURGLASS' ? Number(durationMinutes) : null,
+                    targetCount: type === 'COUNTER' ? Number(targetCount) : null,
                     daysOfWeek: selectedDays.join(','),
                     creatorId: currentMember?.id,
                     assigneeId: assigneeId || currentMember?.id
@@ -160,6 +168,7 @@ export default function RoutinesPage() {
                 setPoints(100)
                 setType('EARN')
                 setDurationMinutes('')
+                setTargetCount('')
             }
         } catch (e) {
             console.error(e)
@@ -292,6 +301,7 @@ export default function RoutinesPage() {
                         setPoints(100)
                         setType('EARN')
                         setDurationMinutes('')
+                        setTargetCount('')
                         setShowForm(!showForm)
                     }}
                     style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: 'var(--color-secondary)', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' }}
@@ -326,6 +336,7 @@ export default function RoutinesPage() {
                                         setDurationMinutes('')
                                     } else {
                                         setType('HOURGLASS')
+                                        setTargetCount('') // 횟수 초기화
                                     }
                                 }}
                             >
@@ -362,6 +373,65 @@ export default function RoutinesPage() {
                                             style={{ flex: 1 }}
                                         />
                                         <span style={{ color: '#607D8B', fontWeight: 'bold' }}>분</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 2.5 Counter Toggle (COUNTER) */}
+                        <div style={{
+                            marginBottom: '1rem',
+                            padding: '1rem',
+                            borderRadius: '12px',
+                            background: type === 'COUNTER' ? 'rgba(0, 191, 165, 0.05)' : 'rgba(255,255,255,0.6)',
+                            border: type === 'COUNTER' ? '2px solid var(--color-primary)' : '1px solid #E0E0E0',
+                            transition: 'all 0.3s ease'
+                        }}>
+                            <div
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                                onClick={() => {
+                                    if (type === 'COUNTER') {
+                                        setType('EARN')
+                                        setTargetCount('')
+                                    } else {
+                                        setType('COUNTER')
+                                        setDurationMinutes('') // 시간 초기화
+                                    }
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Activity size={22} color={type === 'COUNTER' ? 'var(--color-primary)' : '#90A4AE'} />
+                                    <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: type === 'COUNTER' ? 'var(--color-primary)' : '#607D8B' }}>
+                                        이 루틴에 동작 횟수 적용하기
+                                    </span>
+                                </div>
+                                <div style={{
+                                    width: '44px', height: '24px', borderRadius: '12px',
+                                    background: type === 'COUNTER' ? 'var(--color-primary)' : '#CFD8DC',
+                                    position: 'relative', transition: 'background 0.3s'
+                                }}>
+                                    <div style={{
+                                        width: '20px', height: '20px', borderRadius: '50%', background: 'white',
+                                        position: 'absolute', top: '2px', left: type === 'COUNTER' ? '22px' : '2px',
+                                        transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                    }} />
+                                </div>
+                            </div>
+
+                            {type === 'COUNTER' && (
+                                <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
+                                    <label className="label">몇 번 할 예정인가요? (회)</label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input
+                                            type="number"
+                                            className="input"
+                                            value={targetCount}
+                                            onChange={(e) => setTargetCount(Number(e.target.value))}
+                                            placeholder="예: 10"
+                                            min="1"
+                                            style={{ flex: 1 }}
+                                        />
+                                        <span style={{ color: '#607D8B', fontWeight: 'bold' }}>회</span>
                                     </div>
                                 </div>
                             )}
@@ -414,62 +484,69 @@ export default function RoutinesPage() {
                                 setPoints(100)
                                 setType('EARN')
                                 setDurationMinutes('')
+                                setTargetCount('')
                             }} className="btn" style={{ flex: 1, background: '#E0E0E0', color: '#546E7A' }}>취소</button>
                             <button type="submit" disabled={saving || selectedDays.length === 0} className="btn btn-primary" style={{ flex: 2 }}>{saving ? '저장 중...' : (editingRoutineId ? '루틴 수정하기' : '루틴 저장하기')}</button>
                         </div>
                     </form>
-                </div>
-            )}
+                </div >
+            )
+            }
 
-            {loadingRoutines ? (
-                <div style={{ textAlign: 'center', color: '#90A4AE', padding: '2rem' }}>불러오는 중...</div>
-            ) : routines.length === 0 ? (
-                <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', color: '#90A4AE' }}>
-                    <Calendar size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
-                    <p>아직 등록된 루틴이 없어요.<br />새로운 습관을 만들어볼까요?</p>
-                </div>
-            ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {routines.map(routine => (
-                        <div key={routine.id} className="card" style={{ marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.2rem' }}>
-                            <div>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#37474F', marginBottom: '4px' }}>
-                                    {routine.title}
-                                    <span style={{ fontSize: '0.8rem', background: '#ECEFF1', color: '#607D8B', padding: '2px 6px', borderRadius: '8px', marginLeft: '8px', fontWeight: 'normal' }}>
-                                        {/* @ts-ignore */}
-                                        {routine.assignee?.name}
-                                    </span>
-                                </div>
-                                <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem', color: '#546E7A', marginTop: '6px' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={14} color="#FBC02D" /> {routine.points}콩</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> {routine.timeOfDay}</span>
-                                    {routine.type === 'HOURGLASS' && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Timer size={14} color="var(--color-primary)" /> {routine.durationMinutes}분</span>}
-                                </div>
-                                <div style={{ display: 'flex', gap: '4px', marginTop: '8px' }}>
-                                    {DAYS.map(d => (
-                                        <span key={d.id} style={{ fontSize: '0.75rem', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: routine.daysOfWeek.includes(d.id) ? 'var(--color-secondary)' : '#ECEFF1', color: routine.daysOfWeek.includes(d.id) ? 'white' : '#B0BEC5' }}>
-                                            {d.label}
+            {
+                loadingRoutines ? (
+                    <div style={{ textAlign: 'center', color: '#90A4AE', padding: '2rem' }}>불러오는 중...</div>
+                ) : routines.length === 0 ? (
+                    <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', color: '#90A4AE' }}>
+                        <Calendar size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+                        <p>아직 등록된 루틴이 없어요.<br />새로운 습관을 만들어볼까요?</p>
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {routines.map(routine => (
+                            <div key={routine.id} className="card" style={{ marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.2rem' }}>
+                                <div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#37474F', marginBottom: '4px' }}>
+                                        {routine.title}
+                                        <span style={{ fontSize: '0.8rem', background: '#ECEFF1', color: '#607D8B', padding: '2px 6px', borderRadius: '8px', marginLeft: '8px', fontWeight: 'normal' }}>
+                                            {/* @ts-ignore */}
+                                            {routine.assignee?.name}
                                         </span>
-                                    ))}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem', color: '#546E7A', marginTop: '6px' }}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={14} color="#FBC02D" /> {routine.points}콩</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> {routine.timeOfDay}</span>
+                                        {routine.type === 'HOURGLASS' && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Timer size={14} color="var(--color-primary)" /> {routine.durationMinutes}분</span>}
+                                        {routine.type === 'COUNTER' && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Activity size={14} color="var(--color-primary)" />
+                                            {/* @ts-ignore */}
+                                            {routine.targetCount}회</span>}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '4px', marginTop: '8px' }}>
+                                        {DAYS.map(d => (
+                                            <span key={d.id} style={{ fontSize: '0.75rem', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: routine.daysOfWeek.includes(d.id) ? 'var(--color-secondary)' : '#ECEFF1', color: routine.daysOfWeek.includes(d.id) ? 'white' : '#B0BEC5' }}>
+                                                {d.label}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button onClick={() => handleEdit(routine)} style={{ background: 'none', border: 'none', color: '#78909C', cursor: 'pointer', padding: '8px' }}>
+                                        <Pencil size={20} />
+                                    </button>
+                                    <button onClick={() => handleDelete(routine.id)} style={{ background: 'none', border: 'none', color: '#EF5350', cursor: 'pointer', padding: '8px' }}>
+                                        <Trash2 size={20} />
+                                    </button>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <button onClick={() => handleEdit(routine)} style={{ background: 'none', border: 'none', color: '#78909C', cursor: 'pointer', padding: '8px' }}>
-                                    <Pencil size={20} />
-                                </button>
-                                <button onClick={() => handleDelete(routine.id)} style={{ background: 'none', border: 'none', color: '#EF5350', cursor: 'pointer', padding: '8px' }}>
-                                    <Trash2 size={20} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )
+            }
 
             <style jsx global>{`
                 .spin { animation: spin 1s linear infinite; }
                 @keyframes spin { 100% { transform: rotate(360deg); } }
             `}</style>
-        </div>
+        </div >
     )
 }

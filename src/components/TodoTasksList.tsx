@@ -13,8 +13,9 @@ type UnifiedTask = {
     durationMinutes: number | null
     isRoutine: boolean
     // Routine / Task specific
-    type?: 'EARN' | 'HOURGLASS' | 'SPEND' | 'TATTLE' | 'MISSION'
+    type?: 'EARN' | 'HOURGLASS' | 'SPEND' | 'TATTLE' | 'MISSION' | 'COUNTER'
     isCompletedDaily?: boolean
+    targetCount?: number | null
     timeOfDay?: string
     activeTaskId?: string | null
     // Task specific
@@ -84,6 +85,8 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                     body: JSON.stringify({ status: 'PENDING' })
                 })
                 if (res.ok) fetchItems()
+            } else if (routine.type === 'COUNTER') {
+                router.push(`/tasks/${routine.activeTaskId}/counter`)
             } else {
                 router.push(`/tasks/${routine.activeTaskId}/execute`)
             }
@@ -131,6 +134,23 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
             if (task.id) {
                 router.push(`/tasks/${task.id}/execute`)
             }
+        } else if (routine.type === 'COUNTER') {
+            const res = await fetch('/api/tasks', {
+                method: 'POST', body: JSON.stringify({
+                    title: routine.title,
+                    description: '횟수 반복 미션 수행 중...',
+                    type: 'COUNTER',
+                    points: routine.points,
+                    creatorId: currentMember.id,
+                    targetMemberId: currentMember.id,
+                    targetCount: routine.targetCount,
+                    routineId: routine.id
+                })
+            })
+            const task = await res.json()
+            if (task.id) {
+                router.push(`/tasks/${task.id}/counter`)
+            }
         }
     }
 
@@ -163,6 +183,8 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
             }
         } else if (task.type === 'MISSION') {
             router.push(`/tasks/${task.id}/complete`)
+        } else if (task.type === 'COUNTER') {
+            router.push(`/tasks/${task.id}/counter`)
         } else {
             // HOURGLASS goes to execute page
             router.push(`/tasks/${task.id}/execute`)
@@ -205,6 +227,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                         <div style={{ fontSize: '0.85rem', color: '#78909C', display: 'flex', gap: '8px', alignItems: 'center' }}>
                             {item.isRoutine && item.timeOfDay && <span>⏰ {item.timeOfDay}</span>}
                             {item.durationMinutes && <span>⏱️ {item.durationMinutes}분</span>}
+                            {item.targetCount && <span>🔥 {item.targetCount}회</span>}
                             <span style={{ color: (item.type === 'SPEND' || item.type === 'TATTLE') ? '#FF5252' : '#FBC02D', fontWeight: 'bold' }}>
                                 {(item.type === 'SPEND' || item.type === 'TATTLE') ? '-' : '+'}{Math.abs(item.points)}콩
                             </span>
@@ -222,7 +245,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                                     ...(item.isCompletedDaily ? { background: '#B0BEC5', color: 'white', boxShadow: 'none' } : {})
                                 }}
                             >
-                                {item.isCompletedDaily ? '완료 🎉' : (item.type === 'HOURGLASS' ? <><Timer size={16} /> 시작</> : <><Check size={16} /> 완료</>)}
+                                {item.isCompletedDaily ? '완료 🎉' : (item.type === 'HOURGLASS' ? <><Timer size={16} /> 시작</> : item.type === 'COUNTER' ? <><Play size={16} /> 시작 (측정)</> : <><Check size={16} /> 완료</>)}
                             </button>
                         ) : (
                             <button
@@ -234,7 +257,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                                     fontFamily: 'inherit'
                                 }}
                             >
-                                {item.type === 'HOURGLASS' ? <><Timer size={16} /> 시작</> : item.type === 'MISSION' ? <><Check size={16} /> 결과 보고</> : <><Check size={16} /> 완료</>}
+                                {item.type === 'HOURGLASS' ? <><Timer size={16} /> 시작</> : item.type === 'COUNTER' ? <><Play size={16} /> 시작 (측정)</> : item.type === 'MISSION' ? <><Check size={16} /> 결과 보고</> : <><Check size={16} /> 완료</>}
                             </button>
                         )
                     )}
