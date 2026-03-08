@@ -138,7 +138,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-light)'
           }}>
-            <div style={{ marginBottom: '0px', color: 'var(--color-text-main)' }}>
+            <div style={{ marginBottom: '0px', color: '#FFE082' }}>
               <ListTodo size={22} />
             </div>
             <span style={{ fontWeight: 'bold', fontSize: '0.75rem', color: 'var(--color-text-main)', wordBreak: 'keep-all' }}>할 일 등록</span>
@@ -153,7 +153,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-light)'
           }}>
-            <div style={{ marginBottom: '0px', color: 'var(--color-text-main)' }}>
+            <div style={{ marginBottom: '0px', color: '#FFE082' }}>
               <Calendar size={22} />
             </div>
             <span style={{ fontWeight: 'bold', fontSize: '0.75rem', color: 'var(--color-text-main)', wordBreak: 'keep-all' }}>루틴 관리</span>
@@ -168,7 +168,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-light)'
           }}>
-            <div style={{ marginBottom: '0px', color: 'var(--color-text-main)' }}>
+            <div style={{ marginBottom: '0px', color: '#FFE082' }}>
               <Gift size={22} />
             </div>
             <span style={{ fontWeight: 'bold', fontSize: '0.75rem', color: 'var(--color-text-main)', wordBreak: 'keep-all' }}>콩 쓰기</span>
