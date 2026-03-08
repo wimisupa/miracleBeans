@@ -106,13 +106,13 @@ export default function ApprovalsPage() {
 
     return (
         <div>
-            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
-                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: '#1A252C', textDecoration: 'none', marginRight: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', textDecoration: 'none', marginRight: '1rem' }}>
                     <ChevronLeft size={32} />
                 </Link>
-                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
                     <ClipboardCheck size={32} color="var(--color-secondary)" />
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
                         승인 대기
                     </span>
                 </div>
@@ -121,7 +121,7 @@ export default function ApprovalsPage() {
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '2rem' }}>로딩 중...</div>
             ) : tasks.length === 0 ? (
-                <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', color: '#607D8B' }}>
+                <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--color-text-muted)' }}>
                     <CheckCircle size={48} style={{ marginBottom: '1rem', opacity: 0.3 }} />
                     <p>대기 중인 요청이 없습니다.<br />평화로운 위미네요! 🌱</p>
                 </div>
@@ -144,13 +144,13 @@ export default function ApprovalsPage() {
                             <div key={task.id} className="card">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                                     <div>
-                                        <div style={{ fontSize: '0.85rem', color: '#90A4AE', marginBottom: '0.25rem' }}>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>
                                             {task.creator.name} • {new Date(task.createdAt).toLocaleDateString()}
                                             {task.assigneeId && task.assigneeId !== task.creator.id && (
-                                                <span style={{ marginLeft: '4px', fontStyle: 'italic', color: '#B0BEC5' }}>(담당: {allMembers.find(m => m.id === task.assigneeId)?.name})</span>
+                                                <span style={{ marginLeft: '4px', fontStyle: 'italic', color: 'var(--color-text-muted)' }}>(담당: {allMembers.find(m => m.id === task.assigneeId)?.name})</span>
                                             )}
                                         </div>
-                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#37474F' }}>{task.title}</h3>
+                                        <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>{task.title}</h3>
                                         <div style={{
                                             fontWeight: 'bold',
                                             fontSize: '1.1rem',
@@ -162,11 +162,11 @@ export default function ApprovalsPage() {
                                             <div style={{
                                                 marginTop: '0.75rem',
                                                 padding: '0.75rem',
-                                                background: '#F5F5F5',
-                                                borderRadius: '8px',
+                                                background: 'var(--bg-main)',
+                                                borderRadius: 'var(--radius-sm)',
                                                 borderLeft: '4px solid var(--color-primary)',
                                                 fontSize: '0.9rem',
-                                                color: '#455A64',
+                                                color: 'var(--color-text-main)',
                                                 whiteSpace: 'pre-wrap'
                                             }}>
                                                 <div style={{ fontWeight: 'bold', marginBottom: '4px', color: 'var(--color-primary)', fontSize: '0.8rem' }}>결과 보고:</div>
@@ -197,11 +197,11 @@ export default function ApprovalsPage() {
 
                                 {/* Approval Status Bar */}
                                 <div style={{
-                                    borderTop: '1px solid rgba(0,0,0,0.05)',
+                                    borderTop: '1px solid var(--border-light)',
                                     paddingTop: '0.75rem',
                                     fontSize: '0.85rem'
                                 }}>
-                                    <div style={{ color: '#78909C', marginBottom: '0.5rem', fontSize: '0.8rem' }}>승인 현황:</div>
+                                    <div style={{ color: 'var(--color-text-muted)', marginBottom: '0.5rem', fontSize: '0.8rem' }}>승인 현황:</div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         {requiredApprovers.map(approver => {
                                             const approvalRecord = task.approvals.find(a => a.member.id === approver.id)
@@ -212,9 +212,10 @@ export default function ApprovalsPage() {
                                                     alignItems: 'center',
                                                     gap: '8px',
                                                     padding: '6px 12px',
-                                                    borderRadius: '12px',
-                                                    background: isApproved ? '#E0F2F1' : '#ECEFF1',
-                                                    color: isApproved ? 'var(--color-secondary)' : '#B0BEC5',
+                                                    borderRadius: 'var(--radius-full)',
+                                                    background: isApproved ? 'var(--bg-main)' : 'var(--bg-card)',
+                                                    border: isApproved ? 'none' : '1px solid var(--border-light)',
+                                                    color: isApproved ? 'var(--color-secondary)' : 'var(--color-text-muted)',
                                                     opacity: isApproved ? 1 : 0.8,
                                                     transition: 'all 0.2s',
                                                     fontSize: '0.85rem'
@@ -224,13 +225,14 @@ export default function ApprovalsPage() {
                                                     {isApproved && approvalRecord.comment && (
                                                         <span style={{
                                                             marginLeft: '4px',
-                                                            color: '#455A64',
+                                                            color: 'var(--color-text-main)',
                                                             fontStyle: 'italic',
-                                                            background: 'rgba(255,255,255,0.7)',
+                                                            background: 'var(--bg-card)',
                                                             padding: '2px 8px',
                                                             borderRadius: '8px',
                                                             flex: 1,
-                                                            wordBreak: 'break-word'
+                                                            wordBreak: 'break-word',
+                                                            border: '1px solid var(--border-light)'
                                                         }}>
                                                             "{approvalRecord.comment}"
                                                         </span>
@@ -257,12 +259,12 @@ export default function ApprovalsPage() {
                     padding: '1rem'
                 }}>
                     <div className="card" style={{ width: '100%', maxWidth: '400px', animation: 'fadeIn 0.2s ease-out' }}>
-                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#37474F', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h3 className="text-playful" style={{ fontSize: '1.3rem', marginBottom: '1rem', color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             {actionTask.action === 'APPROVE' ? <CheckCircle color="var(--color-secondary)" /> : <XCircle color="var(--color-accent)" />}
                             {actionTask.action === 'APPROVE' ? '승인하기' : '거절하기'}
                         </h3>
-                        <p style={{ color: '#607D8B', marginBottom: '1rem', fontSize: '0.9rem' }}>
-                            <strong>{actionTask.title}</strong> 에 대한 한마디를 남겨보세요. (선택사항)
+                        <p style={{ color: 'var(--color-text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                            <strong style={{ color: 'var(--color-text-main)' }}>{actionTask.title}</strong> 에 대한 한마디를 남겨보세요. (선택사항)
                         </p>
                         <textarea
                             className="input"
@@ -276,7 +278,7 @@ export default function ApprovalsPage() {
                             <button
                                 onClick={() => setActionTask(null)}
                                 className="btn"
-                                style={{ flex: 1, background: '#ECEFF1', color: '#607D8B' }}
+                                style={{ flex: 1, background: 'var(--bg-main)', color: 'var(--color-text-main)' }}
                                 disabled={isSubmitting}
                             >
                                 취소

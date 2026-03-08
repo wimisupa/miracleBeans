@@ -114,7 +114,7 @@ function ManageMembersContent() {
 
     return (
         <main style={{ paddingBottom: '2rem' }}>
-            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
                 <button
                     onClick={() => {
                         if (currentMember?.familyId) {
@@ -125,20 +125,20 @@ function ManageMembersContent() {
                             router.push('/')
                         }
                     }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#1A252C', marginRight: '1rem', padding: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', marginRight: '1rem', padding: 0 }}
                 >
                     <ChevronLeft size={32} />
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
                     <Settings size={32} color="var(--color-secondary)" />
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
                         구성원 수정
                     </span>
                 </div>
             </header>
 
-            <section className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px' }}>
-                <p style={{ color: '#607D8B', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
+            <section className="card" style={{ padding: '1.5rem', borderRadius: 'var(--radius-lg)' }}>
+                <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
                     가족 구성원의 정보를 수정하거나 삭제할 수 있습니다.
                 </p>
 
@@ -149,7 +149,7 @@ function ManageMembersContent() {
                                 // EDIT MODE
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     <div>
-                                        <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: '#455A64', marginBottom: '8px', fontWeight: 'bold' }}>이름</label>
+                                        <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-main)', marginBottom: '8px', fontWeight: 'bold' }}>이름</label>
                                         <input
                                             type="text"
                                             className="input"
@@ -160,51 +160,59 @@ function ManageMembersContent() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: '#455A64', marginBottom: '8px', fontWeight: 'bold' }}>역할</label>
-                                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                                        <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-main)', marginBottom: '8px', fontWeight: 'bold' }}>역할</label>
+                                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'var(--bg-main)', padding: '6px', borderRadius: 'var(--radius-full)' }}>
                                             <button
                                                 type="button"
-                                                className="btn"
                                                 onClick={() => setEditFormData({ ...editFormData, role: 'CHILD' })}
                                                 style={{
                                                     flex: 1,
-                                                    border: '2px solid transparent',
-                                                    background: editFormData.role === 'CHILD' ? 'var(--color-secondary)' : 'rgba(255,255,255,0.5)',
-                                                    color: editFormData.role === 'CHILD' ? 'white' : '#607D8B',
-                                                    flexDirection: 'column',
-                                                    padding: '1.5rem 1rem',
-                                                    gap: '0.5rem',
-                                                    borderRadius: '20px',
-                                                    boxShadow: editFormData.role === 'CHILD' ? '0 4px 12px rgba(0, 191, 165, 0.3)' : 'none'
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '8px',
+                                                    padding: '12px',
+                                                    borderRadius: 'var(--radius-full)',
+                                                    border: 'none',
+                                                    background: editFormData.role === 'CHILD' ? 'var(--bg-card)' : 'transparent',
+                                                    color: editFormData.role === 'CHILD' ? 'var(--color-text-main)' : 'var(--color-text-muted)',
+                                                    fontWeight: editFormData.role === 'CHILD' ? 'bold' : 'normal',
+                                                    boxShadow: editFormData.role === 'CHILD' ? 'var(--shadow-sm)' : 'none',
+                                                    transition: 'all 0.2s',
+                                                    cursor: 'pointer'
                                                 }}
                                             >
-                                                <span style={{ fontSize: '2rem' }}>🧙</span>
-                                                <span style={{ fontWeight: 'bold' }}>자녀</span>
+                                                <span style={{ fontSize: '1.5rem' }}>🧙</span>
+                                                <span>자녀</span>
                                             </button>
                                             <button
                                                 type="button"
-                                                className="btn"
                                                 onClick={() => setEditFormData({ ...editFormData, role: 'PARENT' })}
                                                 style={{
                                                     flex: 1,
-                                                    border: '2px solid transparent',
-                                                    background: editFormData.role === 'PARENT' ? '#FFD54F' : 'rgba(255,255,255,0.5)',
-                                                    color: editFormData.role === 'PARENT' ? '#37474F' : '#607D8B',
-                                                    flexDirection: 'column',
-                                                    padding: '1.5rem 1rem',
-                                                    gap: '0.5rem',
-                                                    borderRadius: '20px',
-                                                    boxShadow: editFormData.role === 'PARENT' ? '0 4px 12px rgba(255, 193, 7, 0.3)' : 'none'
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '8px',
+                                                    padding: '12px',
+                                                    borderRadius: 'var(--radius-full)',
+                                                    border: 'none',
+                                                    background: editFormData.role === 'PARENT' ? 'var(--bg-card)' : 'transparent',
+                                                    color: editFormData.role === 'PARENT' ? 'var(--color-text-main)' : 'var(--color-text-muted)',
+                                                    fontWeight: editFormData.role === 'PARENT' ? 'bold' : 'normal',
+                                                    boxShadow: editFormData.role === 'PARENT' ? 'var(--shadow-sm)' : 'none',
+                                                    transition: 'all 0.2s',
+                                                    cursor: 'pointer'
                                                 }}
                                             >
-                                                <span style={{ fontSize: '2rem' }}>🪄</span>
-                                                <span style={{ fontWeight: 'bold' }}>부모</span>
+                                                <span style={{ fontSize: '1.5rem' }}>🪄</span>
+                                                <span>부모</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: '#455A64', marginBottom: '4px', fontWeight: 'bold' }}>비밀번호 변경</label>
-                                        <p style={{ color: '#90A4AE', fontSize: '0.85rem', marginBottom: '8px' }}>새로운 4자리 숫자를 입력하세요.</p>
+                                        <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-main)', marginBottom: '4px', fontWeight: 'bold' }}>비밀번호 변경</label>
+                                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>새로운 4자리 숫자를 입력하세요.</p>
                                         <input
                                             type="text"
                                             inputMode="numeric"
@@ -220,7 +228,7 @@ function ManageMembersContent() {
                                         />
                                     </div>
                                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-                                        <button className="btn" onClick={handleCancelEdit} disabled={isSubmitting}>
+                                        <button className="btn" onClick={handleCancelEdit} disabled={isSubmitting} style={{ background: 'var(--bg-main)', color: 'var(--color-text-main)' }}>
                                             <X size={16} style={{ marginRight: '4px' }} /> 취소
                                         </button>
                                         <button className="btn btn-primary" onClick={() => handleSaveEdit(member.id)} disabled={isSubmitting}>
@@ -234,14 +242,15 @@ function ManageMembersContent() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{
                                             width: '40px', height: '40px', borderRadius: '50%',
-                                            background: member.role === 'PARENT' ? 'linear-gradient(135deg, #FFD54F, #FFecb3)' : 'linear-gradient(135deg, #80CBC4, #E0F2F1)',
+                                            background: member.role === 'PARENT' ? 'var(--bg-main)' : 'var(--bg-main)',
+                                            border: '1px solid var(--border-light)',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem'
                                         }}>
                                             {member.role === 'PARENT' ? '🪄' : '🧙'}
                                         </div>
                                         <div>
-                                            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#37474F' }}>{member.name}</h3>
-                                            <span style={{ fontSize: '0.8rem', color: '#607D8B' }}>
+                                            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-text-main)' }}>{member.name}</h3>
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                                                 {member.role === 'PARENT' ? '부모' : '아이'} • {member.points.toLocaleString()}콩
                                             </span>
                                         </div>
@@ -250,13 +259,13 @@ function ManageMembersContent() {
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         <button
                                             onClick={() => handleEditClick(member)}
-                                            style={{ background: 'transparent', border: 'none', color: '#607D8B', cursor: 'pointer', padding: '8px' }}
+                                            style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: '8px' }}
                                         >
                                             <Edit2 size={18} />
                                         </button>
                                         <button
                                             onClick={() => setMemberToDelete(member)}
-                                            style={{ background: 'transparent', border: 'none', color: '#FF5252', cursor: 'pointer', padding: '8px' }}
+                                            style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px' }}
                                         >
                                             <Trash2 size={18} />
                                         </button>
@@ -266,7 +275,7 @@ function ManageMembersContent() {
                         </div>
                     ))}
                     {members.length === 0 && (
-                        <div style={{ textAlign: 'center', padding: '2rem', color: '#607D8B' }}>
+                        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-muted)' }}>
                             등록된 가족이 없습니다.
                         </div>
                     )}
@@ -282,20 +291,20 @@ function ManageMembersContent() {
                 }}>
                     <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '2rem', textAlign: 'center', marginBottom: 0 }}>
                         <div style={{
-                            width: '64px', height: '64px', borderRadius: '50%', background: '#FFEBEE',
-                            color: '#FF5252', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            width: '64px', height: '64px', borderRadius: 'var(--radius-full)', background: '#FFEBEE',
+                            color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center',
                             margin: '0 auto 1.5rem auto'
                         }}>
                             <Trash2 size={32} />
                         </div>
-                        <h2 style={{ fontSize: '1.2rem', color: '#37474F', marginBottom: '1rem' }}>정말 삭제하시겠습니까?</h2>
-                        <p style={{ color: '#607D8B', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: '1.5', wordBreak: 'keep-all' }}>
-                            <strong style={{ color: '#FF5252' }}>{memberToDelete.name}</strong> 멤버의 모든 등록된 할 일, 일과, 포인트 정보가 <strong style={{ color: '#FF5252' }}>영구적으로 삭제</strong>됩니다.
+                        <h2 style={{ fontSize: '1.2rem', color: 'var(--color-text-main)', marginBottom: '1rem' }}>정말 삭제하시겠습니까?</h2>
+                        <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: '1.5', wordBreak: 'keep-all' }}>
+                            <strong style={{ color: '#ef4444' }}>{memberToDelete.name}</strong> 멤버의 모든 등록된 할 일, 일과, 포인트 정보가 <strong style={{ color: '#ef4444' }}>영구적으로 삭제</strong>됩니다.
                         </p>
                         <div style={{ display: 'flex', gap: '1rem' }}>
                             <button
                                 className="btn"
-                                style={{ flex: 1, padding: '0.8rem', background: 'rgba(0,0,0,0.05)', color: '#607D8B' }}
+                                style={{ flex: 1, padding: '0.8rem', background: 'var(--bg-main)', color: 'var(--color-text-main)' }}
                                 onClick={() => setMemberToDelete(null)}
                                 disabled={isSubmitting}
                             >
@@ -303,7 +312,7 @@ function ManageMembersContent() {
                             </button>
                             <button
                                 className="btn"
-                                style={{ flex: 1, padding: '0.8rem', background: '#FF5252', color: 'white' }}
+                                style={{ flex: 1, padding: '0.8rem', background: '#ef4444', color: 'white' }}
                                 onClick={() => confirmDelete(memberToDelete)}
                                 disabled={isSubmitting}
                             >

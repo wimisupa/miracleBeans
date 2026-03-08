@@ -80,9 +80,9 @@ export default function TaskSuccessPage() {
             padding: '2rem'
         }}>
             {status === 'submitting' && (
-                <div style={{ color: '#607D8B' }}>
+                <div style={{ color: 'var(--color-text-muted)' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'pulse 1.5s infinite' }}>⏳</div>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>승인 요청 중...</h2>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>승인 요청 중...</h2>
                     <p>수고했어요! 제리에게 결과를 전송하고 있어요.</p>
                 </div>
             )}
@@ -90,19 +90,19 @@ export default function TaskSuccessPage() {
             {status === 'success' && (
                 <div style={{ animation: 'bounceIn 0.5s ease-out' }}>
                     <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
-                    <h2 style={{ fontSize: '2rem', color: '#37474F', marginBottom: '0.5rem' }}>수고했어요!</h2>
-                    <p style={{ color: '#607D8B', fontSize: '1.2rem', marginBottom: '2rem' }}>달성 완료! 승인 요청이 성공적으로 전송되었습니다.</p>
+                    <h2 className="text-playful" style={{ fontSize: '2rem', color: 'var(--color-text-main)', marginBottom: '0.5rem' }}>수고했어요!</h2>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '1.2rem', marginBottom: '2rem' }}>달성 완료! 승인 요청이 성공적으로 전송되었습니다.</p>
 
                     <button
                         onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}
-                        className="btn btn-primary"
+                        className="btn btn-primary animate-pop"
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '8px',
                             padding: '12px 24px',
                             fontSize: '1.1rem',
-                            borderRadius: '16px'
+                            borderRadius: 'var(--radius-full)'
                         }}
                     >
                         <Home size={20} />
@@ -114,12 +114,12 @@ export default function TaskSuccessPage() {
             {status === 'error' && (
                 <div>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>😢</div>
-                    <h2 style={{ fontSize: '1.5rem', color: 'var(--color-accent)', marginBottom: '0.5rem' }}>오류가 발생했습니다</h2>
-                    <p style={{ color: '#607D8B', marginBottom: '2rem' }}>승인 요청 전송에 실패했습니다. 다시 시도해 주세요.</p>
+                    <h2 className="text-playful" style={{ fontSize: '1.5rem', color: 'var(--color-accent)', marginBottom: '0.5rem' }}>오류가 발생했습니다</h2>
+                    <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>승인 요청 전송에 실패했습니다. 다시 시도해 주세요.</p>
                     <button
                         onClick={() => currentMember?.familyId ? router.push(`/family/${currentMember.familyId}/dashboard`) : router.push('/')}
-                        className="btn"
-                        style={{ padding: '10px 20px', background: '#E0E0E0' }}
+                        className="btn animate-pop"
+                        style={{ padding: '10px 20px', background: 'var(--bg-card)', color: 'var(--color-text-main)', border: '1px solid var(--border-light)' }}
                     >
                         홈으로 돌아가기
                     </button>

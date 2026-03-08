@@ -172,13 +172,13 @@ export default function NewTaskPage() {
 
     return (
         <div>
-            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
-                <Link href={`/family/${currentMember?.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: '#1A252C', textDecoration: 'none', marginRight: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <Link href={`/family/${currentMember?.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', textDecoration: 'none', marginRight: '1rem' }}>
                     <ChevronLeft size={32} />
                 </Link>
-                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
                     <ListTodo size={32} color="var(--color-primary)" />
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
                         할 일 등록
                     </span>
                 </div>
@@ -197,10 +197,10 @@ export default function NewTaskPage() {
                                     onClick={() => setAssigneeId(m.id)}
                                     style={{
                                         padding: '0.5rem',
-                                        borderRadius: '12px',
-                                        border: assigneeId === m.id ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.5)',
-                                        background: assigneeId === m.id ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
-                                        color: assigneeId === m.id ? 'white' : '#37474F',
+                                        borderRadius: 'var(--radius-sm)',
+                                        border: assigneeId === m.id ? '2px solid var(--color-primary)' : '1px solid var(--border-light)',
+                                        background: assigneeId === m.id ? 'var(--color-primary)' : 'var(--bg-main)',
+                                        color: assigneeId === m.id ? 'var(--color-text-main)' : 'var(--color-text-muted)',
                                         textAlign: 'center',
                                         cursor: 'pointer',
                                         transition: 'all 0.2s',
@@ -240,11 +240,11 @@ export default function NewTaskPage() {
                         <label className="label">어떤 종류의 할 일인가요?</label>
                         <div style={{
                             display: 'flex',
-                            background: 'rgba(236, 239, 241, 0.6)',
+                            background: 'var(--bg-main)',
                             padding: '4px',
-                            borderRadius: '16px',
+                            borderRadius: 'var(--radius-full)',
                             gap: '4px',
-                            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+                            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
                         }}>
                             {[
                                 { id: 'EARN', label: '즉시 완료', icon: <Zap size={18} /> },
@@ -265,15 +265,15 @@ export default function NewTaskPage() {
                                             justifyContent: 'center',
                                             gap: '4px',
                                             padding: '10px 4px',
-                                            borderRadius: '12px',
-                                            background: isSelected ? 'white' : 'transparent',
-                                            color: isSelected ? 'var(--color-primary)' : '#78909C',
+                                            borderRadius: 'var(--radius-full)',
+                                            background: isSelected ? 'var(--bg-card)' : 'transparent',
+                                            color: isSelected ? 'var(--color-primary)' : 'var(--color-text-muted)',
                                             fontWeight: isSelected ? '800' : '600',
                                             fontSize: '0.75rem',
                                             whiteSpace: 'nowrap',
                                             cursor: 'pointer',
                                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                            boxShadow: isSelected ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+                                            boxShadow: isSelected ? 'var(--shadow-sm)' : 'none',
                                             transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                                         }}
                                     >
@@ -287,7 +287,7 @@ export default function NewTaskPage() {
 
                     {/* Extra Inputs based on Type */}
                     {taskType === 'HOURGLASS' && (
-                        <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'white', borderRadius: '16px', border: '1px solid #ECEFF1', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
+                        <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)', boxShadow: 'none', animation: 'fadeIn 0.3s ease' }}>
                             <label className="label">얼마나 할 건가요? (타이머)</label>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <input
@@ -299,13 +299,13 @@ export default function NewTaskPage() {
                                     min="1"
                                     style={{ flex: 1 }}
                                 />
-                                <span style={{ color: '#607D8B', fontWeight: 'bold' }}>분</span>
+                                <span style={{ color: 'var(--color-text-muted)', fontWeight: 'bold' }}>분</span>
                             </div>
                         </div>
                     )}
 
                     {taskType === 'COUNTER' && (
-                        <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'white', borderRadius: '16px', border: '1px solid #ECEFF1', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', animation: 'fadeIn 0.3s ease' }}>
+                        <div style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)', boxShadow: 'none', animation: 'fadeIn 0.3s ease' }}>
                             <label className="label">몇 번 하실 건가요? (동작 측정)</label>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <input
@@ -317,48 +317,36 @@ export default function NewTaskPage() {
                                     min="1"
                                     style={{ flex: 1 }}
                                 />
-                                <span style={{ color: '#607D8B', fontWeight: 'bold' }}>회 (번)</span>
+                                <span style={{ color: 'var(--color-text-muted)', fontWeight: 'bold' }}>회 (번)</span>
                             </div>
                         </div>
                     )}
 
                     {/* 4. Jerry Consultation */}
-                    <div style={{ marginBottom: '2.5rem', marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ marginBottom: '1.5rem', marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
                         <button
                             type="button"
                             onClick={handleAskJerry}
+                            className="btn btn-primary animate-pop"
                             style={{
-                                padding: '16px 40px',
-                                fontSize: '1.2rem',
-                                fontWeight: '900',
-                                borderRadius: '24px',
-                                border: 'none',
-                                background: (isJerryThinking || cooldown > 0) ? '#CFD8DC' : 'linear-gradient(135deg, var(--color-primary) 0%, #00897B 100%)',
-                                color: 'white',
+                                padding: '12px 24px',
+                                fontSize: '1rem',
+                                background: (isJerryThinking || cooldown > 0) ? 'var(--bg-main)' : 'var(--color-primary)',
+                                color: (isJerryThinking || cooldown > 0) ? 'var(--color-text-muted)' : '#333333',
                                 cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
                                 opacity: (isJerryThinking || cooldown > 0) ? 0.8 : 1,
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: (isJerryThinking || cooldown > 0) ? 'none' : '0 8px 24px rgba(0, 191, 165, 0.4)',
-                                transform: (isJerryThinking || cooldown > 0) ? 'scale(1)' : 'scale(1.02)',
+                                border: (isJerryThinking || cooldown > 0) ? '1px solid var(--border-light)' : 'none',
+                                boxShadow: (isJerryThinking || cooldown > 0) ? 'none' : '0 4px 10px rgba(255, 202, 40, 0.3)',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '8px'
+                                gap: '8px',
+                                width: '100%',
+                                justifyContent: 'center',
+                                borderRadius: 'var(--radius-lg)'
                             }}
                             disabled={isJerryThinking || cooldown > 0 || !title}
-                            onMouseEnter={(e) => {
-                                if (!isJerryThinking && cooldown === 0 && title) {
-                                    e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)'
-                                    e.currentTarget.style.boxShadow = '0 12px 28px rgba(0, 191, 165, 0.5)'
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!isJerryThinking && cooldown === 0 && title) {
-                                    e.currentTarget.style.transform = 'scale(1.02)'
-                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 191, 165, 0.4)'
-                                }
-                            }}
                         >
-                            <span style={{ fontSize: '1.5rem' }}>{isJerryThinking ? '🐹💭' : cooldown > 0 ? '⏳' : '🐹'}</span>
+                            <span style={{ fontSize: '1.2rem' }}>{isJerryThinking ? '🐹💭' : cooldown > 0 ? '⏳' : '🐹'}</span>
                             <span>{isJerryThinking ? '제리가 궁리중...' : cooldown > 0 ? `${cooldown}초 대기` : '제리의 판결'}</span>
                         </button>
                     </div>
@@ -366,16 +354,16 @@ export default function NewTaskPage() {
                     {/* Jerry's Verdict or Thinking State */}
                     {isJerryThinking && (
                         <div style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            border: '2px dashed #B0BEC5',
-                            borderRadius: '20px',
+                            background: 'var(--bg-main)',
+                            border: '1px dashed var(--border-light)',
+                            borderRadius: 'var(--radius-md)',
                             padding: '2rem',
                             marginBottom: '1.5rem',
                             textAlign: 'center',
                             animation: 'pulse 1.5s infinite ease-in-out'
                         }}>
                             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🐹💭</div>
-                            <div style={{ color: '#546E7A', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                            <div style={{ color: 'var(--color-text-muted)', fontWeight: 'bold', fontSize: '1.1rem' }}>
                                 {thinkingMessage}
                             </div>
                         </div>
@@ -383,19 +371,19 @@ export default function NewTaskPage() {
 
                     {!isJerryThinking && jerryVerdict && (
                         <div style={{
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            border: '2px solid #FFD54F',
-                            borderRadius: '20px',
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--color-primary)',
+                            borderRadius: 'var(--radius-md)',
                             padding: '1.5rem',
                             marginBottom: '1.5rem',
                             animation: 'fadeIn 0.3s ease',
-                            boxShadow: '0 8px 20px rgba(255, 213, 79, 0.15)'
+                            boxShadow: 'var(--shadow-sm)'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontWeight: 'bold', color: '#37474F' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontWeight: 'bold', color: 'var(--color-text-main)' }}>
                                 <span style={{ fontSize: '1.5rem' }}>{jerryVerdict.emoji}</span>
                                 <span>제리의 제안:</span>
                             </div>
-                            <p style={{ marginBottom: '0.5rem', color: '#546E7A' }}>"{jerryVerdict.comment}"</p>
+                            <p style={{ marginBottom: '0.5rem', color: 'var(--color-text-muted)' }}>"{jerryVerdict.comment}"</p>
                             <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#FBC02D' }}>
                                 {jerryVerdict.points} 콩
                             </div>
@@ -405,7 +393,7 @@ export default function NewTaskPage() {
                     <button
                         type="submit"
                         className="btn btn-primary"
-                        style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }}
+                        style={{ width: '100%', padding: '12px', fontSize: '1rem', borderRadius: 'var(--radius-lg)' }}
                         disabled={loading || !jerryVerdict || !assigneeId || (taskType === 'HOURGLASS' && !durationMinutes) || (taskType === 'COUNTER' && !targetCount)}
                     >
                         {loading ? '등록 중...' : '등록하기 ✨'}

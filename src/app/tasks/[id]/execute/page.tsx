@@ -136,23 +136,23 @@ export default function ExecuteTaskPage() {
 
     return (
         <div>
-            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', paddingTop: '1rem' }}>
+                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', textDecoration: 'none' }}>
                     <ChevronLeft size={28} />
                 </Link>
-                <div className="logo" style={{ flex: 1 }}>
+                <div className="logo text-playful" style={{ flex: 1, color: 'var(--color-text-main)' }}>
                     <span style={{ fontSize: '24px' }}>⏳</span>
                     <span>할 일 시작!</span>
                 </div>
             </header>
 
             <div className="card" style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-                <div style={{ marginBottom: '0.5rem', display: 'inline-block', background: 'rgba(0,0,0,0.05)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.9rem', color: '#607D8B', fontWeight: 'bold' }}>
+                <div style={{ marginBottom: '0.5rem', display: 'inline-block', background: 'var(--bg-main)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.9rem', color: 'var(--color-text-muted)', fontWeight: 'bold' }}>
                     {task.assignee?.name || '가족'}의 할 일
                 </div>
-                <h2 style={{ fontSize: '1.5rem', color: '#37474F', marginBottom: '0.5rem' }}>{task.title}</h2>
-                <p style={{ color: '#607D8B', marginBottom: '2rem', fontSize: '1.1rem' }}>
-                    보상: <span style={{ fontWeight: 'bold', color: '#FBC02D' }}>{task.points} 콩</span>
+                <h2 style={{ fontSize: '1.5rem', color: 'var(--color-text-main)', marginBottom: '0.5rem' }}>{task.title}</h2>
+                <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem', fontSize: '1.1rem' }}>
+                    보상: <span className="text-playful" style={{ color: '#FBC02D' }}>{task.points} 콩</span>
                 </p>
 
                 {/* Real Hourglass UI */}
@@ -163,11 +163,11 @@ export default function ExecuteTaskPage() {
                         {/* Top Glass */}
                         <div style={{
                             width: '120px', height: '100px',
-                            border: '4px solid #B0BEC5', borderBottom: 'none',
+                            border: '4px solid var(--border-light)', borderBottom: 'none',
                             borderRadius: '10px 10px 50% 50%',
                             overflow: 'hidden', position: 'relative',
-                            background: 'rgba(255,255,255,0.7)',
-                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)'
+                            background: 'var(--bg-card)',
+                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.02)'
                         }}>
                             <div style={{
                                 position: 'absolute', bottom: 0, left: 0, right: 0,
@@ -178,16 +178,16 @@ export default function ExecuteTaskPage() {
                         </div>
 
                         {/* Neck */}
-                        <div style={{ width: '16px', height: '10px', background: '#B0BEC5', borderRadius: '4px', zIndex: 2 }} />
+                        <div style={{ width: '16px', height: '10px', background: 'var(--border-light)', borderRadius: '4px', zIndex: 2 }} />
 
                         {/* Bottom Glass */}
                         <div style={{
                             width: '120px', height: '100px',
-                            border: '4px solid #B0BEC5', borderTop: 'none',
+                            border: '4px solid var(--border-light)', borderTop: 'none',
                             borderRadius: '50% 50% 10px 10px',
                             overflow: 'hidden', position: 'relative',
-                            background: 'rgba(255,255,255,0.7)',
-                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)'
+                            background: 'var(--bg-card)',
+                            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.02)'
                         }}>
                             <div style={{
                                 position: 'absolute', bottom: 0, left: 0, right: 0,
@@ -209,7 +209,7 @@ export default function ExecuteTaskPage() {
                         )}
                     </div>
 
-                    <div style={{ marginTop: '1.5rem', fontSize: '3rem', fontWeight: '900', color: '#37474F', fontFamily: 'monospace' }}>
+                    <div className="text-playful" style={{ marginTop: '1.5rem', fontSize: '3rem', color: 'var(--color-text-main)' }}>
                         {formatTime(timeLeft)}
                     </div>
                 </div>
@@ -219,7 +219,7 @@ export default function ExecuteTaskPage() {
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
                         <button
                             onClick={toggleTimer}
-                            className="btn btn-primary"
+                            className="btn btn-primary animate-pop"
                             style={{
                                 width: '64px', height: '64px', borderRadius: '50%',
                                 padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -230,10 +230,10 @@ export default function ExecuteTaskPage() {
                         </button>
                         <button
                             onClick={() => router.push(`/tasks/${taskId}/success`)}
-                            className="btn"
+                            className="btn animate-pop"
                             style={{
-                                height: '64px', borderRadius: '32px', padding: '0 24px',
-                                background: '#E0E0E0', color: '#757575', fontWeight: 'bold',
+                                height: '64px', borderRadius: 'var(--radius-full)', padding: '0 24px',
+                                background: 'var(--bg-main)', color: 'var(--color-text-muted)', fontWeight: 'bold',
                                 display: 'flex', alignItems: 'center', gap: '8px'
                             }}
                         >

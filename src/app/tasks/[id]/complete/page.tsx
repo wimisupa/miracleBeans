@@ -101,24 +101,24 @@ export default function CompleteMissionPage() {
 
     return (
         <div>
-            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <Link href={`/family/${currentMember?.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', paddingTop: '1rem' }}>
+                <Link href={`/family/${currentMember?.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', textDecoration: 'none' }}>
                     <ChevronLeft size={28} />
                 </Link>
-                <div className="logo" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="logo text-playful" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-main)' }}>
                     <ClipboardEdit size={24} color="var(--color-primary)" />
-                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>결과 보고하기</span>
+                    <span style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>결과 보고하기</span>
                 </div>
             </header>
 
             <div className="card">
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{ marginBottom: '0.5rem', display: 'inline-block', background: 'rgba(0,191,165,0.1)', color: 'var(--color-primary)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                    <div style={{ marginBottom: '0.5rem', display: 'inline-block', background: 'var(--bg-main)', color: 'var(--color-primary)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.9rem', fontWeight: 'bold' }}>
                         미션 완료
                     </div>
-                    <h2 style={{ fontSize: '1.5rem', color: '#37474F', marginBottom: '0.5rem' }}>{task.title}</h2>
-                    <p style={{ color: '#607D8B', fontSize: '1.1rem' }}>
-                        보상: <span style={{ fontWeight: 'bold', color: '#FBC02D' }}>{task.points} 콩</span>
+                    <h2 style={{ fontSize: '1.5rem', color: 'var(--color-text-main)', marginBottom: '0.5rem' }}>{task.title}</h2>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>
+                        보상: <span className="text-playful" style={{ color: '#FBC02D' }}>{task.points} 콩</span>
                     </p>
                 </div>
 
@@ -136,7 +136,7 @@ export default function CompleteMissionPage() {
                     </div>
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn btn-primary animate-pop"
                         style={{ width: '100%', padding: '16px', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                         disabled={submitting || !resultMessage.trim()}
                     >

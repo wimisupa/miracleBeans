@@ -98,7 +98,7 @@ export default function FamilyManagePage() {
 
     return (
         <main style={{ paddingBottom: '3rem' }}>
-            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
                 <button
                     onClick={() => {
                         if (currentMember?.familyId) {
@@ -109,96 +109,74 @@ export default function FamilyManagePage() {
                             router.push('/')
                         }
                     }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#1A252C', marginRight: '1rem', padding: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', marginRight: '1rem', padding: 0 }}
                 >
                     <ChevronLeft size={32} />
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
                     <Settings size={32} color="var(--color-secondary)" />
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
                         가족 정보 수정
                     </span>
                 </div>
             </header>
 
-            <section className="glass-panel" style={{ padding: '2.5rem 2rem', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
+            <section className="card" style={{ padding: '2.5rem 2rem', borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
                 {error && (
-                    <div style={{ background: '#FFEBEE', color: '#D32F2F', padding: '14px', borderRadius: '12px', marginBottom: '20px', fontSize: '0.95rem', textAlign: 'center', fontWeight: 'bold', border: '1px solid #FFCDD2' }}>
+                    <div style={{ background: '#FFEBEE', color: '#D32F2F', padding: '14px', borderRadius: 'var(--radius-sm)', marginBottom: '20px', fontSize: '0.95rem', textAlign: 'center', fontWeight: 'bold', border: '1px solid #FFCDD2' }}>
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem', position: 'relative', zIndex: 1 }}>
                     <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1rem', color: '#37474F', fontWeight: 'bold', marginBottom: '8px' }}>
+                        <label className="label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <Home size={18} color="var(--color-primary)" />
-                            가족 이름 <span style={{ color: '#E53935' }}>*</span>
+                            가족 이름 <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <input
                             type="text"
+                            className="input"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="예: 오마이콩 패밀리"
-                            style={{ padding: '16px', fontSize: '1.1rem', borderRadius: '16px', border: '2px solid transparent', background: 'rgba(255,255,255,0.7)', transition: 'all 0.3s', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}
-                            onFocus={(e) => { e.target.style.background = '#fff'; e.target.style.border = '2px solid var(--color-primary)' }}
-                            onBlur={(e) => { e.target.style.background = 'rgba(255,255,255,0.7)'; e.target.style.border = '2px solid transparent' }}
                             required
                         />
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1rem', color: '#37474F', fontWeight: 'bold', marginBottom: '8px' }}>
+                        <label className="label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <Heart size={18} color="#F06292" />
                             가훈 (선택)
                         </label>
                         <input
                             type="text"
+                            className="input"
                             value={motto}
                             onChange={(e) => setMotto(e.target.value)}
                             placeholder="예: 느리지만 쿨한 가족"
-                            style={{ padding: '16px', fontSize: '1.1rem', borderRadius: '16px', border: '2px solid transparent', background: 'rgba(255,255,255,0.7)', transition: 'all 0.3s', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}
-                            onFocus={(e) => { e.target.style.background = '#fff'; e.target.style.border = '2px solid #F06292' }}
-                            onBlur={(e) => { e.target.style.background = 'rgba(255,255,255,0.7)'; e.target.style.border = '2px solid transparent' }}
                         />
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1rem', color: '#37474F', fontWeight: 'bold', marginBottom: '8px' }}>
+                        <label className="label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <MapPin size={18} color="#FFB74D" />
                             사는 곳 (선택)
                         </label>
                         <input
                             type="text"
+                            className="input"
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
                             placeholder="예: 서귀포시 위미리"
-                            style={{ padding: '16px', fontSize: '1.1rem', borderRadius: '16px', border: '2px solid transparent', background: 'rgba(255,255,255,0.7)', transition: 'all 0.3s', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}
-                            onFocus={(e) => { e.target.style.background = '#fff'; e.target.style.border = '2px solid #FFB74D' }}
-                            onBlur={(e) => { e.target.style.background = 'rgba(255,255,255,0.7)'; e.target.style.border = '2px solid transparent' }}
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="btn btn-primary"
-                        style={{
-                            marginTop: '1.5rem',
-                            padding: '18px',
-                            fontSize: '1.15rem',
-                            borderRadius: '16px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '10px',
-                            background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
-                            boxShadow: '0 6px 20px rgba(0, 191, 165, 0.4)',
-                            border: 'none',
-                            fontWeight: 'bold',
-                            transition: 'all 0.3s ease'
-                        }}
+                        className="btn btn-primary animate-pop"
+                        style={{ marginTop: '1.5rem', justifyContent: 'center' }}
                         disabled={saving}
-                        onMouseEnter={(e) => { if (!saving) e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 191, 165, 0.5)' }}
-                        onMouseLeave={(e) => { if (!saving) e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 191, 165, 0.4)' }}
                     >
                         {saving ? (
                             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -195,7 +195,7 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
 
     if (items.length === 0) {
         return (
-            <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '16px', padding: '1.5rem', textAlign: 'center', color: '#607D8B' }}>
+            <div className="card" style={{ background: 'var(--bg-main)', border: '1px dashed var(--border-light)', boxShadow: 'none', padding: '1.5rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                 <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '8px' }}>🎉</span>
                 지금 당장 해야 할 일이나 루틴은 없어요!<br />휴식을 취하거나 새로운 일을 찾아볼까요?
             </div>
@@ -205,14 +205,12 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             {items.map(item => (
-                <div key={`${item.isRoutine ? 'r' : 't'}-${item.id}`} className="card" style={{
+                <div key={`${item.isRoutine ? 'r' : 't'}-${item.id}`} className="card reward-hover" style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    background: item.isCompletedDaily ? '#ECEFF1' : 'white',
+                    background: item.isCompletedDaily ? 'var(--bg-main)' : 'var(--bg-card)',
                     opacity: item.isCompletedDaily ? 0.7 : 1,
-                    padding: '12px 16px', borderRadius: '16px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                    padding: '12px 16px', borderRadius: 'var(--radius-md)',
                     border: '1px solid transparent',
-                    transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     marginBottom: 0
                 }}>
                     <div>
@@ -238,11 +236,11 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                             <button
                                 disabled={item.isCompletedDaily}
                                 onClick={() => handleRoutineClick(item)}
-                                className={item.isCompletedDaily ? "btn" : "btn btn-primary"}
+                                className={item.isCompletedDaily ? "btn" : "btn btn-primary animate-pop"}
                                 style={{
-                                    padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px',
+                                    padding: '8px 16px', fontSize: '0.85rem',
                                     border: 'none', display: 'flex', gap: '4px', alignItems: 'center',
-                                    ...(item.isCompletedDaily ? { background: '#B0BEC5', color: 'white', boxShadow: 'none' } : {})
+                                    ...(item.isCompletedDaily ? { background: 'var(--bg-main)', color: 'var(--color-text-muted)', boxShadow: 'none' } : {})
                                 }}
                             >
                                 {item.isCompletedDaily ? '완료 🎉' : (item.type === 'HOURGLASS' ? <><Timer size={16} /> 시작</> : item.type === 'COUNTER' ? <><Play size={16} /> 시작 (측정)</> : <><Check size={16} /> 완료</>)}
@@ -250,9 +248,9 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                         ) : (
                             <button
                                 onClick={() => handleTaskClick(item)}
-                                className="btn btn-primary"
+                                className="btn btn-primary animate-pop"
                                 style={{
-                                    padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px',
+                                    padding: '8px 16px', fontSize: '0.85rem',
                                     border: 'none', display: 'flex', gap: '4px', alignItems: 'center',
                                     fontFamily: 'inherit'
                                 }}

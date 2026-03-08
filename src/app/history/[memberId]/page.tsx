@@ -54,21 +54,21 @@ export default function HistoryPage() {
 
     return (
         <div>
-            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0' }}>
-                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '1rem' }}>
+                <Link href={currentMember?.familyId ? `/family/${currentMember.familyId}/dashboard` : '/'} style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', textDecoration: 'none' }}>
                     <ChevronLeft size={32} />
                 </Link>
-                <div className="logo" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="logo" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-main)' }}>
                     <History size={32} color="var(--color-secondary)" />
-                    <span>{memberName ? `${memberName}의 기록` : '히스토리'}</span>
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>{memberName ? `${memberName}의 기록` : '히스토리'}</span>
                 </div>
             </header>
 
             <main className="container" style={{ padding: 0 }}>
                 {/* ⏳ Todo Tasks Section */}
-                <section style={{ padding: '1.5rem 1rem', background: 'rgba(255,255,255,0.7)', borderRadius: '24px', marginBottom: '1rem' }}>
-                    <h2 style={{ fontSize: '1.1rem', color: '#455A64', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '20px' }}>⏳</span> 해야 할 일
+                <section style={{ padding: '1.5rem 1rem', background: 'var(--bg-main)', borderRadius: 'var(--radius-lg)', marginBottom: '1rem' }}>
+                    <h2 className="text-playful" style={{ fontSize: '1.2rem', color: 'var(--color-text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '1.4rem' }}>⏳</span> 해야 할 일
                     </h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                         <TodoTasksList memberId={memberId} hideStartButton={true} />
@@ -76,11 +76,11 @@ export default function HistoryPage() {
                 </section>
 
 
-                <h2 style={{ fontSize: '1.1rem', color: '#455A64', padding: '0 1rem', marginBottom: '1rem', marginTop: '1rem' }}>히스토리</h2>
+                <h2 className="text-playful" style={{ fontSize: '1.2rem', color: 'var(--color-text-main)', padding: '0 1rem', marginBottom: '1rem', marginTop: '1rem' }}>히스토리</h2>
                 {loading ? (
                     <div style={{ textAlign: 'center', padding: '2rem' }}>로딩 중...</div>
                 ) : transactions.length === 0 ? (
-                    <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', color: '#607D8B' }}>
+                    <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--color-text-muted)' }}>
                         <Sprout size={48} style={{ marginBottom: '1rem', opacity: 0.3 }} />
                         <p>아직 콩 기록이 없어요.<br />첫 수확을 기다려보세요! 🌱</p>
                     </div>
@@ -91,25 +91,25 @@ export default function HistoryPage() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
                                     <div style={{
                                         width: '44px', height: '44px', minWidth: '44px',
-                                        borderRadius: '50%',
-                                        background: tx.amount > 0 ? '#E0F2F1' : (tx.amount < 0 ? '#FFEBEE' : '#ECEFF1'),
+                                        borderRadius: 'var(--radius-full)',
+                                        background: tx.amount > 0 ? 'var(--bg-main)' : (tx.amount < 0 ? '#FFEBEE' : 'var(--bg-main)'),
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        color: tx.amount > 0 ? 'var(--color-secondary)' : (tx.amount < 0 ? 'var(--color-accent)' : '#90A4AE'),
-                                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+                                        color: tx.amount > 0 ? 'var(--color-secondary)' : (tx.amount < 0 ? 'var(--color-accent)' : 'var(--color-text-muted)'),
+                                        boxShadow: 'none',
+                                        border: '1px solid var(--border-light)'
                                     }}>
                                         {tx.amount > 0 ? <TrendingUp size={20} /> : (tx.amount < 0 ? <TrendingDown size={20} /> : <XCircle size={20} />)}
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#37474F', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: '1.4' }}>{tx.reason}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#90A4AE', marginTop: '4px' }}>
+                                        <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: '1.4' }}>{tx.reason}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                                             {new Date(tx.createdAt).toLocaleString()}
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{
-                                    fontWeight: '900',
+                                <div className="text-playful" style={{
                                     fontSize: '1.2rem',
-                                    color: tx.amount > 0 ? 'var(--color-secondary)' : (tx.amount < 0 ? 'var(--color-accent)' : '#90A4AE'),
+                                    color: tx.amount > 0 ? 'var(--color-secondary)' : (tx.amount < 0 ? 'var(--color-accent)' : 'var(--color-text-muted)'),
                                     marginLeft: '1rem'
                                 }}>
                                     {tx.amount > 0 ? '+' : ''}{tx.amount}

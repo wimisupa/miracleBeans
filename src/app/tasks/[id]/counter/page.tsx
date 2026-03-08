@@ -87,32 +87,32 @@ export default function CounterTaskExecutePage() {
 
     return (
         <div style={{ paddingBottom: '2rem' }}>
-            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
-                <Link href={`/family/${currentMember?.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: '#1A252C', textDecoration: 'none', marginRight: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <Link href={`/family/${currentMember?.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', textDecoration: 'none', marginRight: '1rem' }}>
                     <ChevronLeft size={32} />
                 </Link>
-                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
                     <Activity size={32} color="var(--color-primary)" />
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
                         진행 중인 미션
                     </span>
                 </div>
             </header>
 
             <div className="card" style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-                <h1 style={{ fontSize: '1.5rem', color: '#37474F', marginBottom: '1rem' }}>{task.title}</h1>
-                <div style={{ color: '#78909C', marginBottom: '2rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+                <h1 style={{ fontSize: '1.5rem', color: 'var(--color-text-main)', marginBottom: '1rem' }}>{task.title}</h1>
+                <div style={{ color: 'var(--color-text-muted)', marginBottom: '2rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Target size={18} /> 목표: {targetCount}회
+                        <Target size={18} /> 목표: <span className="text-playful">{targetCount}회</span>
                     </span>
                 </div>
 
                 {/* Visual Counter */}
                 <div style={{
                     width: '200px', height: '200px', borderRadius: '50%',
-                    background: 'white', margin: '0 auto 2rem', border: '8px solid #ECEFF1',
+                    background: 'var(--bg-card)', margin: '0 auto 2rem', border: '8px solid var(--border-light)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                    boxShadow: 'var(--shadow-sm)',
                     position: 'relative', overflow: 'hidden'
                 }}>
                     <div style={{
@@ -120,7 +120,7 @@ export default function CounterTaskExecutePage() {
                         height: `${progress}%`, background: 'rgba(0, 191, 165, 0.1)',
                         transition: 'height 0.3s ease-out'
                     }} />
-                    <div style={{ fontSize: '4rem', fontWeight: '900', color: 'var(--color-primary)', zIndex: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                    <div className="text-playful" style={{ fontSize: '4rem', color: 'var(--color-primary)', zIndex: 1 }}>
                         {currentCount}
                     </div>
                 </div>
@@ -128,7 +128,7 @@ export default function CounterTaskExecutePage() {
                 {!isMeasuring && !finishing && (
                     <button
                         onClick={startMeasuring}
-                        className="btn btn-primary"
+                        className="btn btn-primary animate-pop"
                         style={{ width: '100%', padding: '16px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                     >
                         <Activity size={24} />
@@ -149,7 +149,7 @@ export default function CounterTaskExecutePage() {
                         <p style={{ color: '#FBC02D', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '1rem' }}>
                             🐹 "자, 시작해볼까? 제리가 지켜보고 있어요!"
                         </p>
-                        <p style={{ color: '#607D8B', fontSize: '0.9rem' }}>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                             폰을 바르게 쥐고 지정된 횟수만큼 동작을 수행하세요.<br />
                             움직임이 측정되면 카운트가 올라갑니다!
                         </p>

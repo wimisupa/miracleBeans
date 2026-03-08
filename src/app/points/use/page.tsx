@@ -222,13 +222,13 @@ export default function PointUsagePage() {
 
     return (
         <div>
-            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
-                <Link href={`/family/${currentMember.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: '#1A252C', textDecoration: 'none', marginRight: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+                <Link href={`/family/${currentMember.familyId}/dashboard`} style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', textDecoration: 'none', marginRight: '1rem' }}>
                     <ChevronLeft size={32} />
                 </Link>
-                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
                     <Gift size={32} color="var(--color-primary)" />
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
                         콩 쓰기
                     </span>
                 </div>
@@ -236,7 +236,7 @@ export default function PointUsagePage() {
 
             <div className="card">
                 {/* Mode Selection */}
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '6px', borderRadius: '20px', overflowX: 'auto' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', background: 'var(--bg-main)', padding: '6px', borderRadius: 'var(--radius-full)', overflowX: 'auto', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
                     {([
                         { id: 'SPEND', icon: <Sprout size={16} />, label: '쓰기' },
                         { id: 'GIFT', icon: <Gift size={16} />, label: '선물' },
@@ -255,17 +255,18 @@ export default function PointUsagePage() {
                                 flex: 1,
                                 minWidth: '70px',
                                 padding: '10px 4px',
-                                borderRadius: '16px',
+                                borderRadius: 'var(--radius-full)',
                                 border: 'none',
-                                background: activeTab === mode.id ? 'white' : 'transparent',
-                                color: activeTab === mode.id ? '#FFB74D' : '#607D8B',
-                                fontWeight: 'bold',
+                                background: activeTab === mode.id ? 'var(--bg-card)' : 'transparent',
+                                color: activeTab === mode.id ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                                fontWeight: activeTab === mode.id ? '800' : '600',
                                 fontSize: '0.95rem',
-                                boxShadow: activeTab === mode.id ? '0 4px 10px rgba(0,0,0,0.05)' : 'none',
+                                boxShadow: activeTab === mode.id ? 'var(--shadow-sm)' : 'none',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
-                                transition: 'all 0.2s',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 cursor: 'pointer',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                transform: activeTab === mode.id ? 'scale(1.02)' : 'scale(1)'
                             }}
                         >
                             {mode.icon}
@@ -288,9 +289,9 @@ export default function PointUsagePage() {
                             </p>
                         </div>
 
-                        <div style={{ marginBottom: '1.5rem', background: 'linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(255, 255, 255, 0.4))', padding: '1.5rem', borderRadius: '24px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.6)' }}>
-                            <div style={{ fontSize: '0.9rem', color: '#607D8B', marginBottom: '0.5rem' }}>나의 콩</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '900', color: '#FBC02D', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                        <div style={{ marginBottom: '1.5rem', background: 'var(--bg-main)', padding: '1.5rem', borderRadius: 'var(--radius-md)', textAlign: 'center', border: '1px solid var(--border-light)' }}>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>나의 콩</div>
+                            <div className="text-playful" style={{ fontSize: '2rem', color: '#FBC02D' }}>
                                 {currentMember.points.toLocaleString()} 콩
                             </div>
                         </div>
@@ -304,18 +305,19 @@ export default function PointUsagePage() {
                                         onClick={() => setReceiverId(m.id)}
                                         style={{
                                             padding: '1rem',
-                                            borderRadius: '20px',
-                                            border: receiverId === m.id ? '2px solid var(--color-secondary)' : '1px solid rgba(255,255,255,0.5)',
-                                            background: receiverId === m.id ? 'rgba(0, 191, 165, 0.1)' : 'rgba(255,255,255,0.4)',
+                                            borderRadius: 'var(--radius-sm)',
+                                            border: receiverId === m.id ? '2px solid var(--color-primary)' : '1px solid var(--border-light)',
+                                            background: receiverId === m.id ? 'var(--bg-card)' : 'var(--bg-main)',
                                             textAlign: 'center',
                                             cursor: 'pointer',
-                                            transition: 'all 0.2s'
+                                            transition: 'all 0.2s',
+                                            boxShadow: receiverId === m.id ? 'var(--shadow-sm)' : 'none'
                                         }}
                                     >
                                         <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>
                                             {m.role === 'PARENT' ? '🪄' : '🧙'}
                                         </div>
-                                        <div style={{ fontWeight: 'bold', color: '#37474F' }}>{m.name}</div>
+                                        <div style={{ fontWeight: 'bold', color: 'var(--color-text-main)' }}>{m.name}</div>
                                     </div>
                                 ))}
                             </div>
@@ -348,8 +350,8 @@ export default function PointUsagePage() {
 
                         <button
                             type="submit"
-                            className="btn btn-primary"
-                            style={{ width: '100%', background: '#FFB74D', color: '#fff' }}
+                            className="btn btn-primary animate-pop"
+                            style={{ width: '100%', justifyContent: 'center' }}
                             disabled={loading || !receiverId || Number(amount) <= 0 || Number(amount) > currentMember.points}
                         >
                             {loading ? '보내는 중...' : '보내기 🧙'}
@@ -377,18 +379,19 @@ export default function PointUsagePage() {
                                         onClick={() => setReceiverId(m.id)}
                                         style={{
                                             padding: '1rem',
-                                            borderRadius: '20px',
-                                            border: receiverId === m.id ? '2px solid #D32F2F' : '1px solid rgba(255,255,255,0.5)',
-                                            background: receiverId === m.id ? 'rgba(211, 47, 47, 0.1)' : 'rgba(255,255,255,0.4)',
+                                            borderRadius: 'var(--radius-sm)',
+                                            border: receiverId === m.id ? '2px solid #D32F2F' : '1px solid var(--border-light)',
+                                            background: receiverId === m.id ? '#FFEBEE' : 'var(--bg-main)',
                                             textAlign: 'center',
                                             cursor: 'pointer',
-                                            transition: 'all 0.2s'
+                                            transition: 'all 0.2s',
+                                            boxShadow: receiverId === m.id ? 'var(--shadow-sm)' : 'none'
                                         }}
                                     >
                                         <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>
                                             {m.role === 'PARENT' ? '🪄' : '🧙'}
                                         </div>
-                                        <div style={{ fontWeight: 'bold', color: '#37474F' }}>{m.name}</div>
+                                        <div style={{ fontWeight: 'bold', color: 'var(--color-text-main)' }}>{m.name}</div>
                                     </div>
                                 ))}
                             </div>
@@ -408,15 +411,14 @@ export default function PointUsagePage() {
                                 <button
                                     type="button"
                                     onClick={handleAskJerry}
-                                    className="btn btn-primary"
+                                    className="btn btn-primary animate-pop"
                                     style={{
                                         minWidth: '80px',
                                         padding: '0 16px',
-                                        borderRadius: '12px',
-                                        background: (isJerryThinking || cooldown > 0) ? '#B0BEC5' : 'linear-gradient(135deg, #FF5252 0%, #E53935 100%)',
-                                        color: 'white',
+                                        background: (isJerryThinking || cooldown > 0) ? 'var(--bg-main)' : '#ef4444',
+                                        color: (isJerryThinking || cooldown > 0) ? 'var(--color-text-muted)' : 'white',
+                                        border: (isJerryThinking || cooldown > 0) ? '1px solid var(--border-light)' : 'none',
                                         cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
-                                        opacity: (isJerryThinking || cooldown > 0) ? 0.7 : 1
                                     }}
                                     disabled={isJerryThinking || cooldown > 0}
                                 >
@@ -428,35 +430,35 @@ export default function PointUsagePage() {
                         {/* Jerry's Verdict or Thinking State */}
                         {isJerryThinking ? (
                             <div style={{
-                                background: 'rgba(255, 255, 255, 0.9)',
-                                border: '2px dashed #B0BEC5',
-                                borderRadius: '20px',
+                                background: 'var(--bg-main)',
+                                border: '1px dashed var(--border-light)',
+                                borderRadius: 'var(--radius-md)',
                                 padding: '2rem',
                                 marginBottom: '1.5rem',
                                 textAlign: 'center',
                                 animation: 'pulse 1.5s infinite ease-in-out'
                             }}>
                                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🐹💭</div>
-                                <div style={{ color: '#546E7A', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                                <div style={{ color: 'var(--color-text-muted)', fontWeight: 'bold', fontSize: '1.1rem' }}>
                                     {thinkingMessage}
                                 </div>
                             </div>
                         ) : jerryVerdict && (
                             <div style={{
-                                background: 'rgba(255, 255, 255, 0.9)',
-                                border: '2px solid #D32F2F',
-                                borderRadius: '20px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid #ef4444',
+                                borderRadius: 'var(--radius-md)',
                                 padding: '1.5rem',
                                 marginBottom: '1.5rem',
                                 animation: 'fadeIn 0.3s ease',
-                                boxShadow: '0 8px 20px rgba(211, 47, 47, 0.15)'
+                                boxShadow: 'var(--shadow-sm)'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontWeight: 'bold', color: '#D32F2F' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontWeight: 'bold', color: '#ef4444' }}>
                                     <span style={{ fontSize: '1.5rem' }}>{jerryVerdict.emoji}</span>
                                     <span>제리의 판결:</span>
                                 </div>
-                                <p style={{ marginBottom: '0.5rem', color: '#37474F', fontSize: '1.1rem' }}>"{jerryVerdict.comment}"</p>
-                                <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#D32F2F' }}>
+                                <p style={{ marginBottom: '0.5rem', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>"{jerryVerdict.comment}"</p>
+                                <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#ef4444' }}>
                                     -{jerryVerdict.points} 콩 (벌금)
                                 </div>
                             </div>
@@ -464,8 +466,8 @@ export default function PointUsagePage() {
 
                         <button
                             type="submit"
-                            className="btn btn-primary"
-                            style={{ width: '100%', background: 'linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)', color: 'white', boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)' }}
+                            className="btn btn-primary animate-pop"
+                            style={{ width: '100%', background: '#ef4444', color: 'white', justifyContent: 'center' }}
                             disabled={loading || !jerryVerdict || !receiverId || isJerryThinking}
                         >
                             {loading ? '신고 접수 중...' : '정의구현 ⚖️'}
@@ -484,9 +486,9 @@ export default function PointUsagePage() {
                             </p>
                         </div>
 
-                        <div style={{ marginBottom: '1.5rem', background: 'linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(255, 255, 255, 0.4))', padding: '1.5rem', borderRadius: '24px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.6)' }}>
-                            <div style={{ fontSize: '0.9rem', color: '#607D8B', marginBottom: '0.5rem' }}>나의 콩</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '900', color: '#FBC02D', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                        <div style={{ marginBottom: '1.5rem', background: 'var(--bg-main)', padding: '1.5rem', borderRadius: 'var(--radius-md)', textAlign: 'center', border: '1px solid var(--border-light)' }}>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>나의 콩</div>
+                            <div className="text-playful" style={{ fontSize: '2rem', color: '#FBC02D' }}>
                                 {currentMember.points.toLocaleString()} 콩
                             </div>
                         </div>
@@ -505,14 +507,14 @@ export default function PointUsagePage() {
                                 <button
                                     type="button"
                                     onClick={handleAskJerry}
-                                    className="btn btn-primary"
+                                    className="btn btn-primary animate-pop"
                                     style={{
                                         minWidth: '80px',
                                         padding: '0 16px',
-                                        borderRadius: '12px',
-                                        background: (isJerryThinking || cooldown > 0) ? '#B0BEC5' : 'var(--color-primary)',
+                                        background: (isJerryThinking || cooldown > 0) ? 'var(--bg-main)' : 'var(--color-primary)',
+                                        color: (isJerryThinking || cooldown > 0) ? 'var(--color-text-muted)' : '#333333',
+                                        border: (isJerryThinking || cooldown > 0) ? '1px solid var(--border-light)' : 'none',
                                         cursor: (isJerryThinking || cooldown > 0) ? 'not-allowed' : 'pointer',
-                                        opacity: (isJerryThinking || cooldown > 0) ? 0.7 : 1
                                     }}
                                     disabled={isJerryThinking || cooldown > 0 || !description}
                                 >
@@ -524,35 +526,35 @@ export default function PointUsagePage() {
                         {/* Jerry's Verdict or Thinking State */}
                         {isJerryThinking ? (
                             <div style={{
-                                background: 'rgba(255, 255, 255, 0.9)',
-                                border: '2px dashed #B0BEC5',
-                                borderRadius: '20px',
+                                background: 'var(--bg-main)',
+                                border: '1px dashed var(--border-light)',
+                                borderRadius: 'var(--radius-md)',
                                 padding: '2rem',
                                 marginBottom: '1.5rem',
                                 textAlign: 'center',
                                 animation: 'pulse 1.5s infinite ease-in-out'
                             }}>
                                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🐹💭</div>
-                                <div style={{ color: '#546E7A', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                                <div style={{ color: 'var(--color-text-muted)', fontWeight: 'bold', fontSize: '1.1rem' }}>
                                     {thinkingMessage}
                                 </div>
                             </div>
                         ) : jerryVerdict && (
                             <div style={{
-                                background: 'rgba(255, 255, 255, 0.9)',
-                                border: '2px solid var(--color-primary)',
-                                borderRadius: '20px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--color-primary)',
+                                borderRadius: 'var(--radius-md)',
                                 padding: '1.5rem',
                                 marginBottom: '1.5rem',
                                 animation: 'fadeIn 0.3s ease',
-                                boxShadow: '0 8px 20px rgba(0, 191, 165, 0.15)'
+                                boxShadow: 'var(--shadow-sm)'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontWeight: 'bold', color: 'var(--color-text-main)' }}>
                                     <span style={{ fontSize: '1.5rem' }}>{jerryVerdict.emoji}</span>
                                     <span>제리의 결정:</span>
                                 </div>
-                                <p style={{ marginBottom: '0.5rem', color: '#37474F', fontSize: '1.1rem' }}>"{jerryVerdict.comment}"</p>
-                                <div style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--color-primary)' }}>
+                                <p style={{ marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>"{jerryVerdict.comment}"</p>
+                                <div className="text-playful" style={{ fontSize: '1.5rem', color: 'var(--color-primary)' }}>
                                     {jerryVerdict.points} 콩 (필요)
                                 </div>
                             </div>
@@ -560,8 +562,8 @@ export default function PointUsagePage() {
 
                         <button
                             type="submit"
-                            className="btn btn-primary"
-                            style={{ width: '100%', background: 'var(--color-primary)', boxShadow: '0 4px 12px rgba(0, 191, 165, 0.3)' }}
+                            className="btn btn-primary animate-pop"
+                            style={{ width: '100%', justifyContent: 'center' }}
                             disabled={loading || !jerryVerdict || isJerryThinking || currentMember.points < jerryVerdict.points}
                         >
                             {loading ? '승인 및 결제 진행 중...' : '사용하기 ✨'}

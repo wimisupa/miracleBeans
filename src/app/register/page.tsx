@@ -59,16 +59,16 @@ function RegisterForm() {
 
     return (
         <div>
-            <header className="header" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem' }}>
                 <button
                     onClick={() => router.back()}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#1A252C', marginRight: '1rem', padding: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--color-text-muted)', marginRight: '1rem', padding: 0 }}
                 >
                     <ChevronLeft size={32} />
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', color: '#1A252C', gap: '8px' }}>
-                    <UserPlus size={32} color="var(--color-secondary)" />
-                    <span style={{ fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
+                    <UserPlus size={32} color="var(--color-primary)" />
+                    <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
                         구성원 추가
                     </span>
                 </div>
@@ -76,8 +76,8 @@ function RegisterForm() {
 
             <div className="card">
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h2 style={{ fontSize: '1.5rem', color: '#37474F' }}>새로운 가족을 환영해요!</h2>
-                    <p style={{ color: '#90A4AE' }}>함께 콩을 모아볼까요?</p>
+                    <h2 className="text-playful" style={{ fontSize: '1.5rem', color: 'var(--color-text-main)' }}>새로운 가족을 환영해요!</h2>
+                    <p style={{ color: 'var(--color-text-muted)' }}>함께 콩을 모아볼까요?</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -102,14 +102,14 @@ function RegisterForm() {
                                 className="btn"
                                 style={{
                                     flex: 1,
-                                    border: '2px solid transparent',
-                                    background: role === 'CHILD' ? 'var(--color-secondary)' : 'rgba(255,255,255,0.5)',
-                                    color: role === 'CHILD' ? 'white' : '#607D8B',
+                                    border: role === 'CHILD' ? '2px solid var(--color-secondary)' : '1px solid var(--border-light)',
+                                    background: role === 'CHILD' ? 'var(--color-secondary)' : 'var(--bg-main)',
+                                    color: role === 'CHILD' ? 'var(--color-text-main)' : 'var(--color-text-muted)',
                                     flexDirection: 'column',
                                     padding: '1.5rem 1rem',
                                     gap: '0.5rem',
-                                    borderRadius: '20px',
-                                    boxShadow: role === 'CHILD' ? '0 4px 12px rgba(0, 191, 165, 0.3)' : 'none'
+                                    borderRadius: 'var(--radius-md)',
+                                    boxShadow: role === 'CHILD' ? 'var(--shadow-md)' : 'none'
                                 }}
                             >
                                 <span style={{ fontSize: '2rem' }}>🧙</span>
@@ -121,14 +121,14 @@ function RegisterForm() {
                                 className="btn"
                                 style={{
                                     flex: 1,
-                                    border: '2px solid transparent',
-                                    background: role === 'PARENT' ? '#FFD54F' : 'rgba(255,255,255,0.5)',
-                                    color: role === 'PARENT' ? '#37474F' : '#607D8B',
+                                    border: role === 'PARENT' ? '2px solid var(--color-primary)' : '1px solid var(--border-light)',
+                                    background: role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-main)',
+                                    color: role === 'PARENT' ? 'var(--color-text-main)' : 'var(--color-text-muted)',
                                     flexDirection: 'column',
                                     padding: '1.5rem 1rem',
                                     gap: '0.5rem',
-                                    borderRadius: '20px',
-                                    boxShadow: role === 'PARENT' ? '0 4px 12px rgba(255, 193, 7, 0.3)' : 'none'
+                                    borderRadius: 'var(--radius-md)',
+                                    boxShadow: role === 'PARENT' ? '0 4px 10px rgba(255, 202, 40, 0.3)' : 'none'
                                 }}
                             >
                                 <span style={{ fontSize: '2rem' }}>🪄</span>
@@ -139,7 +139,7 @@ function RegisterForm() {
 
                     <div style={{ marginBottom: '2.5rem' }}>
                         <label className="label">비밀번호 설정</label>
-                        <p style={{ color: '#90A4AE', fontSize: '0.9rem', marginBottom: '0.5rem' }}>로그인할 때 사용할 4자리 숫자를 입력하세요.</p>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>로그인할 때 사용할 4자리 숫자를 입력하세요.</p>
                         <input
                             type="text"
                             inputMode="numeric"
