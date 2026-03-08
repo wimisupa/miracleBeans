@@ -126,7 +126,7 @@ export default function PointUsagePage() {
                     type: 'TATTLE',
                     points: jerryVerdict.points,
                     creatorId: currentMember.id,
-                    targetMemberId: receiverId
+                    assigneeId: receiverId
                 }),
             })
 

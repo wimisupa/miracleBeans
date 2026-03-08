@@ -106,10 +106,14 @@ export async function POST(request: Request) {
                         data: { points: { increment: pointChange } }
                     })
 
+                    const allApprovals = await tx.taskApproval.findMany({ where: { taskId: id } });
+                    const commentsArr = allApprovals.map(a => a.comment).filter(Boolean);
+                    const commentsText = commentsArr.length > 0 ? `\n💬 심사: ${commentsArr.map(c => `"${c}"`).join(', ')}` : '';
+
                     await tx.transaction.create({
                         data: {
                             amount: pointChange,
-                            reason: `${task.title}${task.resultMessage ? `\n📝 보고: "${task.resultMessage}"` : ''}`,
+                            reason: `${task.title}${task.resultMessage ? `\n📝 보고: "${task.resultMessage}"` : ''}${commentsText}`,
                             memberId: finalTargetMemberId,
                         }
                     })

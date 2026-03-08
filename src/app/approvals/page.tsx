@@ -176,18 +176,18 @@ export default function ApprovalsPage() {
                                     </div>
 
                                     {!isPersonWhoDidIt && !alreadyApproved && !(task.type === 'TATTLE' && currentMember?.id === task.assigneeId) && (
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <div style={{ display: 'flex', gap: '0.8rem' }}>
                                             <button
-                                                onClick={() => promptAction(task, 'APPROVE')}
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); promptAction(task, 'APPROVE'); }}
                                                 className="btn"
-                                                style={{ padding: '10px', borderRadius: '50%', background: '#E0F2F1', color: 'var(--color-secondary)', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
+                                                style={{ padding: '10px', borderRadius: '50%', background: '#E0F2F1', color: '#1E88E5', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
                                             >
                                                 <CheckCircle size={24} />
                                             </button>
                                             <button
-                                                onClick={() => promptAction(task, 'REJECT')}
+                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); promptAction(task, 'REJECT'); }}
                                                 className="btn"
-                                                style={{ padding: '10px', borderRadius: '50%', background: '#FFEBEE', color: 'var(--color-accent)', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
+                                                style={{ padding: '10px', borderRadius: '50%', background: '#FFEBEE', color: 'var(--color-accent)', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
                                             >
                                                 <XCircle size={24} />
                                             </button>

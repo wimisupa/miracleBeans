@@ -165,8 +165,8 @@ export default function TodoTasksList({ memberId, hideStartButton = false }: { m
                 body: JSON.stringify({ status: 'PENDING' })
             })
             if (res.ok) fetchItems()
-        } else if (task.type === 'SPEND' || task.type === 'TATTLE') {
-            // For SPEND or TATTLE, immediately complete and AUTO-APPROVE
+        } else if (task.type === 'SPEND') {
+            // For SPEND, immediately complete and AUTO-APPROVE
             const res = await fetch(`/api/tasks/${task.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },

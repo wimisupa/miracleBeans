@@ -61,7 +61,7 @@ export async function POST(request: Request) {
                 description,
                 type,
                 points,
-                status: type === 'EARN' ? 'PENDING' : 'TODO', // EARN skips TODO and goes straight to PENDING
+                status: (type === 'EARN' || type === 'TATTLE') ? 'PENDING' : 'TODO', // skip TODO and go straight to PENDING
                 creatorId,
                 assigneeId: assigneeId || creatorId, // Explicit assignee from frontend, fallback to creator
                 durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,
