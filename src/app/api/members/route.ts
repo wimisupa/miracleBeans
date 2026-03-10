@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json()
-        const { name, role, pin, familyId } = body
+        const { name, role, pin, familyId, icon } = body
 
         if (!name || !role) {
             return NextResponse.json({ error: 'Name and role are required' }, { status: 400 })
@@ -53,6 +53,7 @@ export async function POST(request: Request) {
                 name,
                 role,
                 pin: pin || '0000',
+                icon: icon || 'star',
                 points: 0, // Start with 0 points
                 familyId: targetFamilyId,
                 userId: session.user.id

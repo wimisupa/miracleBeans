@@ -7,6 +7,7 @@ type Member = {
     name: string
     role: string
     points: number
+    icon?: string | null
     familyId?: string | null
 }
 
@@ -44,7 +45,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
 
     const validateSession = async (member: Member) => {
         try {
-            const res = await fetch(`/api/members?familyId=${member.familyId}`)
+            const res = await fetch(`/api/members?familyId=${member.familyId}`, { cache: 'no-store' })
             const members = await res.json()
             const exists = members.find((m: Member) => m.id === member.id)
             if (exists) {

@@ -28,6 +28,7 @@ model Member {
   role   String // e.g., "HEAD", "MEMBER" (Using Parent / Child conceptually)
   pin    String // 4-digit PIN
   points Int    @default(0) // Centralized points
+  icon   String? // e.g., "star", "heart", "dog", etc.
 
   familyId String? // Optional initially if a user creates profile before family
   family   Family? @relation(fields: [familyId], references: [id], onDelete: Cascade)

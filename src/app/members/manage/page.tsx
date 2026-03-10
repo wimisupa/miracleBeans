@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, Trash2, Save, Edit2, X, Settings } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
+import { ProfileIconPicker, ProfileIconDisplay } from '@/components/ProfileIcons'
 
 type Member = {
     id: string
@@ -11,6 +12,7 @@ type Member = {
     role: string
     pin: string
     points: number
+    icon?: string | null
 }
 
 function ManageMembersContent() {
@@ -18,7 +20,7 @@ function ManageMembersContent() {
     const { currentMember } = useMember()
     const [members, setMembers] = useState<Member[]>([])
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [editFormData, setEditFormData] = useState({ name: '', role: '', pin: '' })
+    const [editFormData, setEditFormData] = useState({ name: '', role: '', pin: '', icon: 'star' })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [memberToDelete, setMemberToDelete] = useState<Member | null>(null)
 
@@ -29,7 +31,7 @@ function ManageMembersContent() {
     const fetchMembers = async () => {
         if (!activeFamilyId) return;
         try {
-            const res = await fetch(`/api/members?familyId=${activeFamilyId}`)
+            const res = await fetch(`/api/members?familyId=${activeFamilyId}`, { cache: 'no-store' })
             const data = await res.json()
             setMembers(data)
         } catch (err) {
@@ -48,13 +50,14 @@ function ManageMembersContent() {
         setEditFormData({
             name: member.name,
             role: member.role,
-            pin: member.pin
+            pin: member.pin,
+            icon: member.icon || 'star'
         })
     }
 
     const handleCancelEdit = () => {
         setEditingId(null)
-        setEditFormData({ name: '', role: '', pin: '' })
+        setEditFormData({ name: '', role: '', pin: '', icon: 'star' })
     }
 
     const handleSaveEdit = async (id: string) => {
@@ -73,6 +76,13 @@ function ManageMembersContent() {
 
                 // If logged in user updated their own info, reload to update context
                 if (currentMember?.id === id) {
+                    const saved = localStorage.getItem('miracle_po_member');
+                    if (saved) {
+                        try {
+                            const parsed = JSON.parse(saved);
+                            localStorage.setItem('miracle_po_member', JSON.stringify({ ...parsed, ...editFormData }));
+                        } catch (e) { }
+                    }
                     location.reload()
                 }
             } else {
@@ -211,6 +221,13 @@ function ManageMembersContent() {
                                         </div>
                                     </div>
                                     <div>
+                                        <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-main)', marginBottom: '8px', fontWeight: 'bold' }}>프로필 아이콘</label>
+                                        <ProfileIconPicker
+                                            selected={editFormData.icon}
+                                            onSelect={(icon) => setEditFormData({ ...editFormData, icon })}
+                                        />
+                                    </div>
+                                    <div>
                                         <label className="label" style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-main)', marginBottom: '4px', fontWeight: 'bold' }}>비밀번호 변경</label>
                                         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '8px' }}>새로운 4자리 숫자를 입력하세요.</p>
                                         <input
@@ -242,11 +259,11 @@ function ManageMembersContent() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{
                                             width: '40px', height: '40px', borderRadius: '50%',
-                                            background: member.role === 'PARENT' ? 'var(--bg-main)' : 'var(--bg-main)',
-                                            border: '1px solid var(--border-light)',
+                                            background: member.role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-main)',
+                                            border: member.role === 'CHILD' ? '1px solid var(--border-light)' : 'none',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem'
                                         }}>
-                                            {member.role === 'PARENT' ? '🪄' : '🧙'}
+                                            <ProfileIconDisplay name={member.icon || (member.role === 'PARENT' ? 'star' : 'star')} size={24} color={member.role === 'PARENT' ? '#FFFFFF' : 'var(--color-text-main)'} />
                                         </div>
                                         <div>
                                             <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-text-main)' }}>{member.name}</h3>

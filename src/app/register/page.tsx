@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Link, Sparkles, UserPlus, Sprout, ChevronLeft } from 'lucide-react'
 import { useMember } from '@/context/MemberContext'
+import { ProfileIconPicker } from '@/components/ProfileIcons'
 
 function RegisterForm() {
     const router = useRouter()
@@ -12,6 +13,7 @@ function RegisterForm() {
 
     const [name, setName] = useState('')
     const [role, setRole] = useState<'PARENT' | 'CHILD'>('CHILD')
+    const [icon, setIcon] = useState('star')
     const [pin, setPin] = useState('')
     const [loading, setLoading] = useState(false)
     const { currentMember, login } = useMember()
@@ -30,7 +32,7 @@ function RegisterForm() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, role, pin, familyId }),
+                body: JSON.stringify({ name, role, pin, familyId, icon }),
             })
 
             if (res.ok) {
@@ -135,6 +137,12 @@ function RegisterForm() {
                                 <span>부모</span>
                             </button>
                         </div>
+                    </div>
+
+                    <div style={{ marginBottom: '2.5rem' }}>
+                        <label className="label">프로필 아이콘</label>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>나를 표현할 손그림 아이콘을 골라주세요.</p>
+                        <ProfileIconPicker selected={icon} onSelect={setIcon} />
                     </div>
 
                     <div style={{ marginBottom: '2.5rem' }}>

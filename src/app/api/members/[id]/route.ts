@@ -14,7 +14,7 @@ export async function PUT(
         }
 
         const body = await request.json();
-        const { name, role, pin } = body;
+        const { name, role, pin, icon } = body;
 
         if (!name || !role || !pin) {
             return NextResponse.json({ error: 'Name, role, and pin are required' }, { status: 400 });
@@ -22,7 +22,7 @@ export async function PUT(
 
         const updatedMember = await prisma.member.update({
             where: { id: memberId },
-            data: { name, role, pin }
+            data: { name, role, pin, icon }
         });
 
         return NextResponse.json(updatedMember);

@@ -6,6 +6,7 @@ import { Plus, Trophy, ClipboardCheck, ListTodo, Sprout, Calendar, Clock, Timer,
 import { useMember } from '@/context/MemberContext'
 import { useRouter } from 'next/navigation'
 import TodoTasksList from '@/components/TodoTasksList'
+import { ProfileIconDisplay } from '@/components/ProfileIcons'
 
 type Member = {
   id: string
@@ -13,6 +14,7 @@ type Member = {
   role: string
   points: number
   pin: string
+  icon?: string | null
 }
 
 export default function Dashboard({ params }: { params: Promise<{ id: string }> }) {
@@ -33,7 +35,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     if (familyId) {
-      fetch(`/api/families/${familyId}`)
+      fetch(`/api/families/${familyId}`, { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
           if (!data.error) {
@@ -47,7 +49,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     if (!currentMember?.familyId) return
-    fetch(`/api/tasks?familyId=${currentMember.familyId}`).then(res => res.json()).then(tasks => {
+    fetch(`/api/tasks?familyId=${currentMember.familyId}`, { cache: 'no-store' }).then(res => res.json()).then(tasks => {
       setPendingCount(tasks.filter((t: any) => t.status === 'PENDING').length)
     })
   }, [currentMember?.familyId])
@@ -232,40 +234,44 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
                 className="card reward-hover"
                 onClick={() => handleMemberClick(member)}
                 style={{
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
+                  display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
                   textDecoration: 'none', color: 'inherit', cursor: 'pointer',
-                  padding: '1rem 0.5rem', marginBottom: 0,
+                  padding: '0.8rem 0.5rem', marginBottom: 0,
                   background: 'var(--bg-card)',
                   borderRadius: 'var(--radius-sm)'
                 }}>
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: member.role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-main)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '0.5rem',
-                    fontSize: '1.2rem',
-                    boxShadow: 'var(--shadow-sm)',
-                    border: member.role === 'CHILD' ? '1px solid var(--border-light)' : 'none'
-                  }}
-                >
-                  {member.role === 'PARENT' ? '🪄' : '🧙'}
+                {/* First Line: Avatar and Name */}
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px', marginBottom: '0.4rem', width: '100%' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: member.role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-main)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1rem',
+                      boxShadow: 'var(--shadow-sm)',
+                      flexShrink: 0,
+                      border: member.role === 'CHILD' ? '1px solid var(--border-light)' : 'none'
+                    }}
+                  >
+                    <ProfileIconDisplay name={member.icon || 'star'} size={20} color={member.role === 'PARENT' ? '#FFFFFF' : 'var(--color-text-main)'} />
+                  </div>
+                  <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-main)', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {member.name}
+                  </h3>
                 </div>
 
-                <h3 style={{ margin: '0 0 0.4rem 0', fontSize: '0.9rem', color: 'var(--color-text-main)', fontWeight: 'bold', wordBreak: 'keep-all' }}>
-                  {member.name}
-                </h3>
-
+                {/* Second Line: Points Info */}
                 <div style={{
-                  fontSize: '0.85rem', fontWeight: '900',
+                  fontSize: '0.75rem', fontWeight: '900',
                   color: 'var(--color-text-main)',
                   background: 'var(--color-primary)',
                   padding: '2px 8px',
-                  borderRadius: '8px'
+                  borderRadius: 'var(--radius-sm)',
+                  alignSelf: 'flex-start'
                 }}>
                   {member.points.toLocaleString()} 콩
                 </div>
