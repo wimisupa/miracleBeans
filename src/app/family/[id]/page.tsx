@@ -157,20 +157,26 @@ export default function FamilyMemberSelectionPage({ params }: { params: Promise<
                             >
                                 {/* First Line: Avatar and Name */}
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px', marginBottom: '0.4rem', width: '100%' }}>
-                                    <div
-                                        style={{
-                                            width: '32px', height: '32px', borderRadius: '50%',
-                                            background: member.role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-main)',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontSize: '1rem', boxShadow: 'var(--shadow-sm)', flexShrink: 0,
-                                            border: member.role === 'CHILD' ? '1px solid var(--border-light)' : 'none'
-                                        }}
-                                    >
-                                        <ProfileIconDisplay name={member.icon || 'dog'} size={20} color={member.role === 'PARENT' ? '#FFFFFF' : 'var(--color-text-main)'} />
-                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '1rem'
+                                    }}>
+                                        <div style={{
+                                            width: '36px',
+                                            height: '36px',
+                                            borderRadius: '50%',
+                                            background: member.role === 'PARENT' ? 'rgba(255, 202, 40, 0.3)' : 'var(--bg-main)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                        <ProfileIconDisplay name={member.icon || 'dog'} size={20} color={member.role === 'PARENT' ? 'var(--color-text-main)' : 'var(--color-text-main)'} />
+                                        </div>
                                     <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-main)', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                         {member.name}
                                     </h3>
+                                    </div>
                                 </div>
 
                                 {/* Second Line: Role Info & Actions */}

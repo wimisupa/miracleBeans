@@ -247,7 +247,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
                       width: '32px',
                       height: '32px',
                       borderRadius: '50%',
-                      background: member.role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-main)',
+                      background: member.role === 'PARENT' ? 'rgba(255, 202, 40, 0.3)' : 'var(--bg-main)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -257,7 +257,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
                       border: member.role === 'CHILD' ? '1px solid var(--border-light)' : 'none'
                     }}
                   >
-                    <ProfileIconDisplay name={member.icon || 'star'} size={20} color={member.role === 'PARENT' ? '#FFFFFF' : 'var(--color-text-main)'} />
+                    <ProfileIconDisplay name={member.icon || 'star'} size={20} color={member.role === 'PARENT' ? 'var(--color-text-main)' : 'var(--color-text-main)'} />
                   </div>
                   <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-main)', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {member.name}

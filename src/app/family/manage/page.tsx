@@ -290,13 +290,13 @@ export default function FamilyManagePage() {
                                     <div
                                         style={{
                                             width: '40px', height: '40px', borderRadius: '50%',
-                                            background: member.role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-card)',
+                                            background: member.role === 'PARENT' ? 'rgba(255, 202, 40, 0.3)' : 'var(--bg-card)',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             boxShadow: 'var(--shadow-sm)',
                                             border: member.role === 'CHILD' ? '2px solid var(--border-light)' : 'none'
                                         }}
                                     >
-                                        <ProfileIconDisplay name={member.icon || 'star'} size={24} color={member.role === 'PARENT' ? '#FFFFFF' : 'var(--color-text-main)'} />
+                                        <ProfileIconDisplay name={member.icon || 'star'} size={24} color={member.role === 'PARENT' ? 'var(--color-text-main)' : 'var(--color-text-main)'} />
                                     </div>
                                     <div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>

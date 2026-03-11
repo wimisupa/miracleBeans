@@ -258,12 +258,16 @@ function ManageMembersContent() {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{
-                                            width: '40px', height: '40px', borderRadius: '50%',
-                                            background: member.role === 'PARENT' ? 'var(--color-primary)' : 'var(--bg-main)',
-                                            border: member.role === 'CHILD' ? '1px solid var(--border-light)' : 'none',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem'
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '50%',
+                                            background: member.role === 'PARENT' ? 'rgba(255, 202, 40, 0.3)' : 'var(--bg-main)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0
                                         }}>
-                                            <ProfileIconDisplay name={member.icon || (member.role === 'PARENT' ? 'star' : 'star')} size={24} color={member.role === 'PARENT' ? '#FFFFFF' : 'var(--color-text-main)'} />
+                                            <ProfileIconDisplay name={member.icon || (member.role === 'PARENT' ? 'star' : 'star')} size={24} color={member.role === 'PARENT' ? 'var(--color-text-main)' : 'var(--color-text-main)'} />
                                         </div>
                                         <div>
                                             <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-text-main)' }}>{member.name}</h3>
