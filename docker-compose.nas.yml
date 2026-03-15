@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  miracle-point:
+    image: ghcr.io/myshpapa/ohmycong:latest
+    container_name: miracle-point-prod
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Use a relative directory for data instead of user home
+      - ./data/miraclePoint:/data
+    environment:
+      - DATABASE_URL=file:/data/prod.db
+      - NODE_ENV=production
+    env_file:
+      - .env.production
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: miracle-point-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data/caddy-data:/data
+      - ./data/caddy-config:/config
+    depends_on:
+      - miracle-point
