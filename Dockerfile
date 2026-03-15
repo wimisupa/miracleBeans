@@ -54,13 +54,15 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # We also need the prisma client to run the migrations
 COPY --from=builder /app/prisma ./prisma
+COPY scripts/entrypoint.sh ./scripts/entrypoint.sh
 
+USER root
+RUN chmod +x ./scripts/entrypoint.sh
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT 3000
 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["node", "server.js"]
+# Use the entrypoint script to run migrations and start the server
+CMD ["./scripts/entrypoint.sh"]
