@@ -48,6 +48,22 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No family available to assign to' }, { status: 400 })
         }
 
+        // Validate that the family exists
+        const familyExists = await prisma.family.findUnique({ where: { id: targetFamilyId } })
+        if (!familyExists) {
+            return NextResponse.json({ error: `Family with ID ${targetFamilyId} not found` }, { status: 400 })
+        }
+
+        // Validate that the user exists in the DB
+        const userExists = await prisma.user.findUnique({ where: { id: session.user.id } })
+        if (!userExists) {
+            console.warn(`User ${session.user.id} not found in DB. Session might be stale.`)
+            return NextResponse.json({ 
+                error: '사용자 정보를 DB에서 찾을 수 없습니다. 로그아웃 후 다시 로그인해 주세요.',
+                code: 'USER_NOT_FOUND' 
+            }, { status: 401 })
+        }
+
         const member = await prisma.member.create({
             data: {
                 name,
