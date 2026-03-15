@@ -19,98 +19,101 @@ type Member = {
 
 export default function Dashboard({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
-  const { currentMember } = useMember()
-  const [members, setMembers] = useState<Member[]>([])
-  const [pendingCount, setPendingCount] = useState(0)
-  const [familyId, setFamilyId] = useState<string | null>(null)
+    const { currentMember, logout } = useMember()
+    const [members, setMembers] = useState<Member[]>([])
+    const [pendingCount, setPendingCount] = useState(0)
+    const [familyId, setFamilyId] = useState<string | null>(null)
 
-  // Family State
-  const [family, setFamily] = useState<{ name: string, motto: string | null, location: string | null } | null>(null)
+    // Family State
+    const [family, setFamily] = useState<{ name: string, motto: string | null, location: string | null } | null>(null)
 
-  useEffect(() => {
-    params.then(p => {
-      setFamilyId(p.id)
-    })
-  }, [params])
-
-  useEffect(() => {
-    if (familyId) {
-      fetch(`/api/families/${familyId}`, { cache: 'no-store' })
-        .then(res => res.json())
-        .then(data => {
-          if (!data.error) {
-            setFamily(data)
-            setMembers(data.members || [])
-          }
+    useEffect(() => {
+        params.then(p => {
+            setFamilyId(p.id)
         })
-        .catch(console.error)
+    }, [params])
+
+    useEffect(() => {
+        if (familyId) {
+            fetch(`/api/families/${familyId}`, { cache: 'no-store' })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.error) {
+                        setFamily(data)
+                        setMembers(data.members || [])
+                    }
+                })
+                .catch(console.error)
+        }
+    }, [familyId])
+
+    useEffect(() => {
+        if (!currentMember?.familyId) return
+        fetch(`/api/tasks?familyId=${currentMember.familyId}`, { cache: 'no-store' }).then(res => res.json()).then(tasks => {
+            setPendingCount(tasks.filter((t: any) => t.status === 'PENDING').length)
+        })
+    }, [currentMember?.familyId])
+
+    const handleMemberClick = (member: Member) => {
+        // Navigate directly to history regardless of user
+        router.push(`/history/${member.id}`)
     }
-  }, [familyId])
 
-  useEffect(() => {
-    if (!currentMember?.familyId) return
-    fetch(`/api/tasks?familyId=${currentMember.familyId}`, { cache: 'no-store' }).then(res => res.json()).then(tasks => {
-      setPendingCount(tasks.filter((t: any) => t.status === 'PENDING').length)
-    })
-  }, [currentMember?.familyId])
-
-  const handleMemberClick = (member: Member) => {
-    // Navigate directly to history regardless of user
-    router.push(`/history/${member.id}`)
-  }
+    const handleLogout = () => {
+        if (confirm('현재 구성원 모드에서 나가시겠습니까?')) {
+            logout()
+            router.push(`/family/${familyId}`)
+        }
+    }
 
 
-  return (
-    <main>
-      <header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
-            <Users size={32} color="var(--color-primary)" />
-            <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
-              {family?.name}
-            </span>
-          </div>
-        </div>
-        {currentMember && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              padding: '6px 12px',
-              background: 'var(--bg-card)',
-              borderRadius: 'var(--radius-full)',
-              border: '1px solid var(--border-light)',
-              boxShadow: 'var(--shadow-sm)'
-            }}>
-              <span style={{ fontSize: '0.9rem', color: 'var(--color-text-main)' }}>
-                <span style={{ fontWeight: 'bold' }}>{currentMember.name}</span>님
-              </span>
-            </div>
-            <button
-              onClick={() => {
-                // Logout logic (clearing local storage & route to selection)
-                localStorage.removeItem('miracle_po_member');
-                window.location.href = `/family/${currentMember.familyId}`;
-              }}
-              style={{
-                background: 'var(--bg-card)',
-                borderRadius: '50%',
-                width: '36px', height: '36px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--color-accent)',
-                border: '1px solid var(--border-light)',
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'transform 0.2s',
-                cursor: 'pointer'
-              }}
-              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
-              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
-          </div>
-        )}
-      </header>
+    return (
+        <main>
+            <header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-main)', gap: '8px' }}>
+                        <Users size={32} color="var(--color-primary)" />
+                        <span className="text-playful" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em' }}>
+                            {family?.name}
+                        </span>
+                    </div>
+                </div>
+                {currentMember && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '6px',
+                            padding: '6px 12px',
+                            background: 'var(--bg-card)',
+                            borderRadius: 'var(--radius-full)',
+                            border: '1px solid var(--border-light)',
+                            boxShadow: 'var(--shadow-sm)'
+                        }}>
+                            <span style={{ fontSize: '0.9rem', color: 'var(--color-text-main)' }}>
+                                <span style={{ fontWeight: 'bold' }}>{currentMember.name}</span>님
+                            </span>
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            style={{
+                                background: 'var(--bg-card)',
+                                borderRadius: '50%',
+                                width: '36px', height: '36px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: 'var(--color-accent)',
+                                border: '1px solid var(--border-light)',
+                                boxShadow: 'var(--shadow-sm)',
+                                transition: 'transform 0.2s',
+                                cursor: 'pointer'
+                            }}
+                            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+                            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        </button>
+                    </div>
+                )}
+            </header>
 
       <section className="card" style={{ padding: '2rem', marginBottom: '2rem', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '1rem' }}>

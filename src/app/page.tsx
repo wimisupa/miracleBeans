@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Sprout, Plus, Users, LogIn } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useMember } from '@/context/MemberContext'
-import { useSession, signIn } from 'next-auth/react'
+import { useSession, signIn, signOut } from 'next-auth/react'
 
 type Family = {
     id: string
@@ -54,11 +54,31 @@ export default function Home() {
 
     return (
         <main>
-            <header className="header" style={{ display: 'flex', justifyContent: 'center', paddingTop: '2.5rem' }}>
+            <header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1.5rem', marginBottom: '1rem' }}>
                 <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Sprout size={36} color="var(--color-primary)" />
-                    <span className="text-playful" style={{ fontSize: '2.2rem', color: 'var(--color-text-main)' }}>오마이콩</span>
+                    <Sprout size={32} color="var(--color-primary)" />
+                    <span className="text-playful" style={{ fontSize: '1.8rem', color: 'var(--color-text-main)' }}>오마이콩</span>
                 </div>
+                {status === 'authenticated' && (
+                    <button
+                        onClick={() => signOut()}
+                        style={{
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-light)',
+                            padding: '8px 12px',
+                            borderRadius: 'var(--radius-full)',
+                            fontSize: '0.85rem',
+                            color: 'var(--color-text-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            cursor: 'pointer',
+                            boxShadow: 'var(--shadow-sm)'
+                        }}
+                    >
+                        로그아웃
+                    </button>
+                )}
             </header>
 
             <section>
