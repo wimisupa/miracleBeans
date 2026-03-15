@@ -62,6 +62,10 @@ export async function POST(request: Request) {
 
         return NextResponse.json(member)
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to create member' }, { status: 500 })
+        console.error('Error creating member:', error)
+        return NextResponse.json({ 
+            error: 'Failed to create member',
+            details: error instanceof Error ? error.message : String(error)
+        }, { status: 500 })
     }
 }

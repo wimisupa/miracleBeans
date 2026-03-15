@@ -49,7 +49,8 @@ function RegisterForm() {
                 }
                 router.refresh()
             } else {
-                alert('등록에 실패했습니다.')
+                const errorData = await res.json().catch(() => ({ error: '알 수 없는 오류가 발생했습니다.' }))
+                alert(`등록에 실패했습니다: ${errorData.error || errorData.details || '서버 오류'}`)
             }
         } catch (error) {
             console.error(error)
