@@ -1,33 +1,39 @@
 ---
-description: Deploy changes to production (v1.x.x)
+description: Deploy changes to Intel iMac Production Server
 ---
 
-This workflow automates the deployment process for the production environment using Docker directly from the `miraclePoint` main folder.
+This workflow automates the deployment process for the Intel iMac production environment.
 
 **Prerequisites:**
-- You must be in the `miraclePoint` folder.
-- Docker Desktop must be running.
+- Access to the Intel iMac (via SSH or terminal).
+- Changes have been committed and pushed to the `main` branch on GitHub.
 
-## The Workflow (Docker Native)
+## The Workflow (Intel iMac)
 
-Now that the application is containerized, you **no longer need** the separate `miraclePoint-prod` directory. Both development and production deployments can be managed elegantly from your main `miraclePoint` repository.
+The deployment now uses a single script on the iMac that pulls the latest code and rebuilds the Docker containers. Database migrations are applied automatically during container startup.
 
-1.  **Tag the Release:**
-    - Test your features locally in dev (`npm run dev`).
-    - Once satisfied, commit your changes.
-    - Run `git tag -a <tag> -m "Release <tag>"`
-    - Run `git push --follow-tags origin main`
+1.  **Tag and Push (Local Machine):**
+    - Ensure your changes are tested and committed.
+    - Run `git push origin main`
 
-2.  **Deploy to Production:**
-    - Production now runs inside an isolated Docker container cluster, routing traffic through Caddy for HTTPS.
-    - Run `mkdir -p ~/miraclePoint-data ~/caddy-data ~/caddy-config` (Ensure the external SQLite and Caddy volumes exist)
-    - Run `docker-compose build` (Builds the Next.js `standalone` image using the latest committed code)
-    - Run `docker-compose up -d --force-recreate` (Re-creates the containers with zero downtime mapping `https://ohmycong.wimi.com` to Port 443)
-    - Run `docker exec miracle-point-prod npx prisma@5.22.0 db push --skip-generate` (Applies schema updates to the isolated `~/miraclePoint-data/prod.db`)
+2.  **Deploy on iMac:**
+    - Open the terminal on the Intel iMac (or SSH into it).
+    - Navigate to the project directory: `cd ~/Workspaces/miraclePoint`
+    - Run the deployment script:
+    // turbo
+    - `bash scripts/deploy-imac.sh`
 
-3.  **Verify:**
-    - Navigate to `https://ohmycong.wimi.com` to verify the production instance is safely encrypted and healthy.
+3.  **Automatic Steps (Handled by Script/Docker):**
+    - The script will pull the latest code: `git pull origin main`
+    - Containers will rebuild and start: `docker-compose up -d --build`
+    - **Migrations:** The `entrypoint.sh` inside the container automatically runs `npx prisma migrate deploy` before the server starts.
+
+4.  **Verify:**
+    - Check the logs to ensure migrations and startup were successful:
+    - `docker-compose logs -f miracle-point`
+    - Visit `https://ohmycong.wimi.com` to verify the site is live.
 
 ---
 **How to Run:**
-Just ask: "Run the deploy workflow" or "배포 워크플로우 실행해줘".
+Just ask: "배포 워크플로우 실행해줘" or "아이맥에 배포해줘".
+
